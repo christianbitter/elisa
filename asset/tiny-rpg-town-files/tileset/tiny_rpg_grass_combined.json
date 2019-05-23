@@ -1,0 +1,21 @@
+{ "columns":1,
+ "grid":
+    {
+     "height":96,
+     "orientation":"orthogonal",
+     "width":96
+    },
+ "image":"grass-tile.png",
+ "imageheight":48,
+ "imagewidth":48,
+ "margin":0,
+ "name":"tiny_rpg_grass_combined",
+ "spacing":0,
+ "tilecount":1,
+ "tiledversion":"1.2.3720",
+ "tileheight":48,
+ "tilewidth":48,
+ "transparentcolor":"#ff00ff",
+ "type":"tileset",
+ "version":1.2
+}
