@@ -83,3 +83,11 @@ class StateMachine(object):
 
         if firing_transition:
             self._current_state = firing_transition.to_state
+
+    @property
+    def transitions(self):
+        return self._transitions
+
+    @property
+    def states(self):
+        return self._states

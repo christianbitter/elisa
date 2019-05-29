@@ -1,7 +1,7 @@
 # auth: christian bitter
 # desc: create a simple map showing some environment for elisa to move in.
 
-import os, sys
+import os
 import pygame
 from pygame.locals import *
 import json
