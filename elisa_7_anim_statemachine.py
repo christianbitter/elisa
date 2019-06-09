@@ -4,15 +4,15 @@
 #       that is, moving right, will move the player right until an imaginary wall is hit
 #           TODO: we may need to think about animation timings, i.e.
 #                 instead of simply looping through the frames, we may need to define sequence of frames
+#                 and bundle this as an animation
 #           TODO: the coupling between state machine and sprite is to tight
 
 from pygame.locals import *
 from sm import *
-from sprites import *
+from sprites import SpriteMap, PSprite
 import os
 import pygame
 
-# TODO: elisa_6 - animation state machine
 
 class Elisa(pygame.sprite.Sprite):
     def __init__(self, sm:StateMachine, pos):

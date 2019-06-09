@@ -161,3 +161,47 @@ class SpriteMap(object):
     @property
     def no_sprites(self):
         return self._no_sprites
+
+
+class SpriteAssetManager(object):
+    """"""
+
+    def __init__(self):
+        """Constructor for AssetManager"""
+        super(SpriteAssetManager, self).__init__()
+        self._assets = {}
+
+    def __repr__(self):
+        return "Registered Assets ({}): {}".format(len(self._assets), self._assets.keys())
+
+    def add_sprite_map(self, name:str, metadata_fp:str, initialize:bool = True):
+        if not name: raise ValueError('name not provided')
+        if not metadata_fp: raise ValueError('metadata file not provided')
+        if name in self._assets: raise ValueError('asset already registered')
+        if not os.path.exists(metadata_fp): raise ValueError('metadata file does not exist')
+
+        self._assets[name] = SpriteMap(metadata_fp)
+        if initialize:
+            self._assets[name].initialize()
+
+    def get_sprite(self, sprite_map_name:str, sprite:str = None):
+        if not sprite_map_name:
+            raise ValueError("Asset cannot be none")
+        if sprite_map_name not in self._assets:
+            raise ValueError("Unknown asset '{}'".format(sprite_map_name))
+        sm = self._assets[sprite_map_name]
+        if not sprite:
+            return sm
+        if sprite not in sm:
+            raise ValueError("Undefined sprite '{}' selected".format(sprite))
+        return sm[sprite]
+
+    def initialize(self, name:str = None):
+        if not name:
+            for a in self._assets:
+                if not a.initialized:
+                    a.initialize()
+        else:
+            if name not in self._assets: raise ValueError('not an asset')
+            if not self._assets[name].initialized:
+                self._assets[name].initialize()
