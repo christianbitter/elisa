@@ -65,6 +65,10 @@ class PSprite(object):
         return self._image
 
     @property
+    def as_sprite(self):
+        return self._image
+
+    @property
     def width(self):
         return self._width
 
@@ -90,6 +94,7 @@ class SpriteMap(object):
         self._image = None
         self._sprites = {}
         self._idx2key = []
+        self._sprite_names = []
 
     @property
     def initialized(self):
@@ -144,6 +149,8 @@ class SpriteMap(object):
 
             if self._no_sprites > 0 and self._no_sprites != len(self._sprites):
                 raise ValueError("Number of defined sprites does not match declared sprites")
+
+            self._sprite_names = [k for k, v in self._sprites.items()]
             self._initialized = True
 
     def __getitem__(self, item):
@@ -157,6 +164,10 @@ class SpriteMap(object):
                 return self._sprites[item]
 
         raise ValueError("SpriteMap.get - undefined sprite selected")
+
+    @property
+    def sprite_names(self):
+        return self._sprite_names
 
     @property
     def no_sprites(self):

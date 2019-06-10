@@ -9,6 +9,8 @@
 
 import pygame
 from enum import Enum, IntFlag
+from sprites import SpriteMap
+
 
 def xy_inside(x:int, y:int, x0:int, y0:int, w:int, h:int) -> bool:
     return x0 <= x <= x0 + w and y0 <= y <= y0 + h
@@ -22,8 +24,8 @@ class FillStyle(Enum):
 
 class TextAlign(Enum):
     Center = 0
-    Left=1
-    Right=2
+    Left = 1
+    Right = 2
 
 
 class FontStyle(IntFlag):
@@ -46,11 +48,10 @@ class UIElement(object):
         self._h = h
         self._x1 = None
         self._y1 = None
-        if x and w:
+        if self._x0 is not None and self._w is not None:
             self._x1 = x + w
-        if y and h:
+        if self._y0 is not None and self._h is not None:
             self._y1 = y + h
-        print("{} :=> x,y,w,h,x1,y1: {}, {}, {}, {}".format(self._name, self._x0, self._y0, self._w, self._h, self._x1, self._y1))
 
     @property
     def name(self):
@@ -77,7 +78,7 @@ class UIElement(object):
     def y(self, y:int):
         if not y:
             raise ValueError("y")
-        if x < 0:
+        if y < 0:
             raise ValueError("y < 0")
         self._y0 = y
         self._y1 = self._y0 + self._h
@@ -101,6 +102,8 @@ class UIElement(object):
 
     @height.setter
     def height(self, h: int = None):
+        if not h:
+            raise ValueError("h")
         if h < 0:
             raise ValueError("h < 0")
         self._h = h
@@ -137,7 +140,8 @@ class Renderable(UIElement):
 
         self._text_caption = None
         self._text_bounds = None
-        if self._caption:
+
+        if self._caption is not None:
             self._text_caption = self._font.render(self._caption, 1, self._font_colour)
             self._text_bounds = self._text_caption.get_rect()
             # we add a safety buffer around the text bounds to allow for the real bounds
@@ -168,12 +172,15 @@ class Renderable(UIElement):
         return self._show_border
 
     def render(self, buffer):
+        r = pygame.Rect(self._x0, self._y0, self._w, self._h)
         if self._fill_style == FillStyle.Colour:
-            r = pygame.Rect(self._x0, self._y0, self._w, self._h)
             pygame.draw.rect(buffer, self._background_colour, r, 0)
         elif self._fill_style == FillStyle.Image:
-            # TODO: support image as background in ui element - scaled to the appropriate dimensions if provided
-            pass
+            if not self._background_image:
+                raise ValueError("background fill image but image not provided")
+
+            scaled_bgimg = pygame.transform.scale(self._background_image.image, (self._w, self._h))
+            buffer.blit(scaled_bgimg, dest=(self._x0, self._y0, self._w, self._h))
         else:
             pass
 
@@ -191,7 +198,6 @@ class Clickable(Renderable):
     def __init__(self, name, x: int = None, y: int = None, w: int = None, h: int = None, **kwargs):
         """Constructor for Clickable"""
         super().__init__(name, x=x, y=y, w=w, h=h, **kwargs)
-        # TODO: print("KWARGS: ", kwargs)
         self._is_clicked = False
 
     def unclick(self):
@@ -244,52 +250,82 @@ class Button(Clickable):
 
 class MenuItem(Button):
     """"""
-    def __init__(self, name:str, caption:str, **kwargs):
+    def __init__(self, name:str, caption: str, w:int = None, h: int = None, **kwargs):
         """Constructor for MenuItem"""
-        super().__init__(name=name, caption=caption, x=0, y=0, **kwargs)
-        print("MenuItem {} = x,y,w,h,x1,y1: {}, {}, {}, {}".format(name, self._x0, self._y0, self._w, self._h, self._x1, self._y1))
+        super().__init__(name=name, caption=caption, x=0, y=0, w=w, h=h, **kwargs)
 
 
 class Menu(Clickable):
     """"""
+    MENU_ITEM_INNER_MARGIN = 3
 
     def __init__(self, name, caption, x, y, **kwargs):
         """Constructor for Menu"""
         super().__init__(name=name, x=x, y=y, w=5, h=5, **kwargs)
-        self._items = []
+        self._items = {}
+        self._item_names = []
 
-    def add_item(self, m:MenuItem):
+    def add_item(self, m: MenuItem):
+        """
+        Add a menu item to the existing menu items.
+        :param m: the menu item to add
+        """
         if not m:
             raise ValueError("No Item to add")
 
-        # TODO: placement of menu items is implicit, we have to remove the x, y from the item
-        # and place them in the container adjusting for potential previous items
-
+        i_margin = Menu.MENU_ITEM_INNER_MARGIN
         # adding a menu item causes a potential update to the dimensions
         # we ask for the bounds of the child item and add some safety buffer
         i_x0, i_y0, i_x1, i_y1 = m.get_bounds()
+        i_w, i_h = i_x1 - i_x0, i_y1 - i_y0
+
+        # where to start placing the item
+        i_x0, i_y0 = self._x0 + i_margin, self._y0 + i_margin
+        i_x1, i_y1 = i_margin + i_w, i_margin + i_h
+
+        if len(self._item_names) >= 1:
+            last_item = self._items[self._item_names[len(self._item_names) - 1]]
+            l_x0, _, _, l_y1 = last_item.get_bounds()
+            i_x0, i_x1 = l_x0, l_x0 + i_w
+            i_y0, i_y1 = l_y1 + 1, l_y1 + 1 + i_h
+
+        m.x = i_x0
+        m.y = i_y0
+
         x1, y1 = self._x0 + self._w, self._y0 + self._h
 
-        print("Add Menu Item <-> {} {}".format(m.name, m.get_bounds()))
-
-        if i_x0 < self._x0:
-            self._x0 = i_x0 - 5
-        if i_y0 < self._y0:
-            self._y0 = i_y0 - 5
+        # all menu items are placed inside the margins of the menu
         if i_x1 > x1:
-            self._w = i_x1 - self._x0 + 5
+            self._w = i_x1 - self._x0 + i_margin
         if i_y1 > y1:
-            self._h = i_y1 - self._y0 + 5
+            self._h = i_y1 - self._y0 + i_margin
 
-        self._items.append(m)
+        self._items[m.name] = m
+        self._item_names.append(m.name)
 
     @property
     def caption(self):
         return self._caption
 
     @property
+    def item_names(self):
+        return self._item_names
+
+    @property
     def items(self):
         return self._items
+
+    def __getitem__(self, item):
+        if item is None:
+            raise ValueError("getitem - key not provided")
+
+        if isinstance(item, int):
+            return self._items[self._item_names[item]]
+        else:
+            if item in self._items:
+                return self._items[item]
+
+        raise ValueError("SpriteMap.get - undefined sprite selected")
 
     @property
     def show_caption(self):
@@ -318,7 +354,7 @@ class Menu(Clickable):
         pygame.draw.rect(buffer, self._colour, r, 1)
 
         # render all the items
-        for m in self._items:
+        for _, m in self._items.items():
             m.render(buffer)
 
 
@@ -328,7 +364,7 @@ class GameScreen(Clickable):
         """Constructor for GameScreen"""
         super().__init__(name, x=0, y=0, w=width, h=height, **kwargs)
         self._title = title
-        self._ui_elements = []
+        self._components = {}
 
         self._initialize_components()
 
@@ -341,7 +377,7 @@ class GameScreen(Clickable):
     def render(self, buffer):
         buffer.fill(self._background_colour)
 
-        for ui_elem in self._ui_elements:
+        for _, ui_elem in self._components.items():
             if isinstance(ui_elem, Renderable):
                 ui_elem.render(buffer)
 
@@ -377,16 +413,24 @@ class MainScreen(GameScreen):
         self.screen_transition(self)
 
     def _initialize_components(self):
+        grass_sprite_map = SpriteMap("asset/tileset_grass.json")
+        grass_sprite_map.initialize()
+        img = grass_sprite_map['grass_2']
+
         main_menu = Menu('menuMain', caption='Main', show_caption=False, x=50, y=100)
         menu_next = MenuItem(name='menuItemNext', caption='Next',
                              font_size=28, font_colour=(255, 255, 255),
                              font_style=FontStyle.Bold | FontStyle.Italic | FontStyle.Underline)
         menu_next.on_click = self._menuitem_next_click
-
         main_menu.add_item(menu_next)
-        main_menu.add_item(MenuItem(name='menuItemCredits', caption='Credits',
-                                    font_size=28, font_colour=(255, 128, 64)))
-        self._ui_elements.append(main_menu)
+
+        main_menu.add_item(MenuItem(name='menuItemCredits', caption='Credits', font_size=28, font_colour=(255, 128, 64)))
+
+        main_menu.add_item(MenuItem(name='menuItemGFX', caption='', font_size=28, font_colour=(255, 128, 64),
+                                    background_image = img, show_border=True, fill_style=FillStyle.Image,
+                                    w=main_menu["menuItemCredits"].width, h=main_menu["menuItemCredits"].height
+                                    ))
+        self._components[main_menu.name] = main_menu
 
     def render(self, buffer):
         GameScreen.render(self, buffer)
@@ -410,7 +454,7 @@ class NextScreen(GameScreen):
         buttonBack = Button('buttonBack', 'back', x=300, y=200, # w=100, h=32, - the alignment is not fixed
                             background_colour=(92, 92, 92), fill_style=FillStyle.Colour)
         buttonBack.on_click = self._button_back_click
-        self._ui_elements.append(buttonBack)
+        self._components[buttonBack.name] = buttonBack
 
     def render(self, buffer):
         GameScreen.render(self, buffer)
@@ -419,7 +463,7 @@ class NextScreen(GameScreen):
 
 def main():
 
-    if not pygame.font: print("Pygame - fonts not loaded")
+    if not pygame.font: raise("Pygame - fonts not loaded")
     if not pygame.mixer: print("Pygame - audio not loaded")
 
     # init pygame - create the main window, and a background surface

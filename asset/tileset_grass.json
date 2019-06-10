@@ -2,7 +2,7 @@
 	"id": "hero",
 	"description": "",
 	"source": "",
-	"image_path": "D:/Development/repos/Python/elisa/asset/tiny-rpg-town-files/tileset/all_grass_tile.png",
+	"image_path": "asset/tiny-rpg-town-files/tileset/all_grass_tile.png",
 	"width": 48,
 	"height": 48,
 	"no_sprites": 3,
