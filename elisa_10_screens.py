@@ -333,14 +333,14 @@ class Menu(Clickable):
 
     def unclick(self):
         Clickable.unclick(self)
-        for c in self._items:
+        for _, c in self._items.items():
             c.unclick()
 
     def clicked(self, mx, my, button):
         # we do not focus on the right button
         is_clicked, sender = Clickable.clicked(self, mx, my, button)
 
-        for c in self._items:
+        for _, c in self._items.items():
             is_clicked_i, sender_i = c.clicked(mx, my, button)
             if is_clicked_i:
                 is_clicked, sender = is_clicked_i, sender_i
@@ -383,7 +383,7 @@ class GameScreen(Clickable):
 
     def unclick(self):
         Clickable.unclick(self)
-        for c in self._components:
+        for _, c in self._components.items():
             c.unclick()
 
     def clicked(self, mx, my, button):
@@ -391,7 +391,7 @@ class GameScreen(Clickable):
         # if no child is clicked, see if we are clicked
         is_clicked, sender = Clickable.clicked(self, mx, my, button)
             
-        for c in self._components:
+        for _, c in self._components.items():
             is_clicked_i, sender_i = c.clicked(mx, my, button)
             if is_clicked_i:
                 is_clicked, sender = is_clicked_i, sender_i
