@@ -383,7 +383,7 @@ class GameScreen(Clickable):
 
     def unclick(self):
         Clickable.unclick(self)
-        for c in self._ui_elements:
+        for c in self._components:
             c.unclick()
 
     def clicked(self, mx, my, button):
@@ -391,7 +391,7 @@ class GameScreen(Clickable):
         # if no child is clicked, see if we are clicked
         is_clicked, sender = Clickable.clicked(self, mx, my, button)
             
-        for c in self._ui_elements:
+        for c in self._components:
             is_clicked_i, sender_i = c.clicked(mx, my, button)
             if is_clicked_i:
                 is_clicked, sender = is_clicked_i, sender_i
@@ -426,7 +426,7 @@ class MainScreen(GameScreen):
 
         main_menu.add_item(MenuItem(name='menuItemCredits', caption='Credits', font_size=28, font_colour=(255, 128, 64)))
 
-        main_menu.add_item(MenuItem(name='menuItemGFX', caption='', font_size=28, font_colour=(255, 128, 64),
+        main_menu.add_item(MenuItem(name='menuItemGFX', caption='GFX', font_size=28, font_colour=(0, 0, 0),
                                     background_image = img, show_border=True, fill_style=FillStyle.Image,
                                     w=main_menu["menuItemCredits"].width, h=main_menu["menuItemCredits"].height
                                     ))
