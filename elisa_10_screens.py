@@ -5,36 +5,52 @@
 # When a clickable is clicked, a specific ui state is issued (clicked).
 # When clicked the main entry, a new screen 'Next' loads. This screen has a single button 'back'.
 # If the user clicks the button, she will be transported back to main menu. This continues until the user quits.
-# TODO: support image as background in ui element - scaled to the appropriate dimensions if provided
-# TODO: allow for different font styles - bold, italic, underlined
+# A renderable can have a caption text. The text can be styled differently - bold, italic, underlined.
 
-import os, sys
 import pygame
-from pygame import locals
-from enum import Enum
-
+from enum import Enum, IntFlag
 
 def xy_inside(x:int, y:int, x0:int, y0:int, w:int, h:int) -> bool:
     return x0 <= x <= x0 + w and y0 <= y <= y0 + h
 
 
+class FillStyle(Enum):
+    Empty = 1
+    Colour = 2
+    Image  = 3
+
+
+class TextAlign(Enum):
+    Center = 0
+    Left=1
+    Right=2
+
+
+class FontStyle(IntFlag):
+    Normal = 0,
+    Bold = 1,
+    Italic = 2,
+    Underline = 8
+
+
 class UIElement(object):
     """"""
 
-    def __init__(self, name, x:int = None, y:int = None, w:int = None, h:int = None, **kwargs):
+    def __init__(self, name, x:int = None, y:int = None, w: int = None, h: int = None, **kwargs):
         """Constructor for UIElement"""
         super().__init__()
         self._name = name
         self._x0 = x
         self._y0 = y
+        self._w = w
+        self._h = h
         self._x1 = None
         self._y1 = None
         if x and w:
             self._x1 = x + w
         if y and h:
             self._y1 = y + h
-        self._w = w
-        self._h = h
+        print("{} :=> x,y,w,h,x1,y1: {}, {}, {}, {}".format(self._name, self._x0, self._y0, self._w, self._h, self._x1, self._y1))
 
     @property
     def name(self):
@@ -44,17 +60,51 @@ class UIElement(object):
     def x(self):
         return self._x0
 
+    @x.setter
+    def x(self, x:int):
+        if not x:
+            raise ValueError("x")
+        if x < 0:
+            raise ValueError("x < 0")
+        self._x0 = x
+        self._x1 = self._x0 + self._w
+
     @property
     def y(self):
         return self._y0
+
+    @y.setter
+    def y(self, y:int):
+        if not y:
+            raise ValueError("y")
+        if x < 0:
+            raise ValueError("y < 0")
+        self._y0 = y
+        self._y1 = self._y0 + self._h
 
     @property
     def width(self):
         return self._w
 
+    @width.setter
+    def width(self, w):
+        if not w:
+            raise ValueError("w")
+        if w < 0:
+            raise ValueError("w < 0")
+        self._w = w
+        self._x1 = self._x0 + w
+
     @property
     def height(self):
         return self._h
+
+    @height.setter
+    def height(self, h: int = None):
+        if h < 0:
+            raise ValueError("h < 0")
+        self._h = h
+        self._y1 = self._y0 + h
 
     def get_bounds(self):
         return self._x0, self._y0, self._x1, self._y1
@@ -63,27 +113,47 @@ class UIElement(object):
         return "UIElement: {} ({})".format(self._name, type(self))
 
 
-class FillStyle(Enum):
-    Empty = 1
-    Colour = 2
-    Image  = 3
-
-class TextAlign(Enum):
-    Center = 0
-    Left=1
-    Right=2
-
 class Renderable(UIElement):
     """"""
 
-    def __init__(self, name, x:int = None, y:int = None, w:int = None, h:int = None, **kwargs):
+    def __init__(self, name, x: int = None, y: int = None, w: int = None, h: int = None, **kwargs):
         """Constructor for Renderable"""
         super().__init__(name, x=x, y=y, w=w, h=h, kwargs=kwargs)
+
         self._fill_style        = kwargs.get('fill_style', FillStyle.Empty)
         self._background_colour = kwargs.get('background_colour', (128, 128, 128))
         self._background_image  = kwargs.get('background_image', None)
         self._colour = kwargs.get('colour', (0, 0, 0))
         self._show_border = kwargs.get('show_border', True)
+
+        self._caption = kwargs.get("caption", "")
+        self._font_size = kwargs.get('font_size', 20)  # width and height is determined by font
+        self._font_style = kwargs.get('font_style', FontStyle.Normal)
+        self._font = pygame.font.Font(kwargs.get('font', pygame.font.get_default_font()),
+                                      self._font_size)
+        self._font_colour = kwargs.get('font_colour', (0, 0, 0))
+
+        self._apply_font_style()
+
+        self._text_caption = None
+        self._text_bounds = None
+        if self._caption:
+            self._text_caption = self._font.render(self._caption, 1, self._font_colour)
+            self._text_bounds = self._text_caption.get_rect()
+            # we add a safety buffer around the text bounds to allow for the real bounds
+            w, h = self._text_bounds[2] + 3, self._text_bounds[3] + 3
+            if not self.width or self.width < w:
+                self.width = w
+            if not self.height or self.height < h:
+                self.height = h
+
+    def _apply_font_style(self):
+        if self._font_style & FontStyle.Bold:
+            self._font.set_bold(True)
+        if self._font_style & FontStyle.Italic:
+            self._font.set_italic(True)
+        if self._font_style & FontStyle.Underline:
+            self._font.set_underline(True)
 
     @property
     def background_colour(self):
@@ -98,13 +168,11 @@ class Renderable(UIElement):
         return self._show_border
 
     def render(self, buffer):
-        # print("FillStyle: ", self._fill_style)
-        # print("Background Colour: ", self._background_colour)
-
         if self._fill_style == FillStyle.Colour:
             r = pygame.Rect(self._x0, self._y0, self._w, self._h)
             pygame.draw.rect(buffer, self._background_colour, r, 0)
         elif self._fill_style == FillStyle.Image:
+            # TODO: support image as background in ui element - scaled to the appropriate dimensions if provided
             pass
         else:
             pass
@@ -113,13 +181,17 @@ class Renderable(UIElement):
             r = pygame.Rect(self._x0, self._y0, self._w, self._h)
             pygame.draw.rect(buffer, self._colour, r, 1)
 
+        if self._caption:
+            buffer.blit(self._text_caption, dest=(self._x0, self._y0, self._text_bounds[2], self._text_bounds[3]))
+
 
 class Clickable(Renderable):
     """"""
 
-    def __init__(self, name, x:int = None, y:int = None, w:int = None, h:int = None, **kwargs):
+    def __init__(self, name, x: int = None, y: int = None, w: int = None, h: int = None, **kwargs):
         """Constructor for Clickable"""
         super().__init__(name, x=x, y=y, w=w, h=h, **kwargs)
+        # TODO: print("KWARGS: ", kwargs)
         self._is_clicked = False
 
     def unclick(self):
@@ -153,18 +225,9 @@ class Clickable(Renderable):
 class Button(Clickable):
     """"""
 
-    def __init__(self, name, caption, x, y, w=0, h=0, **kwargs):
+    def __init__(self, name, caption, x: int, y: int, w: int = None, h: int = None, **kwargs):
         """Constructor for Button"""
-        self._caption = caption
-        # width and height is determined by font
-        self._font_size = kwargs.get('font_size', 20)
-        self._font = pygame.font.Font(kwargs.get('font', pygame.font.get_default_font()), self._font_size)
-        self._font_colour = kwargs.get('font_colour', (0, 0, 0))
-        self._text_caption = self._font.render(caption, 1, self._font_colour)
-        self._text_bounds = self._text_caption.get_rect()
-        super().__init__(name, x=x, y=y, w=max(w, self._text_bounds[2]), h=max(h, self._text_bounds[3]), **kwargs)
-        self._show_border = kwargs.get('show_border', False)
-        self._caption = caption
+        super().__init__(name=name, caption=caption, x=x, y=y, w=w, h=h, **kwargs)
 
     @property
     def caption(self):
@@ -178,14 +241,13 @@ class Button(Clickable):
             r = pygame.Rect(self._x0, self._y0, self._w, self._h)
             pygame.draw.rect(buffer, (0, 255, 0), r, 2)
 
-        buffer.blit(self._text_caption, dest=(self._x0, self._y0, self._text_bounds[2], self._text_bounds[3]))
-
 
 class MenuItem(Button):
     """"""
-    def __init__(self, name:str, caption:str, x, y, **kwargs):
+    def __init__(self, name:str, caption:str, **kwargs):
         """Constructor for MenuItem"""
-        super().__init__(name, caption, x=x, y=y, **kwargs)
+        super().__init__(name=name, caption=caption, x=0, y=0, **kwargs)
+        print("MenuItem {} = x,y,w,h,x1,y1: {}, {}, {}, {}".format(name, self._x0, self._y0, self._w, self._h, self._x1, self._y1))
 
 
 class Menu(Clickable):
@@ -193,25 +255,31 @@ class Menu(Clickable):
 
     def __init__(self, name, caption, x, y, **kwargs):
         """Constructor for Menu"""
-        w, h = 5, 5  # some default, that will potentially be overwritten by sub items
-        # if we show the caption, then we have to adjust the width and height right now
-        self._caption = caption
-        self._show_caption = kwargs.get('show_caption', False)
-
-        super().__init__(name=name, x=x, y=y, w=w, h=h, **kwargs)
-
+        super().__init__(name=name, x=x, y=y, w=5, h=5, **kwargs)
         self._items = []
 
-    def add_item(self, m):
+    def add_item(self, m:MenuItem):
+        if not m:
+            raise ValueError("No Item to add")
+
+        # TODO: placement of menu items is implicit, we have to remove the x, y from the item
+        # and place them in the container adjusting for potential previous items
+
         # adding a menu item causes a potential update to the dimensions
         # we ask for the bounds of the child item and add some safety buffer
         i_x0, i_y0, i_x1, i_y1 = m.get_bounds()
         x1, y1 = self._x0 + self._w, self._y0 + self._h
 
-        if i_x0 < self._x0: self._x0 = i_x0 - 5
-        if i_y0 < self._y0: self._y0 = i_y0 - 5
-        if i_x1 > x1: self._w = i_x1 - self._x0 + 5
-        if i_y1 > y1: self._h = i_y1 - self._y0 + 5
+        print("Add Menu Item <-> {} {}".format(m.name, m.get_bounds()))
+
+        if i_x0 < self._x0:
+            self._x0 = i_x0 - 5
+        if i_y0 < self._y0:
+            self._y0 = i_y0 - 5
+        if i_x1 > x1:
+            self._w = i_x1 - self._x0 + 5
+        if i_y1 > y1:
+            self._h = i_y1 - self._y0 + 5
 
         self._items.append(m)
 
@@ -253,8 +321,7 @@ class Menu(Clickable):
         for m in self._items:
             m.render(buffer)
 
-# TODO: a gamescreen is the container for our game, it can be a screen with a menu
-# or a screen where there is full screen drawing
+
 class GameScreen(Clickable):
     """"""
     def __init__(self, name, title, width, height, **kwargs):
@@ -311,12 +378,13 @@ class MainScreen(GameScreen):
 
     def _initialize_components(self):
         main_menu = Menu('menuMain', caption='Main', show_caption=False, x=50, y=100)
-        menu_next = MenuItem(name='menuItemNext', caption='Next', x=55, y=105,
-                             font_size=28, font_colour=(255, 255, 255))
+        menu_next = MenuItem(name='menuItemNext', caption='Next',
+                             font_size=28, font_colour=(255, 255, 255),
+                             font_style=FontStyle.Bold | FontStyle.Italic | FontStyle.Underline)
         menu_next.on_click = self._menuitem_next_click
 
         main_menu.add_item(menu_next)
-        main_menu.add_item(MenuItem(name='menuItemCredits', caption='Credits', x=55, y=130,
+        main_menu.add_item(MenuItem(name='menuItemCredits', caption='Credits',
                                     font_size=28, font_colour=(255, 128, 64)))
         self._ui_elements.append(main_menu)
 
