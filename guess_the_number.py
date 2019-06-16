@@ -2,18 +2,29 @@
 # vers: 0.1
 # This is a simple game, where the player has to guess a randomly generated integer number. This number has to be
 # in some range [0, MAX]. The player is given some x amount of tries to guess the number
+
 # TODO: the game will issue some informative, conversational messages to keep the player engaged
 # TODO: with each passed try, the goblin from the used art work will come closer to a peasant. Once all tries are out
 #       the goblin will lay down - die!
 # TODO: in a more difficult setting, the player has only some amount of seconds, before the clock ticks off
 # TODO: the screen interface needs to be improved
+# TODO: except for the main playing screen, all screens feature a simple calm background music
 # TODO: a simple game menu, including ...
 #  start new game
 #   input name
 #  options
 #   set difficulty
 #  view high score
-#  view about
+    # TODO: a simple (high score) table UI element
+#  view about ... this shows a simple description of the game, copyright message, version information and credits
+    # TODO: introduce version
+    # TODO: UI element label
+# TODO: main screen shows the menu, in the background we see numbers moving, scaling and rotating
+#           the numbers fade in and out of visibility in the background
+#           TODO: 2d image transform - scale
+#           TODO: 2d image transform - rotate
+#           TODO: 2d image transform - translate
+
 # A simple high score mechanism including persistence is realized. Initially, the score directly mimics the number of
 # tries used to finish a round. Only if the player succeeds will she be awarded a score.
 
@@ -24,6 +35,7 @@ import random
 import pygame
 from pygame.locals import *
 from enum import Enum
+from ui import GameScreen, Button, Menu, MenuItem, FontStyle, HorizontalAlignment, VerticalAlignment
 
 class PlayerType(Enum):
     CPU = 1
@@ -126,6 +138,7 @@ class GameRenderer(object):
 
     def set_game_state(self, state: dict) -> None:
         self._game_state = state
+
 
 class GuessTheNumber(Game):
     """"""
@@ -275,6 +288,76 @@ def is_number_key(k):
     return k in [K_0, K_1, K_2, K_3, K_4, K_5, K_6, K_7, K_8, K_9]
 
 
+# TODO: LeaderBoardScreen
+class LeaderBoardScreen(GameScreen):
+    """"""
+
+    def __init__(self, ):
+        """Constructor for LeaderBoardScreen"""
+        super(LeaderBoardScreen, self).__init__(name='screenLeaderBoard', title='LeaderBoard', width=640, height=480)
+
+
+# TODO: OptionsScreen
+class OptionsScreen(GameScreen):
+    """"""
+
+    def __init__(self, ):
+        """Constructor for OptionsScreen"""
+        super(OptionsScreen, self).__init__(name='screenOptions', title='Options', width=640, height=480)
+
+# TODO: AboutScreen
+class AboutScreen(GameScreen):
+    """"""
+
+    def __init__(self, ):
+        """Constructor for AboutScreen"""
+        super(AboutScreen, self).__init__(name='screenAbout', title='About', width=640, height=480)
+
+
+class MainScreen(GameScreen):
+    """"""
+
+    def __init__(self):
+        """Constructor for MainScreen"""
+        super().__init__(name='screenMain', title='Main', width=640, height=480)
+        text = "Guess My Number"
+        self._font = pygame.font.Font(pygame.font.get_default_font(), 32)
+        self._header = self._font.render(text, 1, (64, 0, 255))
+
+    def _main_on_click(self, sender, x, y, button):
+        if sender.name == 'mniQuit':
+            print("Good-Bye")
+            pygame.event.post(pygame.event.Event(pygame.QUIT))
+
+    def _initialize_components(self):
+        fs, fc, fstyle = 28, (192, 32, 128, 255), FontStyle.Normal
+        main_menu = Menu('menuMain', caption='Main', show_caption=False, show_border=True, x=50, y=100)
+        mni_newgame = MenuItem(name='mniNewGame', caption='New Game', font_size=fs, font_colour=fc, font_style=fstyle)
+        mni_options = MenuItem(name='mniOptions', caption='Options', font_size=fs, font_colour=fc, font_style=fstyle)
+        mni_leader  = MenuItem(name='mniLeaderBoard', caption='Leaderboard', font_size=fs, font_colour=fc, font_style=fstyle)
+        mni_about   = MenuItem(name='mniAbout', caption='About', font_size=fs, font_colour=fc, font_style=fstyle)
+        mni_quit = MenuItem(name='mniQuit', caption='Quit',
+                            font_size=fs, font_colour=fc, font_style=fstyle)
+
+        # wire events
+        mni_newgame.on_click = self._main_on_click
+        mni_options.on_click = self._main_on_click
+        mni_leader.on_click = self._main_on_click
+        mni_about.on_click = self._main_on_click
+        mni_quit.on_click = self._main_on_click
+
+        main_menu.add_item(mni_newgame)
+        main_menu.add_item(mni_options)
+        main_menu.add_item(mni_leader)
+        main_menu.add_item(mni_about)
+        main_menu.add_item(mni_quit)
+
+        self.add_component(main_menu)
+
+    def render(self, buffer):
+        GameScreen.render(self, buffer)
+        buffer.blit(self._header, (50, 50))
+
 def main():
     if not pygame.font: print("Pygame - fonts not loaded")
     if not pygame.mixer: print("Pygame - audio not loaded")
@@ -283,18 +366,26 @@ def main():
 
     S_WIDTH = 640
     S_HEIGHT = 480
-    S_TITLE = "Guess The Number"
+    S_TITLE = "Guess My Number"
     KEY_TO_DIGIT = {K_0: 0, K_1: 1, K_2: 2, K_3: 3, K_4: 4, K_5: 5, K_6: 6, K_7: 7, K_8: 8, K_9: 9}
 
     screen_buffer = pygame.display.set_mode(size=(S_WIDTH, S_HEIGHT))
     pygame.display.set_caption(S_TITLE)
     pygame.mouse.set_visible(True)
 
-    back_buffer: pygame.Surface = pygame.Surface(screen_buffer.get_size())
+    back_buffer: pygame.Surface = pygame.Surface(screen_buffer.get_size(), flags=pygame.SRCALPHA)
     back_buffer = back_buffer.convert()
-    back_buffer.fill((250, 250, 250))
+    back_buffer.fill((255, 255, 255, 255))
 
+    # TODO: player needs to provide input here
     p1 = Player(name='Christian', p_type=PlayerType.Human)
+
+    main_screen = MainScreen()
+    options_screen = OptionsScreen()
+    lboard_screen  = LeaderBoardScreen()
+
+    screens = [main_screen]
+    active_screen = screens[0]
 
     the_game = GuessTheNumber()
     the_renderer = GuessTheNumberRenderer()
@@ -306,32 +397,43 @@ def main():
     is_done = False
     while not is_done:
 
+        active_screen = screens[0]
+
         for event in pygame.event.get():
             if event.type == QUIT:
                 is_done = True
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                x, y =  event.pos[0], event.pos[1]
+                clicked, sender = active_screen.clicked(mx=x, my=y, button=event.button)
+                if clicked:
+                    sender.on_click(sender=sender, x=x, y=y, button=event.button)
+            elif event.type == pygame.MOUSEBUTTONUP:
+                active_screen.unclick()
             elif event.type == KEYDOWN:
                 if event.key == K_RETURN:
-                    the_game.commit_number()
+                    pass # the_game.commit_number()
                 elif is_number_key(event.key):
-                    the_game.add_digit(KEY_TO_DIGIT.get(event.key))
+                    pass # the_game.add_digit(KEY_TO_DIGIT.get(event.key))
                 else:
                     pass
 
-        the_game.update()
-        the_renderer.set_game_state(state={
-            'Player1': p1.name,
-            'Current_Tries': the_game.no_tries,
-            'Max_Tries': the_game.max_tries,
-            'Current_Guess': the_game.current_number,
-            'Current_Score': the_game.score,
-            'Player1_Won': the_game.player_has_won,
-            'Finished': the_game.finished
-        })
-        the_renderer.render(back_buffer)
+        # the_game.update()
+        # the_renderer.set_game_state(state={
+        #     'Player1': p1.name,
+        #     'Current_Tries': the_game.no_tries,
+        #     'Max_Tries': the_game.max_tries,
+        #     'Current_Guess': the_game.current_number,
+        #     'Current_Score': the_game.score,
+        #     'Player1_Won': the_game.player_has_won,
+        #     'Finished': the_game.finished
+        # })
+        # the_renderer.render(back_buffer)
+        back_buffer.fill((255, 255, 255, 128))
+        active_screen.render(back_buffer)
         screen_buffer.blit(back_buffer, (0, 0))
         pygame.display.flip()
-
-        is_done = is_done or the_game.finished
+        #
+        # is_done = is_done or the_game.finished
 
     # wait a bit before closing this off
     the_game.write_scores()

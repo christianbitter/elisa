@@ -76,6 +76,9 @@ class PSprite(object):
     def height(self):
         return self._height
 
+    def __repr__(self):
+        return "{} (w, h => {}, {})".format(self._id, self._width, self._height)
+
 
 class SpriteMap(object):
     def __init__(self, json_descriptor: str):

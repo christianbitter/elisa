@@ -10,10 +10,10 @@
   "sprites": [
     {
       "id": "left_1",
-      "x": 0,
-      "y": 0,
-      "width": 0,
-      "height": 0
+      "x": 1,
+      "y": 1,
+      "width": 12,
+      "height": 14
     },
     {
       "id": "left_2",

@@ -1,3 +1,4 @@
+# auth: christian bitter
 # desc:
 # This implements a simple main screen with a single main menu.
 # The main menu some entry - next.
@@ -22,7 +23,13 @@ class FillStyle(Enum):
     Image  = 3
 
 
-class TextAlign(Enum):
+class TextVAlign(Enum):
+    Center = 0
+    Top = 1
+    Bottom = 2
+
+
+class TextHAlign(Enum):
     Center = 0
     Left = 1
     Right = 2
@@ -518,8 +525,8 @@ def main():
                 if event.type == pygame.MOUSEBUTTONUP:
                     active_screen.unclick()
 
-                active_screen.render(back_buffer)
-                screen_buffer.blit(back_buffer, (0, 0))
-                pygame.display.flip()
+        active_screen.render(back_buffer)
+        screen_buffer.blit(back_buffer, (0, 0))
+        pygame.display.flip()
 
 if __name__ == '__main__': main()
