@@ -6,6 +6,7 @@
 #           TODO: abstraction for maps
 #           TODO: player moves from tile to tile (simple movement not necessarily animation)
 #           TODO: player cannot run into walls
+#               This should use pygame collision detection
 #           TODO: expand the animation concept from frame iteration to an animation composed of sprites
 
 import os
@@ -52,7 +53,7 @@ def render_map(buffer, sprite_map, world_map, start_x, start_y, map_width = 10, 
 # Each update step we move the current frame index. If the frame index reaches the last. If repeat is switched on
 # the repeat will trigger an update of the current frame index, otherwise the i
 
-class Map():
+class Map(object):
     """"""
 
     def __init__(self, ):
@@ -62,7 +63,7 @@ class Map():
     def load(map_fp:str):
         pass
 
-    def save(map_obj:Map):
+    def save(map_obj):
         pass
 
     def render_minimap(self):
@@ -125,7 +126,7 @@ def main():
 
     S_WIDTH = 800
     S_HEIGHT= 600
-    S_TITLE = "Elisa8 - Sprite Animations"
+    S_TITLE = "Elisa8 - Moving in an Environment"
 
     C_WHITE = (250, 250, 250)
     C_BLUE = (0, 0, 255)

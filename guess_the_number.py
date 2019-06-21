@@ -9,22 +9,26 @@
 # TODO: in a more difficult setting, the player has only some amount of seconds, before the clock ticks off
 # TODO: the screen interface needs to be improved
 # TODO: except for the main playing screen, all screens feature a simple calm background music
-# TODO: a simple game menu, including ...
-#  start new game
-#   input name
+# A simple game menu, including ...
+#  (start) new game
 #  options
+#   player name
 #   set difficulty
 #  view high score
     # TODO: a simple (high score) table UI element
 #  view about ... this shows a simple description of the game, copyright message, version information and credits
     # TODO: introduce version
-    # TODO: UI element label
+    # TODO: UI element multi-line label
+#   Quit
+#       Quits the game.
+# menu items is shown.
 # TODO: main screen shows the menu, in the background we see numbers moving, scaling and rotating
 #           the numbers fade in and out of visibility in the background
 #           TODO: 2d image transform - scale
 #           TODO: 2d image transform - rotate
 #           TODO: 2d image transform - translate
-
+# TODO: all screen declarations go into the game renderer
+# TODO: a game renderer has at least one active screen - the one where the game is rendered
 # A simple high score mechanism including persistence is realized. Initially, the score directly mimics the number of
 # tries used to finish a round. Only if the player succeeds will she be awarded a score.
 
@@ -35,13 +39,15 @@ import random
 import pygame
 from pygame.locals import *
 from enum import Enum
-from ui import GameScreen, Button, Menu, MenuItem, FontStyle, HorizontalAlignment, VerticalAlignment
+from ui import Screen, UIEvent, Menu, MenuItem, FontStyle, Label, VerticalAlignment, WindowManager
+
 
 class PlayerType(Enum):
     CPU = 1
     Human = 2
 
-class Player():
+
+class Player(object):
     """"""
 
     def __init__(self, name, p_type: PlayerType):
@@ -121,8 +127,15 @@ class Game(object):
     def max_players(self):
         return self._no_max_players
 
-    def __str__(self):
+    def __repr__(self):
         return "{}".format(self._name)
+
+    def get_render_state(self) -> dict:
+        """
+        Provide all the state necessary to successfully render the game per time step
+        :return: a dict with relevant key-value pairs
+        """
+        return {}
 
 
 class GameRenderer(object):
@@ -132,6 +145,15 @@ class GameRenderer(object):
         """Constructor for GameRenderer"""
         super(GameRenderer, self).__init__()
         self._game_state = None
+        self._wm = WindowManager()
+
+    @property
+    def active_screen(self):
+        return self._wm.active_screen
+
+    @property
+    def window_manager(self):
+        return self._wm
 
     def render(self, buffer):
         raise ValueError("Not implemented")
@@ -140,12 +162,12 @@ class GameRenderer(object):
         self._game_state = state
 
 
-class GuessTheNumber(Game):
+class GuessMyNumber(Game):
     """"""
 
     def __init__(self, MAX_NUMBER=50, MAX_TRIES=10):
         """Constructor for GuessTheNumber"""
-        super(GuessTheNumber, self).__init__(name='GuessTheNumber', max_players=1,
+        super(GuessMyNumber, self).__init__(name='GuessTheNumber', max_players=1,
                                              description='A simple guess the number game')
         self._random_number = None
         self._max_number = MAX_NUMBER
@@ -211,9 +233,10 @@ class GuessTheNumber(Game):
         return self._max_tries
 
     def commit_number(self):
-        self._no_tries += 1
-        self._guess = int(self.current_number)
-        self._digit_buffer = []
+        if len(self.current_number):
+            self._no_tries += 1
+            self._guess = int(self.current_number)
+            self._digit_buffer = []
 
     def add_digit(self, d):
         self._digit_buffer.append(d)
@@ -242,19 +265,64 @@ class GuessTheNumber(Game):
                 for (k, v) in self._highscore:
                     w.writerow({'Player': k, 'Score': v})
 
+    def get_render_state(self) -> dict:
+        return {
+            'Player1': self._active_player.name,
+            'Current_Tries': self.no_tries,
+            'Max_Tries': self.max_tries,
+            'Current_Guess': self.current_number,
+            'Current_Score': self.score,
+            'Player1_Won': self.player_has_won,
+            'Finished': self.finished
+        }
 
-class GuessTheNumberRenderer(GameRenderer):
+
+class GuessMyNumberRenderer(GameRenderer):
     """"""
+
+    @property
+    def game_active(self):
+        return self._game_active
 
     def __init__(self, ):
         """Constructor for GuessTheNumberRenderer"""
-        super(GuessTheNumberRenderer, self).__init__()
+        super(GuessMyNumberRenderer, self).__init__()
+        self._game_active = False
+        self.main_screen = MainScreen()
+        self.options_screen = OptionsScreen()
+        self.lboard_screen = LeaderBoardScreen()
+        self.about_screen = AboutScreen()
+        self.game_screen = GameScreen()
 
+        self.game_screen.render = self.render_game
+
+        self._wm.add_screen(self.main_screen, is_active=True)
+        self._wm.add_screen(self.options_screen)
+        self._wm.add_screen(self.lboard_screen)
+        self._wm.add_screen(self.about_screen)
+        self._wm.add_screen(self.game_screen)
+
+        self._wm.add_transition(from_screen=self.main_screen, to_screen=self.options_screen)
+        self._wm.add_transition(from_screen=self.main_screen, to_screen=self.lboard_screen)
+        self._wm.add_transition(from_screen=self.main_screen, to_screen=self.about_screen)
+        self._wm.add_transition(from_screen=self.main_screen, to_screen=self.game_screen)
+
+        self._wm.add_transition(from_screen=self.game_screen, to_screen=self.main_screen)
+
+        self._wm.on_transitioned = self._wm_on_transitioned
         self._font = pygame.font.Font(None, 36)
         self._textpos = None
 
+    def _wm_on_transitioned(self, from_screen, to_screen):
+        if to_screen == self.game_screen:
+            self._game_active = True
+
     def render(self, buffer):
-        buffer.fill((0, 0, 0))
+        self._wm.active_screen.render(buffer)
+        # TODO: somehow we need to move the game state rendering into the game screen
+
+    def render_game(self, buffer):
+        buffer.fill((0, 0, 0, 255))
 
         if not self._game_state:
             raise ValueError("Game State not provided")
@@ -289,32 +357,43 @@ def is_number_key(k):
 
 
 # TODO: LeaderBoardScreen
-class LeaderBoardScreen(GameScreen):
+class LeaderBoardScreen(Screen):
     """"""
 
     def __init__(self, ):
         """Constructor for LeaderBoardScreen"""
         super(LeaderBoardScreen, self).__init__(name='screenLeaderBoard', title='LeaderBoard', width=640, height=480)
 
+    def _initialize_components(self):
+        self._about_label = Label(name='lblLeaderboard', x=10, y=10, w=300, caption="High Scores")
+        self.add_component(self._about_label)
 
 # TODO: OptionsScreen
-class OptionsScreen(GameScreen):
+class OptionsScreen(Screen):
     """"""
 
     def __init__(self, ):
         """Constructor for OptionsScreen"""
         super(OptionsScreen, self).__init__(name='screenOptions', title='Options', width=640, height=480)
 
+    def _initialize_components(self):
+        self._about_label = Label(name='lblOptions', x=10, y=10, w=300, caption="Options")
+        self.add_component(self._about_label)
+
 # TODO: AboutScreen
-class AboutScreen(GameScreen):
+class AboutScreen(Screen):
     """"""
 
     def __init__(self, ):
         """Constructor for AboutScreen"""
         super(AboutScreen, self).__init__(name='screenAbout', title='About', width=640, height=480)
 
+    def _initialize_components(self):
+        self._about_label = Label(name='lblAbout', x=10, y=10, w=300, caption="About")
+        self.add_component(self._about_label)
 
-class MainScreen(GameScreen):
+
+class MainScreen(Screen):
     """"""
 
     def __init__(self):
@@ -324,43 +403,60 @@ class MainScreen(GameScreen):
         self._font = pygame.font.Font(pygame.font.get_default_font(), 32)
         self._header = self._font.render(text, 1, (64, 0, 255))
 
-    def _main_on_click(self, sender, x, y, button):
-        if sender.name == 'mniQuit':
-            print("Good-Bye")
+    def _main_on_click(self, sender, event_args):
+        if sender.name == self.mni_quit.name:
             pygame.event.post(pygame.event.Event(pygame.QUIT))
+        elif sender.name == self.mni_newgame.name:
+            pygame.event.post(UIEvent.transition_screen(self.name, 'screenGame'))
+        elif sender.name == self.mni_options.name:
+            pygame.event.post(UIEvent.transition_screen(self.name, 'screenOptions'))
+        elif sender.name == self.mni_leader.name:
+            pygame.event.post(UIEvent.transition_screen(self.name, 'screenLeaderBoard'))
+        elif sender.name == self.mni_about.name:
+            pygame.event.post(UIEvent.transition_screen(self.name, 'screenAbout'))
+        else:
+            pass
 
     def _initialize_components(self):
         fs, fc, fstyle = 28, (192, 32, 128, 255), FontStyle.Normal
-        main_menu = Menu('menuMain', caption='Main', show_caption=False, show_border=True, x=50, y=100)
-        mni_newgame = MenuItem(name='mniNewGame', caption='New Game', font_size=fs, font_colour=fc, font_style=fstyle)
-        mni_options = MenuItem(name='mniOptions', caption='Options', font_size=fs, font_colour=fc, font_style=fstyle)
-        mni_leader  = MenuItem(name='mniLeaderBoard', caption='Leaderboard', font_size=fs, font_colour=fc, font_style=fstyle)
-        mni_about   = MenuItem(name='mniAbout', caption='About', font_size=fs, font_colour=fc, font_style=fstyle)
-        mni_quit = MenuItem(name='mniQuit', caption='Quit',
-                            font_size=fs, font_colour=fc, font_style=fstyle)
+        self.main_menu = Menu('menuMain', caption='Main', show_caption=False, show_border=True, x=50, y=100)
+        self.mni_newgame = MenuItem(name='mniNewGame', caption='New Game', font_size=fs, font_colour=fc, font_style=fstyle)
+        self.mni_options = MenuItem(name='mniOptions', caption='Options', font_size=fs, font_colour=fc, font_style=fstyle)
+        self.mni_leader  = MenuItem(name='mniLeaderBoard', caption='Leaderboard', font_size=fs, font_colour=fc, font_style=fstyle)
+        self.mni_about   = MenuItem(name='mniAbout', caption='About', font_size=fs, font_colour=fc, font_style=fstyle)
+        self.mni_quit = MenuItem(name='mniQuit', caption='Quit',
+                                 font_size=fs, font_colour=fc, font_style=fstyle)
 
         # wire events
-        mni_newgame.on_click = self._main_on_click
-        mni_options.on_click = self._main_on_click
-        mni_leader.on_click = self._main_on_click
-        mni_about.on_click = self._main_on_click
-        mni_quit.on_click = self._main_on_click
+        self.mni_newgame.on_click = self._main_on_click
+        self.mni_options.on_click = self._main_on_click
+        self.mni_leader.on_click = self._main_on_click
+        self.mni_about.on_click = self._main_on_click
+        self.mni_quit.on_click = self._main_on_click
 
-        main_menu.add_item(mni_newgame)
-        main_menu.add_item(mni_options)
-        main_menu.add_item(mni_leader)
-        main_menu.add_item(mni_about)
-        main_menu.add_item(mni_quit)
+        self.main_menu.add_item(self.mni_newgame)
+        self.main_menu.add_item(self.mni_options)
+        self.main_menu.add_item(self.mni_leader)
+        self.main_menu.add_item(self.mni_about)
+        self.main_menu.add_item(self.mni_quit)
 
-        self.add_component(main_menu)
+        self.add_component(self.main_menu)
 
     def render(self, buffer):
-        GameScreen.render(self, buffer)
+        Screen.render(self, buffer)
         buffer.blit(self._header, (50, 50))
 
+
+class GameScreen(Screen):
+    """"""
+    def __init__(self):
+        """Constructor for OptionsScreen"""
+        super(GameScreen, self).__init__(name='screenGame', title='Guess My Number', width=640, height=480)
+
+
 def main():
-    if not pygame.font: print("Pygame - fonts not loaded")
-    if not pygame.mixer: print("Pygame - audio not loaded")
+    if not pygame.font: raise("Pygame - fonts not loaded")
+    if not pygame.mixer: raise("Pygame - audio not loaded")
 
     pygame.init()
 
@@ -377,66 +473,63 @@ def main():
     back_buffer = back_buffer.convert()
     back_buffer.fill((255, 255, 255, 255))
 
-    # TODO: player needs to provide input here
-    p1 = Player(name='Christian', p_type=PlayerType.Human)
-
-    main_screen = MainScreen()
-    options_screen = OptionsScreen()
-    lboard_screen  = LeaderBoardScreen()
-
-    screens = [main_screen]
-    active_screen = screens[0]
-
-    the_game = GuessTheNumber()
-    the_renderer = GuessTheNumberRenderer()
+    # TODO: player needs to provide input in options
+    p1 = Player(name='Player1', p_type=PlayerType.Human)
+    the_game = GuessMyNumber()
+    the_renderer = GuessMyNumberRenderer()
+    wm = the_renderer.window_manager
 
     the_game.add_player(p1)
 
     the_game.init()
 
     is_done = False
+    play_game = False
+    clicker = 0
     while not is_done:
-
-        active_screen = screens[0]
 
         for event in pygame.event.get():
             if event.type == QUIT:
                 is_done = True
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                x, y =  event.pos[0], event.pos[1]
-                clicked, sender = active_screen.clicked(mx=x, my=y, button=event.button)
+                clicker = 1
+                x, y = event.pos[0], event.pos[1]
+                clicked, sender = wm.active_screen.clicked(mx=x, my=y, button=event.button)
                 if clicked:
-                    sender.on_click(sender=sender, x=x, y=y, button=event.button)
-            elif event.type == pygame.MOUSEBUTTONUP:
-                active_screen.unclick()
-            elif event.type == KEYDOWN:
+                    event_args = {
+                        "x": x, "y": y, "button": event.button
+                    }
+                    sender.on_click(sender=sender, event_args=event_args)
+            elif event.type == pygame.MOUSEBUTTONUP and clicker:
+                wm.active_screen.unclick()
+            elif event.type == pygame.USEREVENT:
+                if event.mode == UIEvent.SCREEN_TRANSITION:
+                    wm.transition(event.source, event.target)
+                    clicker = 0  # reset the clicks so they are not processed by a transitioned element
+            elif event.type == KEYDOWN and the_renderer.game_active:
                 if event.key == K_RETURN:
-                    pass # the_game.commit_number()
+                    the_game.commit_number()
                 elif is_number_key(event.key):
-                    pass # the_game.add_digit(KEY_TO_DIGIT.get(event.key))
+                    the_game.add_digit(KEY_TO_DIGIT.get(event.key))
                 else:
                     pass
 
-        # the_game.update()
-        # the_renderer.set_game_state(state={
-        #     'Player1': p1.name,
-        #     'Current_Tries': the_game.no_tries,
-        #     'Max_Tries': the_game.max_tries,
-        #     'Current_Guess': the_game.current_number,
-        #     'Current_Score': the_game.score,
-        #     'Player1_Won': the_game.player_has_won,
-        #     'Finished': the_game.finished
-        # })
-        # the_renderer.render(back_buffer)
+        if the_renderer.game_active:
+            the_game.update()
+            gs = the_game.get_render_state()
+            the_renderer.set_game_state(state=gs)
+
+        # TODO: this should be done in the game renderer - as we have all the active windows there
+
         back_buffer.fill((255, 255, 255, 128))
-        active_screen.render(back_buffer)
+        the_renderer.render(back_buffer)
         screen_buffer.blit(back_buffer, (0, 0))
         pygame.display.flip()
-        #
-        # is_done = is_done or the_game.finished
 
-    # wait a bit before closing this off
-    the_game.write_scores()
-    pygame.time.delay(1000)
+        # instead of breaking like before, we return to the main menu saving the score
+        if the_game.finished:
+            the_game.write_scores()
+            pygame.time.delay(2000)
+            pygame.event.post(UIEvent.transition_screen(wm.active_screen.name, 'screenMain'))
 
 if __name__ == '__main__': main()

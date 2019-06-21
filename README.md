@@ -25,7 +25,7 @@ A simple template to kick our coding off. It is based on the official pygame sta
 - **elisa_8_moving_in_environment.py**:
 - **elisa_9_particles.py**:
 - **elisa_10_screens.py**:
-- **elisa_11_sound.py**:  
+- **elisa_12_sound.py**:
 Play a single sound.
 
 ## Credits and References

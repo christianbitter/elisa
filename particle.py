@@ -1,4 +1,14 @@
+# auth: christian bitter
+# name: particle.py
+# desc: a collection of types and functions to build a small particle system
+# TODO: time-based integrator in a future version
+# TODO: better physics integration, update decoupling, render decoupling
+# TODO: allow for bitmaps/ gfx to be particles
+# TODO: enable alpha channel modification
+# TODO: separation of particle/particle system into data and rendering
+
 import pygame as pg
+
 
 class Particle(object):
     """

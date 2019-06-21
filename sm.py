@@ -1,3 +1,7 @@
+# auth: christian bitter
+# name: sm.py
+# desc: simple deterministic Finite State Automaton/ Machine definition
+
 import uuid
 
 class State(object):

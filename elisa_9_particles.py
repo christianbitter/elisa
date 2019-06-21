@@ -1,9 +1,6 @@
 # auth: christian bitter
 # desc: some particles on the screen. this is not a fully fleshed out version,
 #       but it has some basic components such as moving of cooling down particles.
-#       in a later version we may add more to it, and improve it, like so:
-#           TODO: time-based integrator in a future version
-#           TODO: better physics integration, update decoupling, render decoupling
 
 from random import random
 import pygame as pg

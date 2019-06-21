@@ -495,7 +495,8 @@ def main():
     screens = [main_screen]
     active_screen = screens[0]
 
-    # probably not the most elegent way, but what the heck
+    # probably not the most elegent way, i.e. it serves only for single screen transitions,
+    # but for this simple scenario it suffices
     def screen_transition(self, from_screen, to_screen):
         def screen_transition_internal(self):
             screens.pop(0)
