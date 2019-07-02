@@ -103,4 +103,11 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+<<<<<<< HEAD
 .idea/
+=======
+# pycharm
+.idea/
+
+guess_a_number_scores.csv
+>>>>>>> origin/master
