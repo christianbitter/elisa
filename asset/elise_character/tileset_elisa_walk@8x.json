@@ -2,7 +2,7 @@
   "id": "hero",
   "description": "",
   "source": "",
-  "image_path": "D:/Development/repos/Python/elisa/asset/elise_character/elise_walk@8x.png",
+  "image_path": "asset/elise_character/elise_walk@8x.png",
   "width": 2048,
   "height": 256,
   "no_sprites": 6,

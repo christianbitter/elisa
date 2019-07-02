@@ -1,5 +1,5 @@
 # auth: christian bitter
-# name: elisa_13_camera.py
+# name: elisa_14_camera.py
 # desc: a simple 2d orthographic camera, that allows us to focus on different things on the screen
 #       enabling an artistic effect.
 #
@@ -12,7 +12,7 @@
 
 import pygame
 
-# TODO: elisa_13_camera.py
+# TODO: elisa_14_camera.py
 
 def main():
     if not pygame.font: print("Pygame - fonts not loaded")

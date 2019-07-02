@@ -1,5 +1,6 @@
 import os
 import pygame
+from pygame import Surface, PixelArray
 import json
 
 
@@ -17,7 +18,7 @@ def load_image(fp, colorkey=None, image_only=False):
     image = image.convert()
     if colorkey is not None:
         if colorkey is -1:
-            colorkey = image.get_at((0,0))
+            colorkey = image.get_at((0, 0))
         image.set_colorkey(colorkey, pygame.RLEACCEL)
 
     if image_only:
@@ -48,7 +49,14 @@ def load_png(fp, image_only=False):
     else:
         return image, image.get_rect()
 
+
 class PSprite(object):
+    """
+    The PSprite is a pure data object holding limited property data about sprites, such as its underlying
+    bit-mapped representation (image), its width or height. The PSprite object is a simplified version of
+    pygame's Sprite that is required to make working with Sprite maps or texture catalogues easier.
+    """
+
     def __init__(self, id, w, h, img):
         super(PSprite, self).__init__()
         self._id = id
@@ -61,12 +69,20 @@ class PSprite(object):
         return self._id
 
     @property
-    def image(self):
+    def image(self) -> Surface:
+        """
+        Returns a pygame.Surface representing the sprite's underlying image.
+        :return: pygame.Surface
+        """
         return self._image
 
     @property
     def as_sprite(self):
         return self._image
+
+    @property
+    def as_pixel_array(self):
+        return PixelArray(self._image)
 
     @property
     def width(self):
@@ -176,46 +192,80 @@ class SpriteMap(object):
     def no_sprites(self):
         return self._no_sprites
 
+    def __repr__(self):
+        return "Sprite Map: {} # sprites {} -> {}".format(self._id, len(self._sprite_names), self._sprite_names)
+
 
 class SpriteAssetManager(object):
-    """"""
+    """
+    The SpriteAssetManager is an abstraction over different sprite maps. That is, it allows us to conveniently
+    register and access different sprites in sprite maps. It is simple in that you can only add or remove sprite maps.
+    It allows index based access.
+    """
 
     def __init__(self):
         """Constructor for AssetManager"""
         super(SpriteAssetManager, self).__init__()
-        self._assets = {}
+        self._items = {}
 
     def __repr__(self):
-        return "Registered Assets ({}): {}".format(len(self._assets), self._assets.keys())
+        return "Registered Assets ({}): {}".format(len(self._items), self._items.keys())
 
-    def add_sprite_map(self, name:str, metadata_fp:str, initialize:bool = True):
-        if not name: raise ValueError('name not provided')
-        if not metadata_fp: raise ValueError('metadata file not provided')
-        if name in self._assets: raise ValueError('asset already registered')
-        if not os.path.exists(metadata_fp): raise ValueError('metadata file does not exist')
+    @property
+    def number_of_sprite_maps(self):
+        return len(self._items)
 
-        self._assets[name] = SpriteMap(metadata_fp)
+    def add_sprite_map(self, name: str, metadata_fp: str, initialize:bool = True):
+        if not name:
+            raise ValueError('name not provided')
+        if not metadata_fp:
+            raise ValueError('metadata file not provided')
+        if name in self._items:
+            raise ValueError('asset already registered')
+        if not os.path.exists(metadata_fp):
+            raise ValueError('metadata file does not exist')
+
+        self._items[name] = SpriteMap(metadata_fp)
         if initialize:
-            self._assets[name].initialize()
+            self._items[name].initialize()
 
-    def get_sprite(self, sprite_map_name:str, sprite:str = None):
+    def remove_sprite_map(self, name):
+        if not name:
+            raise ValueError('name not provided')
+        if name not in self._items:
+            raise ValueError('asset not registered')
+        del(self._items[name])
+
+    def get_sprite(self, sprite_map_name: str, sprite: str = None):
         if not sprite_map_name:
             raise ValueError("Asset cannot be none")
-        if sprite_map_name not in self._assets:
+        if sprite_map_name not in self._items:
             raise ValueError("Unknown asset '{}'".format(sprite_map_name))
-        sm = self._assets[sprite_map_name]
+        sm = self._items[sprite_map_name]
         if not sprite:
             return sm
         if sprite not in sm:
             raise ValueError("Undefined sprite '{}' selected".format(sprite))
         return sm[sprite]
 
+    def __getitem__(self, item):
+        if item is None:
+            raise ValueError("getitem - key not provided")
+
+        if isinstance(item, int):
+            return self._items[self._item_names[item]]
+        else:
+            if item in self._items:
+                return self._items[item]
+
+        raise ValueError("undefined sprite selected")
+
     def initialize(self, name:str = None):
         if not name:
-            for a in self._assets:
-                if not a.initialized:
+            for a in self._items:
+                if not self._items[a].initialized:
                     a.initialize()
         else:
-            if name not in self._assets: raise ValueError('not an asset')
-            if not self._assets[name].initialized:
-                self._assets[name].initialize()
+            if name not in self._items: raise ValueError('not an asset')
+            if not self._items[name].initialized:
+                self._items[name].initialize()
