@@ -106,5 +106,5 @@ venv.bak/
 # pycharm
 .idea/
 
-./guess_a_number_scores.csv
-./test_json.json
+guess_a_number_scores.csv
+test_json.json
