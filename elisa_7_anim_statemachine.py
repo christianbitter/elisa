@@ -5,7 +5,7 @@
 
 from pygame.locals import *
 from sm import *
-from sprites import SpriteMap, PSprite
+from sprites import SpriteMap
 import os
 import pygame
 

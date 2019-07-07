@@ -1,0 +1,19 @@
+{
+	"id": "lightmap",
+	"description": "a simple 2d lightmap",
+	"source": "",
+	"image_path": "asset/gfx/lightmap.png",
+	"width": 256,
+	"height": 256,
+	"no_sprites": 1,
+	"color_key": { },
+	"sprites": [
+		{
+			"id": "light_1",
+			"x": 0,
+			"y": 0,
+			"width": 256,
+			"height": 256
+		}
+	]
+}

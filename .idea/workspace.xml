@@ -2,34 +2,25 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="37a977bd-e183-464c-b70d-f85414eb84f3" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/asset/monogram_extended.zip" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/asset/tileset_hero2x.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/asset/tiny-rpg-town-files/spritesheets/hero2x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/base.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/elisa_7_anim_statemachine_collision.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/guess_my_number/asset/asset_store.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/guess_my_number/asset/data/message.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/guess_my_number/asset/gfx/background/guess_my_number_-_main_background_640_480.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/guess_my_number/asset/gfx/ui/button_back.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/guess_my_number/asset/gfx/ui/button_back_clicked.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/guess_my_number/asset/gfx/ui/button_back_hover.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/guess_my_number/assets.pptx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/physx_examples/start_template.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_json.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/asset/gfx/lightmap.kra" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/asset/gfx/lightmap.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/asset/tileset_lightmap.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/elisa/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/elisa_12_2_blending_simple_light.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/elisa_12_3_blending_spite_light.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/elisa_13_pixel_effects.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/elisa_15_collision_detection.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/extreme_pong/extreme_pong.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/asset/elise_character/tileset_elisa_idle@8x.json" beforeDir="false" afterPath="$PROJECT_DIR$/asset/elise_character/tileset_elisa_idle@8x.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/asset/elise_character/tileset_elisa_walk@8x.json" beforeDir="false" afterPath="$PROJECT_DIR$/asset/elise_character/tileset_elisa_walk@8x.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/asset/elise_character/tileset_elisa_walk_jump@8x.json" beforeDir="false" afterPath="$PROJECT_DIR$/asset/elise_character/tileset_elisa_walk_jump@8x.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/elisa_6_environment_map.py" beforeDir="false" afterPath="$PROJECT_DIR$/elisa_6_environment_map.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/elisa_11_blending.py" beforeDir="false" afterPath="$PROJECT_DIR$/elisa_12_1_blending.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/elisa_13_camera.py" beforeDir="false" afterPath="$PROJECT_DIR$/elisa_14_camera.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/elisa_7_anim_statemachine.py" beforeDir="false" afterPath="$PROJECT_DIR$/elisa_7_anim_statemachine.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/elisa_8_moving_in_environment.py" beforeDir="false" afterPath="$PROJECT_DIR$/elisa_8_moving_in_environment.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/elisa_9_particles.py" beforeDir="false" afterPath="$PROJECT_DIR$/elisa_9_particles.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/guess_a_number_scores.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/guess_the_number.py" beforeDir="false" afterPath="$PROJECT_DIR$/guess_the_number.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/particle.py" beforeDir="false" afterPath="$PROJECT_DIR$/particle.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/extreme_pong.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/sprites.py" beforeDir="false" afterPath="$PROJECT_DIR$/sprites.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/start_template.py" beforeDir="false" afterPath="$PROJECT_DIR$/start_template.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -43,28 +34,10 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/lib/__init__.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="34">
-              <caret line="2" selection-start-line="2" selection-end-line="2" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/lib/physics.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="398">
-              <caret line="26" column="39" selection-start-line="26" selection-start-column="39" selection-end-line="26" selection-end-column="39" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/particle.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="-2033">
-              <caret line="13" column="13" lean-forward="true" selection-start-line="13" selection-start-column="13" selection-end-line="13" selection-end-column="13" />
+              <caret line="13" column="13" selection-start-line="13" selection-start-column="13" selection-end-line="13" selection-end-column="13" />
               <folding>
                 <element signature="e#3298#5842#0" />
                 <element signature="e#5865#6069#0" />
@@ -73,7 +46,7 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ui.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="289">
@@ -83,10 +56,27 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/physx_examples/start_template.py">
+        <entry file="file://$PROJECT_DIR$/guess_my_number/asset/data/message.csv">
+          <provider selected="true" editor-type-id="text-editor" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="381">
-              <caret line="43" selection-start-line="43" selection-end-line="43" />
+            <state relative-caret-position="353">
+              <caret line="106" lean-forward="true" selection-start-line="106" selection-end-line="106" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/sprites.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="330">
+              <caret line="299" column="16" selection-start-line="299" selection-start-column="16" selection-end-line="299" selection-end-column="16" />
+              <folding>
+                <element signature="e#0#9#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -95,7 +85,7 @@
         <entry file="file://$PROJECT_DIR$/start_template.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="381">
-              <caret line="49" lean-forward="true" selection-start-line="49" selection-end-line="49" />
+              <caret line="49" selection-start-line="49" selection-end-line="49" />
             </state>
           </provider>
         </entry>
@@ -116,7 +106,7 @@
         <entry file="file://$PROJECT_DIR$/elisa_8_moving_in_environment.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="238">
-              <caret line="71" column="33" lean-forward="true" selection-start-line="71" selection-start-column="33" selection-end-line="71" selection-end-column="33" />
+              <caret line="71" column="33" selection-start-line="71" selection-start-column="33" selection-end-line="71" selection-end-column="33" />
             </state>
           </provider>
         </entry>
@@ -189,11 +179,9 @@
         <option value="$PROJECT_DIR$/elisa_10_screens.py" />
         <option value="$PROJECT_DIR$/sm.py" />
         <option value="$PROJECT_DIR$/elisa_13_camera.py" />
-        <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/elisa_6_environment_map.py" />
         <option value="$PROJECT_DIR$/base.py" />
         <option value="$PROJECT_DIR$/test_json.json" />
-        <option value="$PROJECT_DIR$/sprites.py" />
         <option value="$PROJECT_DIR$/asset/elise_character/tileset_elisa_walk@8x.json" />
         <option value="$PROJECT_DIR$/asset/elise_character/tileset_elisa_idle@8x.json" />
         <option value="$PROJECT_DIR$/asset/elise_character/tileset_elisa_walk_jump@8x.json" />
@@ -210,6 +198,8 @@
         <option value="$PROJECT_DIR$/elisa_8_moving_in_environment.py" />
         <option value="$PROJECT_DIR$/elisa_9_particles.py" />
         <option value="$PROJECT_DIR$/ui.py" />
+        <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/sprites.py" />
       </list>
     </option>
   </component>
@@ -241,6 +231,36 @@
             <path>
               <item name="elisa" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
               <item name="D:\Development\repos\Python\elisa" type="442cc68d:ScopeViewTreeModel$RootNode" />
+            </path>
+            <path>
+              <item name="elisa" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
+              <item name="D:\Development\repos\Python\elisa" type="442cc68d:ScopeViewTreeModel$RootNode" />
+              <item name="guess_my_number" type="9f88c78c:ScopeViewTreeModel$FileNode" />
+            </path>
+            <path>
+              <item name="elisa" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
+              <item name="D:\Development\repos\Python\elisa" type="442cc68d:ScopeViewTreeModel$RootNode" />
+              <item name="guess_my_number" type="9f88c78c:ScopeViewTreeModel$FileNode" />
+              <item name="asset" type="9f88c78c:ScopeViewTreeModel$FileNode" />
+            </path>
+            <path>
+              <item name="elisa" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
+              <item name="D:\Development\repos\Python\elisa" type="442cc68d:ScopeViewTreeModel$RootNode" />
+              <item name="guess_my_number" type="9f88c78c:ScopeViewTreeModel$FileNode" />
+              <item name="asset" type="9f88c78c:ScopeViewTreeModel$FileNode" />
+              <item name="data" type="9f88c78c:ScopeViewTreeModel$FileNode" />
+            </path>
+            <path>
+              <item name="elisa" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
+              <item name="D:\Development\repos\Python\elisa" type="442cc68d:ScopeViewTreeModel$RootNode" />
+              <item name="guess_my_number" type="9f88c78c:ScopeViewTreeModel$FileNode" />
+              <item name="asset" type="9f88c78c:ScopeViewTreeModel$FileNode" />
+              <item name="gfx" type="9f88c78c:ScopeViewTreeModel$FileNode" />
+            </path>
+            <path>
+              <item name="elisa" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
+              <item name="D:\Development\repos\Python\elisa" type="442cc68d:ScopeViewTreeModel$RootNode" />
+              <item name="lib" type="9f88c78c:ScopeViewTreeModel$FileNode" />
             </path>
             <path>
               <item name="elisa" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
@@ -454,7 +474,28 @@
       <option name="project" value="LOCAL" />
       <updated>1561130148291</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="changed meta-data added further improvement and physx namespace start.">
+      <created>1562486498989</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1562486498989</updated>
+    </task>
+    <task id="LOCAL-00008" summary="added data to message.csv">
+      <created>1562486580706</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1562486580706</updated>
+    </task>
+    <task id="LOCAL-00009" summary="added further ignore.">
+      <created>1562486661427</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1562486661427</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TodoView">
@@ -468,8 +509,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1381" height="895" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.6595331" visible="true" weight="0.22939867" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.6595331" visible="true" weight="0.22197476" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" sideWeight="0.34046692" weight="0.24350408" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -478,9 +520,9 @@
       <window_info anchor="bottom" id="Debug" order="3" weight="0.3994778" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" visible="true" weight="0.32898173" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.32898173" />
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.32898173" />
-      <window_info anchor="bottom" id="Terminal" order="8" weight="0.32898173" />
+      <window_info anchor="bottom" id="Terminal" order="8" visible="true" weight="0.32898173" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.5011136" side_tool="true" weight="0.18276763" />
       <window_info anchor="bottom" id="Python Console" order="10" weight="0.32898173" />
       <window_info anchor="bottom" id="Messages" order="11" />
@@ -496,10 +538,12 @@
     <MESSAGE value="Update the hero tile set meta-data. Added helper function to sprite. Fixed clicking and drawing of menu and menu items. Updated guess the number." />
     <MESSAGE value="added true type pixel font from itch.io." />
     <MESSAGE value="added documentation" />
-    <option name="LAST_COMMIT_MESSAGE" value="added documentation" />
+    <MESSAGE value="changed meta-data added further improvement and physx namespace start." />
+    <MESSAGE value="added data to message.csv" />
+    <MESSAGE value="added further ignore." />
+    <option name="LAST_COMMIT_MESSAGE" value="added further ignore." />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/tic_tac_toe.py" />
     <entry file="file://$PROJECT_DIR$/asset/map/world_1.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="34">
@@ -622,13 +666,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="455">
-          <caret line="108" column="25" selection-start-line="108" selection-start-column="25" selection-end-line="108" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/base.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
@@ -698,18 +735,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="562">
           <caret line="50" column="19" lean-forward="true" selection-start-line="50" selection-start-column="19" selection-end-line="50" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sprites.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3604">
-          <caret line="252" column="62" lean-forward="true" selection-start-line="252" selection-start-column="62" selection-end-line="252" selection-end-column="62" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-            <element signature="e#126#661#0" />
-            <element signature="e#704#1335#0" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -797,7 +822,7 @@
     <entry file="file://$PROJECT_DIR$/start_template.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="381">
-          <caret line="49" lean-forward="true" selection-start-line="49" selection-end-line="49" />
+          <caret line="49" selection-start-line="49" selection-end-line="49" />
         </state>
       </provider>
     </entry>
@@ -821,7 +846,7 @@
     <entry file="file://$PROJECT_DIR$/elisa_8_moving_in_environment.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="238">
-          <caret line="71" column="33" lean-forward="true" selection-start-line="71" selection-start-column="33" selection-end-line="71" selection-end-column="33" />
+          <caret line="71" column="33" selection-start-line="71" selection-start-column="33" selection-end-line="71" selection-end-column="33" />
         </state>
       </provider>
     </entry>
@@ -840,7 +865,7 @@
     <entry file="file://$PROJECT_DIR$/particle.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-2033">
-          <caret line="13" column="13" lean-forward="true" selection-start-line="13" selection-start-column="13" selection-end-line="13" selection-end-column="13" />
+          <caret line="13" column="13" selection-start-line="13" selection-start-column="13" selection-end-line="13" selection-end-column="13" />
           <folding>
             <element signature="e#3298#5842#0" />
             <element signature="e#5865#6069#0" />
@@ -852,6 +877,26 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="289">
           <caret line="202" column="22" selection-start-line="202" selection-start-column="22" selection-end-line="202" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/guess_my_number/asset/data/message.csv">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="353">
+          <caret line="106" lean-forward="true" selection-start-line="106" selection-end-line="106" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sprites.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="299" column="16" selection-start-line="299" selection-start-column="16" selection-end-line="299" selection-end-column="16" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

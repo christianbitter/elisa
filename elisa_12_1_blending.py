@@ -1,4 +1,5 @@
 # auth: christian bitter
+# name: elisa_12_1_blending.py
 # desc:
 # this tests the blending of a sprite onto background, using various blend modes
 
@@ -17,7 +18,7 @@ def main():
 
     S_WIDTH = 640
     S_HEIGHT= 480
-    S_TITLE = "Elisa 11 - Blending of sprites"
+    S_TITLE = "Elisa 12-1 - Blending of sprites"
 
     screen_buffer = pygame.display.set_mode(size=(S_WIDTH, S_HEIGHT))
     pygame.display.set_caption(S_TITLE)
