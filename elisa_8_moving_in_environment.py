@@ -3,11 +3,15 @@
 #       in an environment generated from a sprite map
 #       the character can move around according to the simple constraints
 #       imposed by the environment. That is, this tutorial will support
-#           TODO: abstraction for maps
-#           TODO: player moves from tile to tile (simple movement not necessarily animation)
+#           An abstraction for maps
+#               TODO: a tiled map is built from a 2d array of map tiles
+#               TODO: map tiles are identifiable unique game objects
+#               TODO: a map tile links some structural game-relevant properties and a visual representation
+#           TODO: on habitable tiles player moves from tile to tile (simple movement not necessarily animation)
 #           TODO: player cannot run into walls
-#               This should use pygame collision detection
 #           TODO: expand the animation concept from frame iteration to an animation composed of sprites
+#       In this example we keep the data and rendering close, but at a later stage (particle system),
+#       the data holding map and rendering map renderer is broken.
 
 import os
 import pygame
@@ -17,7 +21,7 @@ import json
 # gfx: https://ansimuz.itch.io/tiny-rpg-town
 # sprite packing: https://www.leshylabs.com/apps/sstool/
 
-# TODO: elisa_9
+# TODO: elisa_8
 
 def tileno2spritemap(tileno, sprite_map):
     tile_id = "grass_{}".format(tileno)
@@ -53,24 +57,132 @@ def render_map(buffer, sprite_map, world_map, start_x, start_y, map_width = 10, 
 # Each update step we move the current frame index. If the frame index reaches the last. If repeat is switched on
 # the repeat will trigger an update of the current frame index, otherwise the i
 
-class Map(object):
+class MapTile(dict):
+    """Since a map tile is mostly structural properties, and we wish to desire it into JSON,
+    let's make it inherit from dict and get serialization out of the box
+    """
+    def __repr__(self):
+        return "MapTile"
+
+
+class TiledMap(object):
     """"""
 
-    def __init__(self, ):
+    def __init__(self):
         """Constructor for Map"""
-        super(Map, self).__init__()
+        super(TiledMap, self).__init__()
+        self._map = None  # map is the actual map data
+        self._tile_def = None  # tile def links a specific tile referenced in the map to a definition
+        self._width = 0
+        self._height = 0
+
+    @staticmethod
+    def __check_tile_ids(the_map, tile_def):
+        tile_ids = set(the_map)
+        if len(tile_ids) != len(tile_def):
+            raise ValueError("number of referenced tiles != number of defined tiles")
+
+        for an_id in tile_ids:
+            if an_id not in tile_def.keys():
+                raise ValueError("tile definition does not contain definition for {}".format(an_id))
+
+        return True
+
+    @staticmethod
+    def from_1d(a_map: list, width: int, height: int, tile_def: dict):
+        if not a_map:
+            raise ValueError("Map missing")
+        if width is None:
+            raise ValueError("Width missing")
+        if width < 1:
+            raise ValueError("Width <= 0")
+        if height is None:
+            raise ValueError("Height missing")
+        if height < 1:
+            raise ValueError("Height <= 0")
+        if not tile_def:
+            raise ValueError("Tile Definition missing")
+
+        wh = width*height
+
+        if len(a_map) != wh:
+            raise ValueError("Map does not contain suffient tiles")
+        m = TiledMap()
+        m._width = width
+        m._height = height
+        m._map = a_map
+        _ = TiledMap.__check_tile_ids(the_map=a_map, tile_def=tile_def)
+        m._tile_def = tile_def
+
+        return m
+
+    @property
+    def map_data(self):
+        return self._map
+
+    @staticmethod
+    def from_2d(a_map:list, tile_def:dict):
+        if not a_map:
+            raise ValueError("Map missing")
+        if not tile_def:
+            raise ValueError("Tile Definition missing")
+
+        _height = len(a_map)
+        entry_0 = a_map[0]
+        if not isinstance(entry_0, list):
+            raise ValueError("Map is not 2-D - map[][]")
+        _width = len(entry_0)
+
+        for r in a_map:
+            if not isinstance(r, list):
+                raise ValueError("Map is not 2-D - map[][]")
+            if len(r) != _width:
+                raise ValueError("Uneven map segments/ differing width")
+
+        wh = _width * _height
+        m = TiledMap()
+        l_map = [xy for y_row in a_map for xy in y_row]
+        assert(len(l_map) == wh)
+        m._map = l_map
+        m._width = _width
+        m._height = _height
+
+        _ = TiledMap.__check_tile_ids(the_map=l_map, tile_def=tile_def)
+        m._tile_def = tile_def
+        return m
+
+    @property
+    def width(self):
+        return self._width
+
+    @property
+    def height(self):
+        return self._height
+
+    def serialize(self):
+        pass
+
+    def deserialize(self):
+        pass
 
     def load(map_fp:str):
+        # TODO: load from json structure
         pass
 
-    def save(map_obj):
-        pass
+    def save(self, save_fp: str):
+        if not save_fp:
+            raise ValueError("save file path not provided")
+        with open(save_fp, 'w+', encoding='ascii') as f:
+            json_dict = {
+                "map": self._map,
+                "tile_def": self._tile_def,
+                "width": self._width,
+                "height": self._height
+            }
+            json.dump(json_dict, f)
 
-    def render_minimap(self):
-        pass
-
-    def render(self):
-        pass
+    def __repr__(self):
+        return "Map - Width: {}/ Height: {}".format(self._width, self._height)
 
 
 class SpriteAnimation(object):
@@ -109,17 +221,28 @@ def main():
     pygame.init()
 
     world_map = [
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        1, 2, 2, 2, 2, 2, 2, 2, 2, 1,
-        1, 1, 3, 1, 3, 1, 3, 1, 3, 1,
-        1, 2, 2, 2, 2, 2, 2, 2, 2, 1,
-        1, 1, 3, 1, 3, 1, 3, 1, 3, 1,
-        1, 2, 2, 2, 2, 2, 2, 2, 2, 1,
-        1, 1, 3, 1, 3, 1, 3, 1, 3, 1,
-        1, 2, 2, 2, 2, 2, 2, 2, 2, 1,
-        1, 1, 3, 1, 3, 1, 3, 1, 3, 1,
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 2, 2, 2, 2, 2, 2, 2, 2, 1],
+        [1, 1, 3, 1, 3, 1, 3, 1, 3, 1],
+        [1, 2, 2, 2, 2, 2, 2, 2, 2, 1],
+        [1, 1, 3, 1, 3, 1, 3, 1, 3, 1],
+        [1, 2, 2, 2, 2, 2, 2, 2, 2, 1],
+        [1, 1, 3, 1, 3, 1, 3, 1, 3, 1],
+        [1, 2, 2, 2, 2, 2, 2, 2, 2, 1],
+        [1, 1, 3, 1, 3, 1, 3, 1, 3, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     ]
+
+    wall_tile = MapTile()
+    way1_tile = MapTile()
+    flower1_tile = MapTile()
+
+    a_map = TiledMap.from_2d(world_map, tile_def={1: wall_tile,
+                                                  2: way1_tile,
+                                                  3: flower1_tile})
+
+    a_map_fp = "test_json.json"
+    a_map.save(a_map_fp)
 
     MAP_WIDTH, MAP_HEIGHT = 10, 10
     MAP_OFFSET_X, MAP_OFFSET_Y = 50, 50
@@ -139,13 +262,9 @@ def main():
     back_buffer = back_buffer.convert()
     back_buffer.fill(C_WHITE)
 
-    # FPS watcher
-    fps_watcher = pygame.time.Clock()
     is_done = False
 
-
     while not is_done:
-        fps_watcher.tick(60)
 
         for event in pygame.event.get():
             if event.type == QUIT:

@@ -10,24 +10,24 @@
   "sprites": [
     {
       "id": "idle_1",
-      "x": 0,
-      "y": 0,
-      "width": 256,
-      "height": 256
+      "x": 96,
+      "y": 64,
+      "width": 48,
+      "height": 128
     },
     {
       "id": "idle_2",
-      "x": 256,
-      "y": 0,
-      "width": 256,
-      "height": 256
+      "x": 352,
+      "y": 64,
+      "width": 48,
+      "height": 128
     },
     {
       "id": "idle_3",
-      "x": 512,
-      "y": 0,
-      "width": 256,
-      "height": 256
+      "x": 608,
+      "y": 64,
+      "width": 48,
+      "height": 128
     }
   ]
 }

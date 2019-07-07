@@ -2,10 +2,6 @@
 # desc: this is based on elisa4 and 5
 #       we couple the state machine with animation and make movement slightly more realistic.
 #       that is, moving right, will move the player right until an imaginary wall is hit
-#           TODO: we may need to think about animation timings, i.e.
-#                 instead of simply looping through the frames, we may need to define sequence of frames
-#                 and bundle this as an animation
-#           TODO: the coupling between state machine and sprite is to tight
 
 from pygame.locals import *
 from sm import *

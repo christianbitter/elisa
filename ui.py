@@ -8,6 +8,9 @@
 # UI elements are re-rendered upon invalidation. In that case the elements paint method is called, causing the
 # UI elements surface buffer to be refreshed, so that it can be blitted with valid content subsequently.
 # todo: ui element text box
+# todo: ui element imagebutton
+# todo: on mouse over event
+# todo: on focus event
 # todo: ui element label
 # todo: support for rendering form with background and alpha blending of controls
 # todo: having to forward the pygame event loop events to the controls is cumbersome, there
@@ -18,6 +21,7 @@
 # todo: controls should have a global coordinate pair as well, this would simplify the hit-testing
 # todo: screen transitions either in the screen or in the UI
 
+import os
 import pygame
 from enum import Enum, IntFlag
 
@@ -32,6 +36,9 @@ C_WHITE = (255, 255, 255, 255)
 
 I_MARGIN = 3
 
+def xy_inside(x: int, y: int, x0: int, y0: int, w: int, h: int) -> bool:
+    return x0 <= x <= x0 + w and y0 <= y <= y0 + h
+
 
 class UIEvent:
     SCREEN_TRANSITION:int = 99999
@@ -41,12 +48,10 @@ class UIEvent:
         return pygame.event.Event(pygame.USEREVENT,
                                   {
                                       "mode": UIEvent.SCREEN_TRANSITION,
-                                      "source" : event_from,
-                                      "target" : event_to
+                                      "source": event_from,
+                                      "target": event_to
                                   })
 
-def xy_inside(x: int, y: int, x0: int, y0: int, w: int, h: int) -> bool:
-    return x0 <= x <= x0 + w and y0 <= y <= y0 + h
 
 class FillStyle(Enum):
     Empty = 1
@@ -59,11 +64,17 @@ class VerticalAlignment(Enum):
     Top = 1
     Bottom = 2
 
+    def __str__(self):
+        return self.name
+
 
 class HorizontalAlignment(Enum):
     Center = 0
     Left = 1
     Right = 2
+
+    def __str__(self):
+        return self.name
 
 
 class FontStyle(IntFlag):
@@ -71,6 +82,9 @@ class FontStyle(IntFlag):
     Bold = 1,
     Italic = 2,
     Underline = 8
+
+    def __str__(self):
+        return self.name
 
 
 class UIElement(object):
@@ -95,8 +109,8 @@ class UIElement(object):
         if self._y0 is not None and self._h is not None:
             self._y1 = y + h
         self._client_rect = (0, 0, self._w, self._h)
-        self._invalidated = True
-        self._has_focus = False
+        self._invalidated = kwargs.get('invalidated', False)
+        self._has_focus = kwargs.get('has_focus', False)
 
     @property
     def name(self):
@@ -166,7 +180,7 @@ class UIElement(object):
             self._y1 = self._y0 + h
             self.invalidate()
 
-    def invalidate(self):
+    def invalidate(self, **kwargs):
         self._client_rect = (0, 0, self._w, self._h)
         self._invalidated = True
 
@@ -180,13 +194,14 @@ class UIElement(object):
     def __repr__(self):
         return "UIElement: {} ({})".format(self._name, type(self))
 
-
     def initialize(self):
         pass
 
     def finalize(self):
         pass
 
+    def update(self, t):
+        pass
 
 class Renderable(UIElement):
     """"""
@@ -207,6 +222,9 @@ class Renderable(UIElement):
         self._font = pygame.font.Font(kwargs.get('font', pygame.font.get_default_font()), self._font_size)
         self._font_colour = kwargs.get('font_colour', C_BLACK)
 
+        self._is_visible = kwargs.get('visible', True)
+        self._z_order = kwargs.get('z', 0)
+
         self._caption_halign = kwargs.get('caption_halign', HorizontalAlignment.Left)
         self._caption_valign = kwargs.get('caption_valign', VerticalAlignment.Center)
 
@@ -214,6 +232,7 @@ class Renderable(UIElement):
 
         self._text_caption = None
         self._text_bounds = None
+        self._surface = None
 
         if self._show_caption and self._caption is not None:
             self._text_caption = self._font.render(self._caption, 1, self._font_colour)
@@ -226,10 +245,9 @@ class Renderable(UIElement):
             if self.height is None or self.height < h:
                 self.height = _h
 
-        self._surface = None
         if self.width is not None and self.height is not None:
             # TODO: we need to see about the correct surface flags to enable transparent control overlays
-            self._surface = pygame.Surface((self.width, self.height))
+            self._surface = pygame.Surface((self.width, self.height), flags=pygame.SRCALPHA)
         else:
             print("{}' surface was not initialized, because either width ({}) or height ({}) was not provided {}.".format(
                 self._name, self.width, self.height, (w, h))
@@ -244,6 +262,14 @@ class Renderable(UIElement):
             self._font.set_underline(True)
 
     @property
+    def z_order(self):
+        return self._z_order
+
+    @property
+    def is_visible(self):
+        return self._is_visible
+
+    @property
     def background_colour(self):
         return self._background_colour
 
@@ -255,10 +281,14 @@ class Renderable(UIElement):
     def show_border(self):
         return self._show_border
 
-    def invalidate(self):
-        UIElement.invalidate(self)
-        if self._w is not None and self._h is not None:
-            self._surface = pygame.Surface((self._w, self._h), flags=pygame.SRCALPHA)
+    def invalidate(self, **kwargs):
+        UIElement.invalidate(self, **kwargs)
+        # if we need to create a new surface we do otherwise we just clear
+        if 'clear_only' in kwargs:
+            self._surface.fill(C_BLACK)
+        else:
+            if self._w is not None and self._h is not None:
+                self._surface = pygame.Surface((self._w, self._h), flags=pygame.SRCALPHA)
 
     @property
     def caption(self):
@@ -273,14 +303,13 @@ class Renderable(UIElement):
             if self._surface is None:
                 raise ValueError("Cannot paint into None surface: {}".format(self._name))
 
-            self._surface.fill(C_BLACK)
             if self._fill_style == FillStyle.Colour:
                 pygame.draw.rect(self._surface, self._background_colour, self._client_rect, 0)
             elif self._fill_style == FillStyle.Image:
                 if not self._background_image:
                     raise ValueError("background fill image but image not provided")
 
-                scaled_bgimg = pygame.transform.scale(self._background_image.image, (self._w, self._h))
+                scaled_bgimg = pygame.transform.scale(self._background_image, (self._w, self._h))
                 self._surface.blit(scaled_bgimg, dest=self._client_rect)
             else:
                 pass
@@ -325,7 +354,8 @@ class Renderable(UIElement):
         #   every paint/ render pair needs to be check
         if self._invalidated:
             self._paint()
-        buffer.blit(self._surface, (self.x, self.y))
+        if self._is_visible:
+            buffer.blit(self._surface, (self.x, self.y))
 
 
 class Clickable(Renderable):
@@ -334,7 +364,7 @@ class Clickable(Renderable):
     def __init__(self, name, x: int = None, y: int = None, w: int = None, h: int = None, **kwargs):
         """Constructor for Clickable"""
         super().__init__(name, x=x, y=y, w=w, h=h, **kwargs)
-        self._is_clicked = False
+        self._is_clicked = kwargs.get('is_clicked', False)
 
     def unclick(self):
         self._is_clicked = False
@@ -354,6 +384,71 @@ class Clickable(Renderable):
     def on_click(self, sender, event_args):
         # when clicked this fires, it needs to be overwritten in a derived class
         pass
+
+
+class UIImage(Clickable):
+    """
+    A component to show an image
+    """
+
+    def __init__(self, name: str, image_fp: str, x: int, y: int, w: int = None, h: int = None, **kwargs):
+        """Constructor for UIImage"""
+        if not image_fp or not os.path.exists(image_fp):
+            raise ValueError("Image path not provided or does not exist")
+        img = pygame.image.load(image_fp)
+        rescale = False
+        if w is None:
+            w = img.get_width()
+            rescale  = True
+        if h is None:
+            h = img.get_height()
+            rescale = True
+        s_img = pygame.transform.scale(img, (w, h))
+        s = pygame.Surface((w, h))
+        s.blit(s_img, (0, 0))
+        del img
+        kwargs['background_image'] = s
+        kwargs['fill_style'] = FillStyle.Image
+        self._image_fp = image_fp
+        super(UIImage, self).__init__(name=name, x=x, y=y, w=w, h=h, **kwargs)
+
+    def __repr__(self):
+        return "[UIImage] {}: {}".format(self._name, self._image_fp)
+
+    @property
+    def image(self):
+        return self._background_image
+
+    @property
+    def image_path(self):
+        return self._image_fp
+
+    def render(self, buffer):
+        if self._invalidated:
+            self._paint()
+        Renderable.render(self, buffer)
+        buffer.blit(self._background_image, (self._x0, self._y0, self.width, self.height))
+
+
+class Canvas(Clickable):
+    """
+    A canvas is a simple renderable, which only exists for the purposes of drawing into it
+    """
+
+    def __init__(self, name: str, x: int, y: int, w: int, h: int, **kwargs):
+        """Constructor for Canvas"""
+        kwargs['show_border'] = False
+        kwargs['show_caption'] = False
+        super(Canvas, self).__init__(name=name, x=x, y=y, w=w, h=h, **kwargs)
+
+    def render(self, buffer):
+        if self.is_visible:
+            return
+
+        if self._invalidated:
+            self._paint()
+
+        buffer.blit(self._surface, (self.x, self.y))
 
 
 class Label(Renderable):
@@ -403,6 +498,7 @@ class MultiLineLabel(Label):
             self._invalidated = False
             pass
 
+
 class Button(Clickable):
     """"""
 
@@ -420,14 +516,13 @@ class Button(Clickable):
 class MenuItem(Button):
     """"""
 
-    def __init__(self, name: str, caption:str, w: int = None, h: int = None, **kwargs):
+    def __init__(self, name: str, caption: str, w: int = None, h: int = None, **kwargs):
         """Constructor for MenuItem"""
         kwargs['caption'] = caption
         kwargs['show_caption'] = True
         kwargs['show_border'] = True
         kwargs['fill_style'] = FillStyle.Colour
-        super().__init__(name=name, x=0, y=0, w=w, h=h,
-                         **kwargs)
+        super().__init__(name=name, x=0, y=0, w=w, h=h, **kwargs)
 
 
 class Menu(Clickable):
@@ -455,7 +550,7 @@ class Menu(Clickable):
     def add_item(self, mni: MenuItem):
         """
         Add a menu item to the existing menu items.
-        :param m: the menu item to add
+        :param mni: the menu item to add
         """
         if not mni:
             raise ValueError("Item not provided")
@@ -489,6 +584,9 @@ class Menu(Clickable):
         self._items[mni.name] = mni
         self._item_names.append(mni.name)
         self.invalidate()
+
+    def __repr__(self):
+        return "Menu: {} - {} items".format(self._name, len(self._item_names))
 
     @property
     def caption(self):
@@ -537,7 +635,7 @@ class Menu(Clickable):
             m._paint()
 
     def render(self, buffer):
-        if not self._show_caption and len(self._item_names) < 1:
+        if not self._show_caption and not self._show_border and len(self._item_names) < 1:
             return
 
         if self._invalidated:
@@ -572,21 +670,28 @@ class Screen(Clickable):
     def _initialize_components(self):
         pass
 
-    def paint(self):
-        Clickable.paint(self)
+    def _paint(self):
+        Clickable._paint(self)
         for _, ui_elem in self._components.items():
             if isinstance(ui_elem, Renderable):
-                ui_elem.paint()
+                ui_elem._paint()
 
     def render(self, buffer):
+        """
+        Renders the screen and all its associated components to the provided buffer
+        :param buffer:
+        :return:
+        """
         if self._invalidated:
             self._paint()
 
         Clickable.render(self, buffer)
-
-        for _, ui_elem in self._components.items():
-            if isinstance(ui_elem, Renderable):
-                ui_elem.render(self._surface)
+        # remove non-visible items and sort by z-index - front to back rendering
+        ui_elems = [i for i in self._components.values() if isinstance(i, Renderable) and i.is_visible]
+        # sort by zindex
+        visibles = sorted(ui_elems, key=lambda x: x.z_order, reverse=False)
+        for ui_elem in visibles:
+            ui_elem.render(self._surface)
 
         buffer.blit(self._surface, (self._x0, self._y0))
 
@@ -596,7 +701,12 @@ class Screen(Clickable):
             if isinstance(c, Clickable):
                 c.unclick()
 
-    def add_component(self, c):
+    def add_component(self, c:UIElement) -> None:
+        """
+        Add a component to the screen's components
+        :param c: (UIElement) the component to add
+        :return: None
+        """
         if not c:
             raise ValueError("component to add not provided")
         self._components[c.name] = c
@@ -672,6 +782,7 @@ class WindowManager:
         self._active_screen = to_screen
         self.on_transitioned(from_screen, to_screen)
 
+    # TODO: make into getter and setter
     def on_transitioned(self, from_name, to_name) -> None:
         """
         called after a transition is made

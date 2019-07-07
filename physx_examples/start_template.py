@@ -1,6 +1,6 @@
 # auth: christian bitter
-# name:
-# desc:
+# name: start_template.py
+# desc: the starter template for all physics explorations. based off the elisa starter template.
 
 import pygame
 
@@ -9,11 +9,9 @@ def main():
     if not pygame.font: print("Pygame - fonts not loaded")
     if not pygame.mixer: print("Pygame - audio not loaded")
 
-    # init pygame - create the main window, and a background surface
-
     pygame.init()
 
-    S_WIDTH, S_HEIGHT, S_TITLE = 640, 480, "Elisa - <The Name of The Example>"
+    S_WIDTH, S_HEIGHT, S_TITLE = 640, 480, "Physx - <The Name of The Example>"
     C_WHITE = (255, 255, 255)
 
     screen_buffer = pygame.display.set_mode(size=(S_WIDTH, S_HEIGHT))
@@ -34,10 +32,6 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 is_done = True
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                pass
-            elif event.type == pygame.MOUSEBUTTONUP:
-                pass
             else:
                 pass
 
@@ -47,3 +41,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

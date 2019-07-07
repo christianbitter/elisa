@@ -3,12 +3,25 @@
 # This is a simple game, where the player has to guess a randomly generated integer number. This number has to be
 # in some range [0, MAX]. The player is given some x amount of tries to guess the number
 
+# TODO: simple asset store
 # TODO: the game will issue some informative, conversational messages to keep the player engaged
-# TODO: with each passed try, the goblin from the used art work will come closer to a peasant. Once all tries are out
-#       the goblin will lay down - die!
+#   Messages are loaded from a csv file.
+# TODO: while the player is guessing, we show the elisa running sprite
+#   The running is virtual, i.e. we move some arbirary other sprite like a simple point or we can use the tree in the
+#   tileset/tileset.png, past elisa.
+#   TODO: This involves the creation of a parallax scrolling effect.
+#       This means while the foreground (elisa) is animated to show moving,
+#       the background moves at a much lower pace than induced by the foreground.
 # TODO: in a more difficult setting, the player has only some amount of seconds, before the clock ticks off
-# TODO: the screen interface needs to be improved
+#   This will be visualized by Elisa moving from the starting position to the end position. The end is marked by the
+#   tree.
+# TODO: the screen interface needs to be improved.
+#   TODO: a real background image needs to be drawn.
+#    TODO: The same image is shown on all screens.
+#    TODO: leaderboard, options, and about screen need a back button.
+#       TODO: when clicking the back button, the player is navigated back to the main screen.
 # TODO: except for the main playing screen, all screens feature a simple calm background music
+# TODO: clicking on a menu item will issue a click sound.
 # A simple game menu, including ...
 #  (start) new game
 #  options
@@ -19,18 +32,21 @@
 #  view about ... this shows a simple description of the game, copyright message, version information and credits
     # TODO: introduce version
     # TODO: UI element multi-line label
+    #   The multiline label is composed of multiple virtual individual line 'labels'.
+    #   A virtual line is created whenever the number of characters fitting on defined virtual screen line exceeds
+    #   the available width. Breaking words should reflect the standard orthography.
 #   Quit
 #       Quits the game.
 # menu items is shown.
-# TODO: main screen shows the menu, in the background we see numbers moving, scaling and rotating
-#           the numbers fade in and out of visibility in the background
-#           TODO: 2d image transform - scale
-#           TODO: 2d image transform - rotate
-#           TODO: 2d image transform - translate
+# The main screen shows the menu, in the background we see numbers moving.
+# the numbers fade in and out of visibility in the background.
 # TODO: all screen declarations go into the game renderer
-# TODO: a game renderer has at least one active screen - the one where the game is rendered
+# A game renderer has at least one active screen - the one where the game is rendered.
 # A simple high score mechanism including persistence is realized. Initially, the score directly mimics the number of
-# tries used to finish a round. Only if the player succeeds will she be awarded a score.
+# tries used to finish a round. Only if the player succeeds will she be awarded a score. There is no limitation in terms
+# of best N to define the leaderboard - all entries are persisted and loaded.
+# A particle that moves out of bounds cools down to a temperature of 0 and essentially is respawned.
+# The particle renderer renders the circle (text) and a number inside to represent the thought bubbles of guessing a number.
 
 import os
 import csv
@@ -39,12 +55,22 @@ import random
 import pygame
 from pygame.locals import *
 from enum import Enum
-from ui import Screen, UIEvent, Menu, MenuItem, FontStyle, Label, VerticalAlignment, WindowManager
+from particle import ParticleSystem, Particle, _to_unit_vector, _angle_to_dir, ParticleSystemRenderer
+from ui import Screen, UIEvent, Menu, MenuItem, FontStyle, Label, UIImage, WindowManager, Canvas
 
+ASSET_BASE_DIR_FP = "guess_my_number/asset"
+GUESS_MY_NUMBER_BG_FP = "{}/gfx/background/guess_my_number_-_main_background_640_480.png".format(ASSET_BASE_DIR_FP)
+BTN_BACK_UNCLICKED_FP = "{}/gfx/ui/button_back.png".format(ASSET_BASE_DIR_FP)
 
 class PlayerType(Enum):
+    """
+    Enumeration of different player types.
+    """
     CPU = 1
     Human = 2
+
+    def __str__(self):
+        return self.name
 
 
 class Player(object):
@@ -60,6 +86,8 @@ class Player(object):
     def __str__(self):
         return "[{}] {}".format(self._id, self._name)
 
+    def __eq__(self, other):
+        return self._id == other.id
 
     @property
     def id(self):
@@ -73,9 +101,14 @@ class Player(object):
     def player_type(self):
         return self._type
 
+    def __repr__(self):
+        return "{} ({}: {})".format(self._name, self._type, self._id)
+
 
 class Game(object):
-    """"""
+    """
+    Base class of our games
+    """
 
     def __init__(self, name, max_players, **kwargs):
         """Constructor for Game"""
@@ -181,6 +214,7 @@ class GuessMyNumber(Game):
         self._score = None
         self._active_player = None
         self._score_table_fp = "guess_a_number_scores.csv"
+        self._asset_base_fp = "guess_my_number/asset"
 
     def init(self):
         self._random_number = random.randint(0, self._max_number)
@@ -362,11 +396,22 @@ class LeaderBoardScreen(Screen):
 
     def __init__(self, ):
         """Constructor for LeaderBoardScreen"""
+        self._bg_img_fp = GUESS_MY_NUMBER_BG_FP
+        self._btnBackUnclicked_fp = BTN_BACK_UNCLICKED_FP
         super(LeaderBoardScreen, self).__init__(name='screenLeaderBoard', title='LeaderBoard', width=640, height=480)
 
     def _initialize_components(self):
         self._about_label = Label(name='lblLeaderboard', x=10, y=10, w=300, caption="High Scores")
+        image_margin = 10
+        self.bg_image = UIImage(name='mnBGImage', image_fp=self._bg_img_fp,
+                                x=image_margin, y=image_margin,
+                                w=self.width - 2 * image_margin,
+                                h=self.height - 2 * image_margin,
+                                z=-2)
+        self._btnBack = UIImage(name='btnBack', image_fp=self._btnBackUnclicked_fp, x=600, y=image_margin, w=32, h=32)
         self.add_component(self._about_label)
+        self.add_component(self.bg_image)
+        self.add_component(self._btnBack)
 
 # TODO: OptionsScreen
 class OptionsScreen(Screen):
@@ -374,11 +419,22 @@ class OptionsScreen(Screen):
 
     def __init__(self, ):
         """Constructor for OptionsScreen"""
+        self._bg_img_fp = GUESS_MY_NUMBER_BG_FP
+        self._btnBackUnclicked_fp = BTN_BACK_UNCLICKED_FP
         super(OptionsScreen, self).__init__(name='screenOptions', title='Options', width=640, height=480)
 
     def _initialize_components(self):
         self._about_label = Label(name='lblOptions', x=10, y=10, w=300, caption="Options")
+        image_margin = 10
+        self.bg_image = UIImage(name='mnBGImage', image_fp=self._bg_img_fp,
+                                x=image_margin, y=image_margin,
+                                w=self.width - 2 * image_margin,
+                                h=self.height - 2 * image_margin,
+                                z=-2)
+        self._btnBack = UIImage(name='btnBack', image_fp=self._btnBackUnclicked_fp, x=600, y=image_margin, w=32, h=32)
         self.add_component(self._about_label)
+        self.add_component(self.bg_image)
+        self.add_component(self._btnBack)
 
 # TODO: AboutScreen
 class AboutScreen(Screen):
@@ -386,22 +442,67 @@ class AboutScreen(Screen):
 
     def __init__(self, ):
         """Constructor for AboutScreen"""
+        self._bg_img_fp = GUESS_MY_NUMBER_BG_FP
+        self._btnBackUnclicked_fp = BTN_BACK_UNCLICKED_FP
         super(AboutScreen, self).__init__(name='screenAbout', title='About', width=640, height=480)
 
     def _initialize_components(self):
         self._about_label = Label(name='lblAbout', x=10, y=10, w=300, caption="About")
+        image_margin  = 10
+        self.bg_image = UIImage(name='mnBGImage', image_fp=self._bg_img_fp,
+                                x=image_margin, y=image_margin,
+                                w=self.width - 2 * image_margin,
+                                h=self.height - 2 * image_margin,
+                                z=-2)
+        self._btnBack = UIImage(name='btnBack', image_fp=self._btnBackUnclicked_fp, x=600, y=image_margin, w=32, h=32)
         self.add_component(self._about_label)
+        self.add_component(self.bg_image)
+        self.add_component(self._btnBack)
 
 
 class MainScreen(Screen):
     """"""
 
+    # TODO: the main screen shows some number tiles, i.e. rects with numbers on them
+    #       spawning at random locations
+    #       moving into random locations
+    #       rotating around random angles
+    #       living and disappearing
+
     def __init__(self):
         """Constructor for MainScreen"""
-        super().__init__(name='screenMain', title='Main', width=640, height=480)
         text = "Guess My Number"
-        self._font = pygame.font.Font(pygame.font.get_default_font(), 32)
-        self._header = self._font.render(text, 1, (64, 0, 255))
+        self._bg_img_fp = GUESS_MY_NUMBER_BG_FP
+        super().__init__(name='screenMain', title='Main', width=640, height=480)
+
+        self._t_last = pygame.time.get_ticks()
+        self._delta_t= 0  # in seconds
+        self._number_psys = ParticleSystem(max_particles=40)
+        self._psys_renderer = GMNParticleSystemRenderer()
+        self._number_psys.on_particle_died = lambda psys, particle: self.particle_died(psys, particle)
+
+        for _ in range(self._number_psys.max_particles):
+            self._number_psys.add_particle(self._random_particle())
+
+    def _random_particle(self):
+        temp_decrease = 0.2 * random.random()
+        particle_size = random.randint(1, 20)
+        max_particle_velocity = random.randint(0, 60)
+        G_DIR = _to_unit_vector(_angle_to_dir(90))
+        G_FORCE = (0 * G_DIR[0], G_DIR[1] * 9.81)
+        velocity = [max_particle_velocity, max_particle_velocity]
+        alpha = int(random.random() * 360)
+        dir = _to_unit_vector(_angle_to_dir(alpha))
+        v = (dir[0] * velocity[0], dir[1] * velocity[1])
+        p = GMNParticle(pos=(random.randint(0, self.width), random.randint(0, self.height)),
+                        temperature=.7, temp_decrease=temp_decrease, size=particle_size,
+                        velocity=v, max_velocity=max_particle_velocity,
+                        acceleration=G_FORCE, max_acceleration=-1)
+        return p
+
+    def particle_died(self, psys, particle):
+        # create a new particle
+        psys.add_particle(self._random_particle())
 
     def _main_on_click(self, sender, event_args):
         if sender.name == self.mni_quit.name:
@@ -419,13 +520,12 @@ class MainScreen(Screen):
 
     def _initialize_components(self):
         fs, fc, fstyle = 28, (192, 32, 128, 255), FontStyle.Normal
-        self.main_menu = Menu('menuMain', caption='Main', show_caption=False, show_border=True, x=50, y=100)
+        self.main_menu = Menu('menuMain', caption='Main', show_caption=False, show_border=True, x=30, y=50)
         self.mni_newgame = MenuItem(name='mniNewGame', caption='New Game', font_size=fs, font_colour=fc, font_style=fstyle)
         self.mni_options = MenuItem(name='mniOptions', caption='Options', font_size=fs, font_colour=fc, font_style=fstyle)
         self.mni_leader  = MenuItem(name='mniLeaderBoard', caption='Leaderboard', font_size=fs, font_colour=fc, font_style=fstyle)
         self.mni_about   = MenuItem(name='mniAbout', caption='About', font_size=fs, font_colour=fc, font_style=fstyle)
-        self.mni_quit = MenuItem(name='mniQuit', caption='Quit',
-                                 font_size=fs, font_colour=fc, font_style=fstyle)
+        self.mni_quit = MenuItem(name='mniQuit', caption='Quit', font_size=fs, font_colour=fc, font_style=fstyle)
 
         # wire events
         self.mni_newgame.on_click = self._main_on_click
@@ -440,18 +540,108 @@ class MainScreen(Screen):
         self.main_menu.add_item(self.mni_about)
         self.main_menu.add_item(self.mni_quit)
 
+        # TODO: support transparent blitting of images
+        # TODO: support the drawing of the particle system into a canvas element
+        image_margin  = 10
+        self.bg_image = UIImage(name='mnBGImage', image_fp=self._bg_img_fp,
+                                x=image_margin, y=image_margin,
+                                w=self.width - 2 * image_margin,
+                                h=self.height - 2 * image_margin,
+                                z=-2)
+
+        self.title_label = Label(name='lblTitle', x=5, y=5, w=300, caption="Guess My Number")
+        self.add_component(self.title_label)
+
+        self.add_component(self.bg_image)
         self.add_component(self.main_menu)
+        self.add_component(self.title_label)
 
     def render(self, buffer):
+        tl = pygame.time.get_ticks()
+
+        Screen.invalidate(self)
+        Screen._paint(self)
+        self._delta_t = 0.001 * (tl - self._t_last)
+        self._t_last = tl
+        self._number_psys.update(t=self._delta_t)
+        # check each particle if it is out of bounds
+        for p in self._number_psys.particles:
+            if 0 <= p.x < self.width and 0 <= p.y < self.height:
+                continue
+            else:
+                p.temperature = 0.0
+
         Screen.render(self, buffer)
-        buffer.blit(self._header, (50, 50))
+        self._psys_renderer.render(buffer, self._number_psys.particles)
+        # buffer.blit(self.bg_image.image, (0, 0))#, special_flags=pygame.BLEND_MAX)
 
 
 class GameScreen(Screen):
     """"""
     def __init__(self):
-        """Constructor for OptionsScreen"""
+        """Constructor for GameScreen"""
         super(GameScreen, self).__init__(name='screenGame', title='Guess My Number', width=640, height=480)
+
+
+class GMNParticle(Particle):
+    """"""
+
+    def __init__(self, pos, size: int,
+                 temperature:float, temp_decrease,
+                 velocity, max_velocity, acceleration, max_acceleration,
+                 minno: int = 0, maxno: int = 10):
+        """Constructor for GMNParticle"""
+        self._number = random.randint(minno, maxno)
+        super(GMNParticle, self).__init__(pos, size, temperature, temp_decrease,
+                                          velocity, max_velocity,
+                                          acceleration, max_acceleration)
+
+    @property
+    def number(self):
+        return self._number
+
+
+class GMNParticleSystemRenderer(ParticleSystemRenderer):
+    """"""
+
+    def __init__(self):
+        """Constructor for GMNParticleSystemRenderer"""
+        super(GMNParticleSystemRenderer, self).__init__()
+
+    def temperature2colour(self, temperature:float) -> tuple:
+        return int(temperature * 164), int(64 * temperature), int(temperature * 255), 255
+
+    def render(self, buffer, render_items: list, x: int = None, y: int = None):
+        if not render_items or len(render_items) < 1:
+            return
+        C_WHITE = (255, 255, 255, 255)
+        w, h = buffer.get_width(), buffer.get_height()
+        p = [0, 0]
+        if x is not None:
+            if not (0 <= x < w):
+                raise ValueError("x outside of viewport")
+            p[0] = x
+        if y is not None:
+            if not (0 <= y < h):
+                raise ValueError("y outside of viewport")
+            p[1] = y
+
+        for particle in render_items:
+            col = self.temperature2colour(particle.temperature)
+            if len(col) != 4:
+                raise ValueError("temperature2colour must yield an RGBA tuple")
+            if 0 <= particle.x < w and 0 <= particle.y < h:
+                font = pygame.font.Font(None, particle.size)
+                text = font.render(str(particle.number), 1, C_WHITE)
+                textpos = text.get_rect()
+                textpos.centerx = particle.x
+                textpos.centery = particle.y
+
+                pygame.draw.circle(buffer, col, (int(particle.x), int(particle.y)), particle.size, 0)
+                pygame.draw.circle(buffer, (128, 128, 128, int(255*particle.temperature)),
+                                   (int(particle.x), int(particle.y)),
+                                   particle.size, 1)
+                buffer.blit(text, textpos)
 
 
 def main():

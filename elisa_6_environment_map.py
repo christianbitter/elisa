@@ -203,7 +203,7 @@ def main():
 
     S_WIDTH = 800
     S_HEIGHT= 600
-    S_TITLE = "Elisa7 - Drawing a Map using a Sprite Sheet"
+    S_TITLE = "Elisa - Drawing a Map using a Sprite Sheet"
 
     C_WHITE = (250, 250, 250)
     C_BLUE = (0, 0, 255)

@@ -2,6 +2,8 @@ import os
 import pygame
 import json
 
+# TODO: support serialization
+
 
 def load_image(fp, colorkey=None, image_only=False):
     if not fp:
@@ -48,17 +50,34 @@ def load_png(fp, image_only=False):
     else:
         return image, image.get_rect()
 
+
 class PSprite(object):
-    def __init__(self, id, w, h, img):
+    def __init__(self, id, w, h, img, z: int = 0):
         super(PSprite, self).__init__()
         self._id = id
         self._width = w
         self._height = h
         self._image = img
+        self._z_order = z
+        self._visible = True
+
+    @property
+    def is_visible(self):
+        return self._visible
+
+    @is_visible.setter
+    def is_visible(self, v:bool):
+        if v is None:
+            raise ValueError("v not provided")
+        self._visible = v
 
     @property
     def id(self):
         return self._id
+
+    @property
+    def z_order(self):
+        return self._z_order
 
     @property
     def image(self):
@@ -76,8 +95,12 @@ class PSprite(object):
     def height(self):
         return self._height
 
+    @property
+    def image_rect(self):
+        return self._image.get_rect()
+
     def __repr__(self):
-        return "{} (w, h => {}, {})".format(self._id, self._width, self._height)
+        return "{} (w, h => {}, {}, {}, {})".format(self._id, self._width, self._height, self._z_order, self._visible)
 
 
 class SpriteMap(object):
@@ -117,7 +140,7 @@ class SpriteMap(object):
         self._width, self._height = r.width, r.height
         return None
 
-    def initialize(self):
+    def initialize(self, verbose: bool = False):
         if not self._initialized:
             with open(self._descriptor, mode='r+') as fp:
                 self._sprite_map = json.load(fp)
@@ -146,6 +169,8 @@ class SpriteMap(object):
                 y = sprite_def['y']
                 w = sprite_def['width']
                 h = sprite_def['height']
+                if verbose:
+                    print("Loading subsurface:{}/ {}".format((x, y, w, h), (self._image.get_rect())))
                 sprite_img = self._image.subsurface(x, y, w, h)
                 self._sprites[id] = PSprite(id, w, h, sprite_img)
                 self._idx2key.append(id)
@@ -188,17 +213,23 @@ class SpriteAssetManager(object):
     def __repr__(self):
         return "Registered Assets ({}): {}".format(len(self._assets), self._assets.keys())
 
-    def add_sprite_map(self, name:str, metadata_fp:str, initialize:bool = True):
-        if not name: raise ValueError('name not provided')
-        if not metadata_fp: raise ValueError('metadata file not provided')
-        if name in self._assets: raise ValueError('asset already registered')
-        if not os.path.exists(metadata_fp): raise ValueError('metadata file does not exist')
+    def add_sprite_map(self, name: str, metadata_fp: str, initialize: bool = True, verbose: bool = False):
+        if not name:
+            raise ValueError('name not provided')
+        if not metadata_fp:
+            raise ValueError('metadata file not provided')
+        if name in self._assets:
+            raise ValueError('asset already registered')
+        if not os.path.exists(metadata_fp):
+            raise ValueError('metadata file does not exist')
 
+        if verbose:
+            print("Adding Sprite Map: ", name)
         self._assets[name] = SpriteMap(metadata_fp)
         if initialize:
-            self._assets[name].initialize()
+            self._assets[name].initialize(verbose=verbose)
 
-    def get_sprite(self, sprite_map_name:str, sprite:str = None):
+    def get_sprite(self, sprite_map_name: str, sprite: str = None):
         if not sprite_map_name:
             raise ValueError("Asset cannot be none")
         if sprite_map_name not in self._assets:
@@ -210,12 +241,13 @@ class SpriteAssetManager(object):
             raise ValueError("Undefined sprite '{}' selected".format(sprite))
         return sm[sprite]
 
-    def initialize(self, name:str = None):
+    def initialize(self, name: str = None, verbose: bool = False):
         if not name:
             for a in self._assets:
                 if not a.initialized:
                     a.initialize()
         else:
-            if name not in self._assets: raise ValueError('not an asset')
+            if name not in self._assets:
+                raise ValueError('not an asset')
             if not self._assets[name].initialized:
-                self._assets[name].initialize()
+                self._assets[name].initialize(verbose=verbose)

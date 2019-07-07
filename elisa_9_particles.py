@@ -176,7 +176,6 @@ def main():
     pns = time.perf_counter_ns()
 
     while not is_done:
-        #time_ms = pygame.time.get_ticks()
         pns = cns
         cns = time.perf_counter_ns()
         dns = cns - pns
@@ -210,4 +209,6 @@ def main():
         screen_buffer.blit(back_buffer, (0, 0))
         pg.display.flip()
 
-if __name__ == '__main__': main()
+
+if __name__ == '__main__':
+    main()

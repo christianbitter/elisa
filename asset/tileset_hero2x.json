@@ -1,0 +1,96 @@
+{
+  "id": "hero",
+  "description": "",
+  "source": "",
+  "image_path": "asset/tiny-rpg-town-files/spritesheets/hero2x.png",
+  "width": 96,
+  "height": 128,
+  "no_sprites": 12,
+  "color_key": { },
+  "sprites": [
+    {
+      "id": "left_1",
+      "x": 2,
+      "y": 2,
+      "width": 26,
+      "height": 30
+    },
+    {
+      "id": "left_2",
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "left_3",
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "up_1",
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "up_2",
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "up_3",
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "down_1",
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "down_2",
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "down_3",
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "other_1",
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "other_2",
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "other_3",
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    }
+  ]
+}
