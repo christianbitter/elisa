@@ -1,5 +1,5 @@
 # auth: christian bitter
-# name: elisa_14_collision_detection.py
+# name: elisa_15_parallax_mapping.py
 # desc: we build up the
 
 import pygame
