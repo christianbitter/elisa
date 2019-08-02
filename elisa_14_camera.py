@@ -3,10 +3,11 @@
 # desc: a simple 2d orthographic camera, that allows us to focus on different things on the screen
 #       enabling an artistic effect.
 #
-#       TODO: The scene is a simple raining environment, mountain range like background, with raindrops falling off
-#       TODO: The user can use the mouse and click in the scene.
-#       TODO: When clicked in the scene, the camera directs focus to the area clicked and magnifies the area so that
-#        the majority of the render area is covered with that portion of the screen.
+# TODO: the scene is a mountain range background
+# TODO: elisa is set at some position
+# TODO: the camera is fixed
+# TODO: only the camera visible portion of the screen is rendered
+# TODO:
 
 # https://stackoverflow.com/questions/14354171/add-scrolling-to-a-platformer-in-pygame
 

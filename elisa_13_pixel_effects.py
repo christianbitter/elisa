@@ -178,7 +178,7 @@ def main():
     # load a sprite map, and extract a particular sprite - idle_1 - from it
     am = SpriteAssetManager()
     sm_meta_json_fp = 'asset/elise_character/tileset_elisa_idle@8x.json'
-    am.add_sprite_map(name='ELISA_IDLE', metadata_fp=sm_meta_json_fp)
+    am.add_sprite_map(name='ELISA_IDLE', metadata_fp=sm_meta_json_fp, verbose=True)
     sprite_map = am['ELISA_IDLE']
     sprite_idle_1 = sprite_map['idle_1']
     img_elisa_idle = sprite_idle_1.image

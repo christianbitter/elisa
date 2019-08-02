@@ -9,6 +9,7 @@
 # downloaded from free sound here: https://freesound.org/people/Kastenfrosch/sounds/162479/
 # requires pygame 1.8 for mixer.Sound
 
+# TODO: render text indicating that a mouse button should be pressed to play the sound
 
 import os
 import pygame
@@ -46,6 +47,12 @@ def main():
     elapsed_sound_time = 0
     mouse_down, sound_playing = False, False
 
+    font = pygame.font.Font(None, 32)
+    text = [
+        font.render("Press (and hold) any mouse button", 1, (0, 64, 192, 255)),
+        font.render("to trigger the playing of the sound", 1, (0, 64, 192, 255))
+    ]
+
     while not is_done:
         fps_watcher.tick(60)
 
@@ -74,6 +81,11 @@ def main():
                 sound_playing = False
         else:
             pass
+
+        x0, y0 = 300, 200
+        for f in text:
+            back_buffer.blit(f, (x0 - (f.get_width()/2), y0))
+            y0 += f.get_height()
 
         screen_buffer.blit(back_buffer, (0, 0))
         pygame.display.flip()

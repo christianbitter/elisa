@@ -251,9 +251,9 @@ class SpriteAssetManager(object):
         if verbose:
             print("Adding Sprite Map: ", name)
 
-        self._assets[name] = SpriteMap(metadata_fp)
+        self._items[name] = SpriteMap(metadata_fp)
         if initialize:
-            self._assets[name].initialize(verbose=verbose)
+            self._items[name].initialize(verbose=verbose)
 
         self._items[name] = SpriteMap(metadata_fp)
         if initialize:

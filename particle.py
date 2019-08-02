@@ -71,7 +71,6 @@ class Particle(object):
             raise ValueError("temperature cannot be none")
         self._temperature = t
 
-
     @property
     def velocity(self):
         return self._velocity
