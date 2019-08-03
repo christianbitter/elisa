@@ -16,10 +16,10 @@ import pygame
 # TODO: elisa_14_camera.py
 
 def main():
-    if not pygame.font: print("Pygame - fonts not loaded")
-    if not pygame.mixer: print("Pygame - audio not loaded")
-
-    # init pygame - create the main window, and a background surface
+    if not pygame.font:
+        print("Pygame - fonts not loaded")
+    if not pygame.mixer:
+        print("Pygame - audio not loaded")
 
     pygame.init()
 

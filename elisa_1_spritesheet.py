@@ -50,8 +50,8 @@ back_buffer = pygame.Surface(screen_buffer.get_size())
 back_buffer.fill(C_WHITE)
 
 elisa = Elisa(asset_base="asset/elise_character")
-
 allsprites = pygame.sprite.RenderPlain(elisa)
+is_done = False
 
 while not is_done:
     fps_watcher.tick(60)

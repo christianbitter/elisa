@@ -1,12 +1,13 @@
 import os
 import pygame
-from pygame import Surface, PixelArray
 import json
+import uuid
+from pygame import Surface, PixelArray
 
-# TODO: support serialization
+# TODO: support serialization for PSprite, etc.
 
 
-def load_image(fp, colorkey=None, image_only=False):
+def load_image(fp, colorkey=None, image_only: bool = False, verbose: bool = False):
     if not fp:
         raise ValueError("load_image - fp not provided")
 
@@ -17,12 +18,24 @@ def load_image(fp, colorkey=None, image_only=False):
         print('Cannot load image:', fp)
         raise SystemExit(message)
 
-    image = image.convert()
+    if image.get_alpha() is None:
+        if verbose:
+            print("change the pixel format image to constant alpha or colorkey")
+        image = image.convert()
+    else:
+        if verbose:
+            print("change the pixel format image including per pixel alphas")
+        image = image.convert_alpha()
+
     if colorkey is not None:
         if colorkey is -1:
             colorkey = image.get_at((0, 0))
+        if verbose:
+            print("Setting colour key: ", colorkey)
         image.set_colorkey(colorkey, pygame.RLEACCEL)
 
+    if verbose:
+        print("Loaded image: ", image)
     if image_only:
         return image
     else:
@@ -66,6 +79,16 @@ class PSprite(object):
         self._image = img
         self._z_order = z
         self._visible = True
+
+    @staticmethod
+    def from_image(image_fp, color_key: tuple = None, verbose: bool = False):
+        if not image_fp or not os.path.exists(image_fp):
+            raise ValueError("image path not valid")
+
+        if verbose:
+            print("Loading ... ", image_fp)
+        p_image, rect = load_image(image_fp, colorkey=color_key, verbose=verbose)
+        return PSprite(s_id=uuid.uuid4(), w=rect[2], h=rect[3], img=p_image)
 
     @property
     def is_visible(self):
@@ -215,6 +238,9 @@ class SpriteMap(object):
     def no_sprites(self):
         return self._no_sprites
 
+    def __len__(self):
+        return self._no_sprites
+
     def __repr__(self):
         return "Sprite Map: {} # sprites {} -> {}".format(self._id, len(self._sprite_names), self._sprite_names)
 
@@ -289,6 +315,9 @@ class SpriteAssetManager(object):
                 return self._items[item]
 
         raise ValueError("undefined sprite selected")
+
+    def __len__(self):
+        return len(self._items)
 
     def initialize(self, name: str = None, verbose: bool = False):
         if not name:
