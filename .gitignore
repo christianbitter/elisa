@@ -106,3 +106,4 @@ venv.bak/
 guess_a_number_scores.csv
 test_json.json
 /.idea/
+.idea/workspace.xml
