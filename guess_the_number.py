@@ -59,15 +59,16 @@
 # TODO: write book
 
 import os
-import csv, json
+import csv
+import json
 import random
 import pygame
 from pygame.locals import *
 from particle import ParticleSystem, Particle, _to_unit_vector, _angle_to_dir, ParticleSystemRenderer
 from ui import Screen, UIEvent, Menu, MenuItem, FontStyle, Label, UIImage, MultiLineLabel, C_FORMBLUE, Button,\
     TextBox, FillStyle
-from lib import uifx
-from lib.game import Player, PlayerType, Game, GameDifficulty, GameRenderer
+from elisa import uifx
+from elisa.game import Player, PlayerType, Game, GameDifficulty, GameRenderer
 from collections import deque
 
 ASSET_BASE_DIR_FP = "guess_my_number/asset"

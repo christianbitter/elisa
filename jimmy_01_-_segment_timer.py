@@ -5,7 +5,8 @@
 # TODO: jimmy needs to move to his own space, depending on the library
 
 import pygame
-from lib import uifx
+from elisa import uifx
+
 
 def main():
     if not pygame.font:

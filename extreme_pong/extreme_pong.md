@@ -39,7 +39,22 @@ we may target different (mobile Android) devices.
 
 1€ Arcade game, fast-paced, action packed.
 
+## Pong Extreme Mechanics
+
+Pong Extreme combines the original Pong with elements of Tower-Defense Load-Out Shooter games. That is, 
+each player can select up to k items prior to start, with which she wants to customize her playing environment.
+Her environment is the half screen of the game board which she can fully navigate. Customization options should enable
+her to play more offensive (think accelerators for her ball) or more defensive (brakes for the incoming ball).
+
+Each player is allowed to freely roam her side of the game board. The only restrictions are the back of each playing
+field and the save zone that delineates both halfs of the playing field. While roaming around the players must avoid
+static obstacles, such as walls or blocks on the board. We can imagine blocks and/ or walls having different types of effect. 
+
 ## Player Challenges and Incentives
- 
+
+The player is constantly challenged by scoring goals of her own and avoiding that the opponent scores. We can imagine
+the player receiving some points for each win, which she may invest in an upcoming round's load out/ customization.
+However, care has to be taken to avoid getting good players already on a winning path when customizing her playing field.
+
 ## References
 https://www.wikihow.com/Design-a-Video-Game
