@@ -1,6 +1,5 @@
-import uuid
 from enum import Enum
-from .ui import WindowManager
+from elisa.ui.ui import WindowManager
 from .player import Player
 
 
@@ -68,7 +67,7 @@ class Game(object):
         return False
 
     def add_player(self, p: Player):
-        if not p:
+        if p is None:
             raise ValueError("Player not provided")
         if p.id in self._players.keys():
             raise ValueError("Player with id already added")

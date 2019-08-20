@@ -106,4 +106,10 @@ venv.bak/
 guess_a_number_scores.csv
 test_json.json
 /.idea/
+.idea/
+.idea/*
+.idea/PyBlocks.iml
+.idea/misc.xml
+.idea/workspace.xml
+
 .idea/workspace.xml

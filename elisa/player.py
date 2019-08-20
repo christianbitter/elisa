@@ -18,7 +18,7 @@ class Player(Entity):
     A player entity
     """
 
-    def __init__(self, name, p_type: PlayerType):
+    def __init__(self, name: str, p_type: PlayerType):
         """Constructor for Player"""
         super(Player, self).__init__(name=name)
         self._type = p_type

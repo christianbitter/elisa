@@ -5,7 +5,7 @@
 # TODO: jimmy needs to move to his own space, depending on the library
 
 import pygame
-from elisa import uifx
+from elisa.ui import uifx
 
 
 def main():

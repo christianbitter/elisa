@@ -1166,15 +1166,30 @@ class WindowManager:
     def active_screen(self):
         return self._active_screen
 
-    def add_screen(self, s:Screen, is_active:bool = False):
+    def add_screen(self, s, is_active: bool = False):
+        """
+        Add a screen to the window manager's collection of screens
+        :param s: (Screen) or list of (Screen) instances. If s is an individual screen the is_active flag can be
+        used to set the screen to the default active screen. If multiple screens are passed as (list) object, then
+        is_active is not used.
+        :param is_active: (bool) sets the passed screen as the currently active screen
+        :return: (None)
+        """
         if not s:
             raise ValueError("screen not provided")
 
-        self._items[s.name] = s
-        self._item_names.append(s.name)
+        if isinstance(s, Screen):
+            self._items[s.name] = s
+            self._item_names.append(s.name)
 
-        if is_active:
-            self._active_screen = s
+            if is_active:
+                self._active_screen = s
+        elif isinstance(s, list):
+            for _screen in s:
+                self._items[_screen.name] = _screen
+                self._item_names.append(_screen.name)
+        else:
+            raise ValueError("Unknown type of s")
 
     def remove_screen(self, s_name:str):
         if not s_name:
