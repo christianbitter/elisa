@@ -16,12 +16,10 @@ def main():
 
     pygame.init()
 
-    S_WIDTH = 640
-    S_HEIGHT= 480
-    S_TITLE = "Elisa 12-1 - Blending of sprites"
+    w, h, t = 640, 480, "Elisa 12-1 - Blending of sprites"
 
-    screen_buffer = pygame.display.set_mode(size=(S_WIDTH, S_HEIGHT))
-    pygame.display.set_caption(S_TITLE)
+    screen_buffer = pygame.display.set_mode(size=(w, h))
+    pygame.display.set_caption(t)
 
     is_done = False
     alpha = 0
@@ -66,4 +64,6 @@ def main():
             alpha = 0
 
 
-if __name__ == '__main__': main()
+if __name__ == '__main__':
+    main()
+

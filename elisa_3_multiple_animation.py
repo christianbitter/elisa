@@ -116,8 +116,10 @@ class Elisa(pygame.sprite.Sprite):
 
 
 def main():
-    if not pygame.font: print("Pygame - Font")
-    if not pygame.mixer: print("Pygame - Mixer")
+    if not pygame.font:
+        print("Pygame - Font")
+    if not pygame.mixer:
+        print("Pygame - Mixer")
 
     pygame.init()
     elisa = Elisa("asset/elise_character/")
@@ -125,14 +127,14 @@ def main():
     is_done = False
     game_clock = pygame.time.Clock()
 
-    S_WIDTH, S_HEIGHT, S_TITLE = 640, 480, "Elisa3"
-    C_WHITE = (250, 250, 250)
+    w, h, t = 640, 480, "Elisa 3 - multiple animation"
+    c_white = (250, 250, 250)
 
-    front_buffer = pygame.display.set_mode((S_WIDTH, S_HEIGHT))
-    pygame.display.set_caption(S_TITLE)
+    front_buffer = pygame.display.set_mode((w, h))
+    pygame.display.set_caption(t)
 
     back_buffer = pygame.Surface(front_buffer.get_size())
-    back_buffer.fill(C_WHITE)
+    back_buffer.fill(c_white)
 
     elisa.initialize()
 
@@ -159,4 +161,5 @@ def main():
         pygame.display.flip()
 
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()

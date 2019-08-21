@@ -95,8 +95,10 @@ class StateMachine(object):
 
 
 def main():
-    if not pygame.font: print("Pygame - fonts not loaded")
-    if not pygame.mixer: print("Pygame - audio not loaded")
+    if not pygame.font:
+        print("Pygame - fonts not loaded")
+    if not pygame.mixer:
+        print("Pygame - audio not loaded")
 
     # init pygame - create the main window, and a background surface
     pygame.init()

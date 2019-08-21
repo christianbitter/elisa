@@ -7,6 +7,7 @@
 import pygame
 from lib import uifx
 
+
 def main():
     if not pygame.font:
         print("Pygame - fonts not loaded")

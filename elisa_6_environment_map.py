@@ -9,6 +9,7 @@ import json
 # gfx: https://ansimuz.itch.io/tiny-rpg-town
 # sprite packing: https://www.leshylabs.com/apps/sstool/
 
+
 def tileno2spritemap(tileno, sprite_map):
     tile_id = "grass_{}".format(tileno)
     return sprite_map[tile_id]
@@ -72,6 +73,7 @@ def load_png(fp, image_only=False):
         return image
     else:
         return image, image.get_rect()
+
 
 class PSprite(object):
     def __init__(self, id, w, h, img):
@@ -179,10 +181,11 @@ class SpriteMap(object):
 
 
 def main():
-    if not pygame.font: print("Pygame - fonts not loaded")
-    if not pygame.mixer: print("Pygame - audio not loaded")
+    if not pygame.font:
+        print("Pygame - fonts not loaded")
+    if not pygame.mixer:
+        print("Pygame - audio not loaded")
 
-    # init pygame - create the main window, and a background surface
     pygame.init()
 
     world_map = [
@@ -201,20 +204,17 @@ def main():
     MAP_WIDTH, MAP_HEIGHT = 10, 10
     MAP_OFFSET_X, MAP_OFFSET_Y = 50, 50
 
-    S_WIDTH = 800
-    S_HEIGHT= 600
-    S_TITLE = "Elisa - Drawing a Map using a Sprite Sheet"
+    w, h, t = 800, 600, "Elisa 6 - Drawing a Map using a Sprite Sheet"
 
-    C_WHITE = (250, 250, 250)
-    C_BLUE = (0, 0, 255)
+    c_white = (250, 250, 250)
 
-    screen_buffer = pygame.display.set_mode(size=(S_WIDTH, S_HEIGHT))
-    pygame.display.set_caption(S_TITLE)
+    screen_buffer = pygame.display.set_mode(size=(w, h))
+    pygame.display.set_caption(t)
     pygame.mouse.set_visible(True)
 
     back_buffer: pygame.Surface = pygame.Surface(screen_buffer.get_size())
     back_buffer = back_buffer.convert()
-    back_buffer.fill(C_WHITE)
+    back_buffer.fill(c_white)
 
     # FPS watcher
     fps_watcher = pygame.time.Clock()
@@ -231,7 +231,7 @@ def main():
                 is_done = True
                 break
 
-        back_buffer.fill(C_WHITE)
+        back_buffer.fill(c_white)
         render_map(back_buffer, grass_sprite_map, world_map, MAP_OFFSET_X, MAP_OFFSET_Y, MAP_WIDTH, MAP_HEIGHT)
         screen_buffer.blit(back_buffer, (0, 0))
         pygame.display.flip()
