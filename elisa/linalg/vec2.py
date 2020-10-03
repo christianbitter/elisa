@@ -11,8 +11,8 @@ class Vec2(Vec):
     def __repr__(self):
         return "Vec2[{}, {}]".format(self._v[0], self._v[1])
 
-    def is_zero(self, v):
-        return v[0] == 0. and v[1] == 0.
+    def is_zero(self):
+        return self._v[0] == 0. and self._v[1] == 0.
 
     def __add__(self, other):
         return Vec2(self._v[0] + other[0], self._v[1] + other[1])

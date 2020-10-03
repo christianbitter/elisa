@@ -1,5 +1,6 @@
+#desc: this is a simple example demonstrating some linear algebra
+# such as vector addition and linear interpolation
 from elisa import Vec2, Mat2
-
 
 def main():
     v0 = Vec2(0, 0)
@@ -16,6 +17,7 @@ def main():
     print("{} - {} = {}".format(v1, v0, v1 - v0))
     print("{} * {} = {}".format(v1, v0, v1 * v0))
     print("{} / {} = {}".format(v2, v1, v2 / v1))
+    # TODO:
     print("Lerp {}, {}, {} => {}".format(0.5, v0, v2, Vec2.lerp(v0, v2, .5)))
     print("matrix 2D: {}".format(m1))
     print("Trace/ Determinant/ Inverse/ Transpose: {}, {}\r\nInverse: {}\r\nTranspose: {}".format(m1.trace, m1.det, m1.inv, m1.t))
