@@ -9,8 +9,6 @@
 # downloaded from free sound here: https://freesound.org/people/Kastenfrosch/sounds/162479/
 # requires pygame 1.8 for mixer.Sound
 
-# TODO: render text indicating that a mouse button should be pressed to play the sound
-
 import os
 import pygame
 

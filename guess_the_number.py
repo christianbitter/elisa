@@ -56,7 +56,6 @@
 # TODO: package things up
 # TODO: clean things up
 # TODO: write blog posts
-# TODO: write book
 
 import os
 import csv

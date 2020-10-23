@@ -96,6 +96,16 @@ class Entity(ECSBase):
 			delattr(self._components, component_id)
 			delattr(self._ctypes[ctype], component_id)
 
+	def __getitem__(self, key):
+		if isinstance(key, int):
+			if key > len(self._components):
+				raise ValueError("index outside of registered components")
+			for i, k in enumerate(self._components):
+				if i == key:
+					return self._components[k]
+		else:
+			return self._components[key]
+
 	def send_msg(self, msg):
 		pass
 
@@ -174,26 +184,26 @@ class InputSystem(System):
 		super(InputSystem, self).__init__()
 
 	def update(self, time_delta, entities):
-			key_pressed = pygame.event == pygame.KEYDOWN
-			key_map = pygame.key.get_pressed()
+		key_pressed = pygame.event == pygame.KEYDOWN
+		key_map = pygame.key.get_pressed()
 
-			if key_map[pygame.K_LEFT]:
-				# let's move all entities with a position component to the left
-				position_entities = [e for e in entities if e.has_component_type("Position")]
+		if key_map[pygame.K_LEFT]:
+			# let's move all entities with a position component to the left
+			position_entities = [e for e in entities if e.has_component_type("Position")]
 
-				upos = UpdatePositionMessage(dx=-1, dy=0)
-				for pe in position_entities:
-					# send the update position message					
-					pe.send_msg(upos)
+			upos = UpdatePositionMessage(dx=-1, dy=0)
+			for pe in position_entities:
+				# send the update position message					
+				pe.send_msg(upos)
 
-			if key_map[pygame.K_RIGHT]:
-				position_entities = [e for e in entities if e.has_component_type("Position")]
-				print("Found {} entities with position.".format(len(position_entities)))
+		if key_map[pygame.K_RIGHT]:
+			position_entities = [e for e in entities if e.has_component_type("Position")]
+			print("Found {} entities with position.".format(len(position_entities)))
 
-				upos = UpdatePositionMessage(dx=+1, dy=0)
-				for pe in position_entities:
-					# send the update position message					
-					pe.send_msg(upos)
+			upos = UpdatePositionMessage(dx=+1, dy=0)
+			for pe in position_entities:
+				# send the update position message					
+				pe.send_msg(upos)
 
 	def send_msg(self, msg):
 		return super().send_msg(msg)
@@ -228,15 +238,17 @@ class RenderSystem(System):
 
 def main():
 	if not pygame.font:
-			print("Pygame - fonts not loaded")
+		print("Pygame - fonts not loaded")
 	if not pygame.mixer:
-			print("Pygame - audio not loaded")
+		print("Pygame - audio not loaded")
 
 	# create the main entity
 	elisa = AgentEntity()
 	elisa.add(CharacterComponent("elisa"))
 	elisa.add(PositionComponent(1, 1))
 	print(elisa)
+	i = 1
+	print(f"Component at index {i} = {elisa[i]}")
 
 	# create a system to handle input and rendering
 	input_sys = InputSystem()
