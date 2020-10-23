@@ -10,12 +10,14 @@ game development skills.
 There is a host of topics that is typically associated with programming a game. In order to avoid
 having to deal with too many things at once, we deliberately constrain the type of game we are going to produce to 
 "TODO:". Consequently, you will (initially) not find elisa files for all aspects of a somewhat advanced game, but only
-some starter code that deals with standard (and simple but fun) issues you would encounter in a simple single player game. 
+some starter code that deals with standard (and simple but fun) issues you would encounter in a simple single player game. You may realize that over time the code files change or certain topics are introduced "between" alrady existing topics - whenever I feel there should have been something explained differently, a bug needs fixing, etc. ... invariably this will happen.
 
 ## Mapping Intent to Source
 
 - **start_template.py**:  
 A simple template to kick our coding off. It is based on the official pygame starter code.
+- **elisa_0_1_drawing_shapes.py**:  
+This is a simple example, building on geometric primitives provided by the pygame.draw module. Specifically, we are going to draw a circle, square, polygon and some lines. Part of the drawing, will make use of some basic linear algebra (projection of 2D vectors). This is a very basic, non-animated example, to show the composition of scenes from basic pygame elements.
 - **elisa_1_spritesheet.py**:
 - **elisa_2_animation.py**:
 - **elisa_3_multiple_animation.py**:
