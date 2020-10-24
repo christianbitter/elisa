@@ -16,7 +16,7 @@ some starter code that deals with standard (and simple but fun) issues you would
 
 - **start_template.py**:  
 A simple template to kick our coding off. It is based on the official pygame starter code.
-- ""elisa_0_init.py**:  
+- **elisa_0_init.py**:  
 Based of the initial template, we are going to look into pygame initialization procedures to arrive at a point where we have a displayed window and a double-buffer based drawing setup. For simplicity's sake we only fill the drawing canvas with white colour. But stay tuned for future examples.
 - **elisa_0_1_drawing_shapes.py**:  
 This is a simple example, building on geometric primitives provided by the pygame.draw module. Specifically, we are going to draw a circle, square, polygon and some lines. Part of the drawing, will make use of some basic linear algebra (projection of 2D vectors). This is a very basic, non-animated example, to show the composition of scenes from basic pygame elements.
