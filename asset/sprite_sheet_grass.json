@@ -1,0 +1,34 @@
+{
+	"name": "hero",
+	"description": "",
+	"source": "",
+	"image_path": "asset/tiny-rpg-town-files/tileset/all_grass_tile.png",
+	"width": 48,
+	"height": 48,
+	"no_sprites": 3,
+	"color_key": { },
+	"sprites": [
+		{
+			"name": "grass_1",
+			"x": 0,
+			"y": 0,
+			"width": 48,
+			"height": 48
+		},
+		{
+			"name": "grass_2",
+			"x": 49,
+			"y": 0,
+			"width": 48,
+			"height": 48
+		},
+		{
+			"name": "grass_3",
+			"x": 0,
+			"y": 49,
+			"width": 48,
+			"height": 48
+		}
+
+	]
+}

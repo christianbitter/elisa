@@ -83,8 +83,6 @@ class Elisa(pygame.sprite.Sprite):
 
 
 class SpriteAssetManager(object):
-    """"""
-
     def __init__(self):
         """Constructor for AssetManager"""
         super(SpriteAssetManager, self).__init__()

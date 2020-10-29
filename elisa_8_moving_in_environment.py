@@ -1,6 +1,5 @@
 # auth: christian bitter
-# desc: this will combine elisa 7 and 6 by having a movable character
-#       in an environment generated from a sprite map
+# desc: this will combine elisa 7 and 6 by having a movable character in an environment generated from a sprite map
 #       the character can move around according to the simple constraints
 #       imposed by the environment. That is, this tutorial will support
 #           An abstraction for maps
@@ -42,23 +41,8 @@ def render_map(buffer, sprite_map, world_map, start_x, start_y, map_width = 10, 
         _y = _y + sprite_def.height #
 
 
-# The sprite animation
-#
-# We animate sprites by composing a sequence of pictures across time. Different types of animation may exist:
-# Single Frame - one frame is defined and always repeated
-# Frame Sequence - there can be many frames, the user has to specify how each sprite maps to a particular frame number
-#                  under the assumption of defined frame rate. For example, the user may specify
-#                  play sprite0 for 8 frames, then spriteN for another 8 frames and close it out by playing SpriteM for the rest
-#                  of 9 frames.
-# Procedural - the user defines a set of frames at most no frames in no frames per second framerate, i.e. 25 frames or similar.
-#
-# Repeat - will set the state of the animation back to zero, after the end of the animation is reached
-# Sprites can be registered from any sprite map source or image source
-# Each update step we move the current frame index. If the frame index reaches the last. If repeat is switched on
-# the repeat will trigger an update of the current frame index, otherwise the i
-
 class MapTile(dict):
-    """Since a map tile is mostly structural properties, and we wish to desire it into JSON,
+    """Since a map tile is mostly structural properties, and we wish to serialize it into JSON,
     let's make it inherit from dict and get serialization out of the box
     """
     def __repr__(self):
@@ -183,34 +167,6 @@ class TiledMap(object):
 
     def __repr__(self):
         return "Map - Width: {}/ Height: {}".format(self._width, self._height)
-
-
-class SpriteAnimation(object):
-    """"""
-
-    def __init__(self, sprite_def:list, frame_def:list, repeat_index: int = -1):
-        """Constructor for SpriteAnimation"""
-        super(SpriteAnimation, self).__init__()
-        self._sprites = sprite_def
-        self._frames  = frame_def
-        self._frame_index = 0
-
-        # TODO: a sprite def is just a sprite
-        # TODO: check that number of sprite and frame defs line up
-        # TODO: check repeat index either -1 or a valid frame index
-        self._repeat_index = repeat_index
-
-    def next_frame(self):
-        self._frame_index = self._frame_index + 1
-        if self.repeats and self._frame_index >= self._repeat_index:
-            self._frame_index = 0
-
-    def render(self, buffer):
-        pass
-
-    @property
-    def repeats(self):
-        return self._repeat_index > -1
 
 
 def main():

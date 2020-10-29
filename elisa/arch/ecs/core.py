@@ -1,3 +1,4 @@
+from __future__ import annotations
 from uuid import uuid4
 
 # https://www.gamasutra.com/blogs/TobiasStein/20171122/310172/The_EntityComponentSystem__An_awesome_gamedesign_pattern_in_C_Part_1.php#comments
@@ -21,3 +22,9 @@ class ECSBase(object):
 
 	def __repr__(self):
 		return f"ECSBase[{self.id}]"
+
+	def serialize(self) -> str:
+		raise ValueError("serialize not implemented")
+
+	def deserialize(self, str) -> ECSBase:
+		raise ValueError("deserialize not implemented")
