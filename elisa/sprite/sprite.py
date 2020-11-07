@@ -1,13 +1,14 @@
+from __future__ import annotations
 import os
+import json
 from uuid import uuid4
 from pygame import Surface, PixelArray
 
 from .sprites import load_image, load_png
 
 # TODO: serialize to json/dict struct, remove the internal id
-
 class Sprite(object):
-	def __init__(self, name:str, w: int, h: int, img, z: int = 0):
+	def __init__(self, name:str, w: int, h: int, img, img_fp:str, z: int = 0):
 		"""
 		The Sprite is a pure data object holding limited property data about sprites, such as its underlying
 		bit-mapped representation (image), its width or height. The PSprite object is a simplified version of
@@ -19,6 +20,7 @@ class Sprite(object):
 		self._width = w
 		self._height = h
 		self._image = img
+		self._image_fp = img_fp
 		self._z_order = z
 		self._visible = True
 
@@ -30,7 +32,7 @@ class Sprite(object):
 		if verbose:
 			print("Loading ... ", image_fp)
 		p_image, rect = load_image(image_fp, colorkey=color_key, verbose=verbose)
-		return Sprite(name, w=rect[2], h=rect[3], img=p_image)
+		return Sprite(name, w=rect[2], h=rect[3], img=p_image, img_fp=image_fp)
 
 	@property
 	def is_visible(self):
@@ -41,6 +43,10 @@ class Sprite(object):
 		if v is None:
 			raise ValueError("v not provided")
 		self._visible = v
+
+	@property
+	def image_path(self):
+		return self._image_fp
 
 	@property
 	def id(self):
@@ -65,6 +71,10 @@ class Sprite(object):
 	def z_order(self, z_order:int):		
 		self._z_order = z_order
 		return self
+
+	def to_json(self, filter_keys:list = ['_id', '_image']) -> str:		
+		json_dict = [(k, v) for (k, v) in self.__dict__.items() if k not in filter_keys]
+		return json.dumps(json_dict)
 
 	@property
 	def image(self) -> Surface:

@@ -97,7 +97,7 @@ def main():
                 0,
                 max(0, w - max(0, x_pos - w)),  # clamp to 640 - 0
                 h)
-        print("[{}] area: {}".format(x_pos, area))
+        # print("[{}] area: {}".format(x_pos, area))
 
         # show the background ...
         # back_buffer.fill(c_black)

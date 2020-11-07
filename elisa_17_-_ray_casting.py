@@ -183,7 +183,8 @@ class SInput(System):
 			return None
 
 		key_pressed = pygame.event == pygame.KEYDOWN
-		key_map = pygame.key.get_pressed()
+		key_up      = pygame.event == pygame.KEYUP
+		key_map = pygame.key.get_pressed()		
 
 		if SInput.arrow_key_pressed(key_map):
 			dx, dy = 0., 0., 

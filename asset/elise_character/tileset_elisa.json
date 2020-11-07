@@ -1,0 +1,82 @@
+{
+  "name": "Elisa",
+  "description": "The descriptor for elise_tileset.png",
+  "source": "",
+  "image_path": "asset/elise_character/elise_tileset.png",
+  "width": 256,
+  "height": 320,
+  "no_sprites": 10,
+  "color_key": { },
+  "sprites": [
+    {
+      "name": "idle_1",
+      "x": 0,
+      "y": 0,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "name": "idle_2",
+      "x": 32,
+      "y": 0,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "name": "idle_3",
+      "x": 64,
+      "y": 0,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "name": "idle_4",
+      "x": 96,
+      "y": 0,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "name": "walk_1",
+      "x": 0,
+      "y": 32,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "name": "walk_2",
+      "x": 32,
+      "y": 32,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "name": "walk_3",
+      "x": 64,
+      "y": 32,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "name": "walk_4",
+      "x": 96,
+      "y": 32,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "name": "walk_5",
+      "x": 128,
+      "y": 32,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "name": "walk_6",
+      "x": 160,
+      "y": 32,
+      "width": 32,
+      "height": 32
+    }
+  ]
+}

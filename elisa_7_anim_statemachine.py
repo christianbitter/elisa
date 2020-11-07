@@ -123,7 +123,6 @@ class SpriteAssetManager(object):
             if not self._assets[name].initialized:
                 self._assets[name].initialize()
 
-
 def main():
     if not pygame.font: print("Pygame - fonts not loaded")
     if not pygame.mixer: print("Pygame - audio not loaded")

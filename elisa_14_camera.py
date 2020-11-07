@@ -134,8 +134,6 @@ class Camera:
     # everything that is outside of this normalized space is clipped or removed
 # and transform it to screen/ device space (0, 0, w, h)
 
-# TODO: this should be expressed as matrices (when moved to library)
-# TODO: add a lense mask
 class Camera2D(Camera):
     def __init__(self,
                  world_space,
@@ -250,14 +248,6 @@ class Camera2D(Camera):
 
     def __str__(self):
         return "Cam({},{}): {}".format(self._cam_x, self._cam_y, self._cam_space)
-
-
-# TODO: see the GDC talk - add trauma, and translational/ rotational shake
-class ShakyCamera2D(Camera2D):
-    """
-
-    """
-
 
 def rect_coord2pygame(b, c, w, r0, r1):
     if r0 is None or r1 is None:

@@ -5,6 +5,7 @@ from .sprites import load_image, load_png
 from .sprite import Sprite
 from pygame import Surface, PixelArray
 
+# TODO: modification is only possible if not yet initialized
 # TODO: serialize to json/dict struct, remove the internal id and persist to file
 # TODO: add sprite (that does not exist) from the underlying image source
 # TODO: remove sprite
@@ -101,6 +102,9 @@ class SpriteSheet(object):
 			self._load_image()
 			# load sprites
 			sprites = self._sprite_map['sprites']
+			if verbose:
+				print("Source Image Surface: {}".format(self._image.get_rect()))
+				
 			for i, sprite_def in enumerate(sprites):
 				_n = sprite_def['name']
 				x = sprite_def['x']
@@ -111,9 +115,9 @@ class SpriteSheet(object):
 					raise ValueError("Sprite already registered with that name")
 
 				if verbose:
-					print("Loading subsurface:{}/ {}".format((x, y, w, h), (self._image.get_rect())))
+					print("Loading subsurface:{}".format((x, y, w, h)))
 				sprite_img = self._image.subsurface(x, y, w, h)
-				_sprite    = Sprite(_n, w, h, sprite_img)
+				_sprite    = Sprite(_n, w, h, sprite_img, img_fp=self._image_path)
 
 				self._sprites[_sprite.id] = _sprite
 				self._name2id[_n] = _sprite.id
@@ -132,6 +136,8 @@ class SpriteSheet(object):
 		else:
 			if item in self._sprites:
 				return self._sprites[item]
+			if item in self._name2id:
+				return self._sprites[self._name2id[item]]
 
 		raise ValueError("SpriteMap.get - undefined sprite selected")
 

@@ -35,7 +35,7 @@ class Mat2:
 
     def __sub__(self, other):
         if is_numeric(other):
-            return self.__add__(Mat2(other, other, other, other))
+            return self.__sub__(Mat2(other, other, other, other))
         else:
             return Mat2(self._v[0] - other[0],
                         self._v[1] - other[1],
@@ -129,7 +129,6 @@ class Mat2:
         return """[Mat2]
                 [{}, {}
                  {}, {}]""".format(self._v[0], self._v[1], self._v[2], self._v[3])
-
 
 zero2 = Mat2(0., 0., 0., 0.)
 one2  = Mat2(1., 1., 1., 1.)

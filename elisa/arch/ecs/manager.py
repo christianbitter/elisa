@@ -1,5 +1,7 @@
 from .core import ECSBase
-from .ecs import Component, Entity, System
+from .entity import Entity
+from .component import Component
+from .system import System
 
 
 # We start with a simple manager like entity, i.e. it does not encapsulate creation/ factory

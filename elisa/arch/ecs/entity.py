@@ -46,17 +46,53 @@ class Entity(ECSBase):
 		else:
 			return self._components[key]
 
-	def get_of_type(self, component_type:str):
+	def get_of_type(self, component_type:str) -> Component:
+		"""Get the first component of a specific type associated with the entity.
+
+		Args:
+				component_type (str): type of the component, you wish to retrieve
+
+		Raises:
+				ValueError: if the component type is not provided, or is not found among the entities components.
+
+		Returns:
+				Component: The component of the specified type.
+		"""
 		if not component_type:
 			raise ValueError("component_type not provided")
+		if len(self._components) < 1:
+			raise ValueError("entity does not have any associated component")
+		
 		ci = self._ctypes[component_type]
 		return ci
 
-	def has_component_type(self, component_type):
+	def has_component_type(self, component_type) -> bool:
+		"""Interrogates the underlying entity about the presence of a component of a specific type. In the case of a single type query,
+		the entity is checked for the presence and a True/False result is delivered. If a list of type names is passed, all component
+		types have to be defined on the entity for a True result.
+
+		Args:
+				component_type (str or list of str): the component type name to query the entity for.
+
+		Raises:
+				ValueError: if component type is none, an empty list or the empty string
+
+		Returns:
+				bool: result of the type query
+		"""
 		if not component_type or component_type == "":
 			raise ValueError("component_type not provided")
 
-		return component_type in self._ctypes
+		if isinstance(component_type, str):
+			return component_type in self._ctypes
+		elif isinstance(component_type, list):
+			if len(component_type):
+				raise ValueError("component_type cannot be an empty list")
+
+			_types = [(t in self._ctypes) for t in component_type]
+			return all(_types)
+		else:
+			raise ValueError("component type has to be a list of strings or an individual string")
 
 	def remove(self, component_id:str):
 		if not component_id or component_id == "":

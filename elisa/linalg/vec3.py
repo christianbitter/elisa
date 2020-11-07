@@ -18,7 +18,17 @@ class Vec3(object):
 	def is_zero(v):
 		return v[0] == 0. and v[1] == 0. and v[2] == 0.
 
-	def __add__(self, other):
+	def __add__(self, other:Vec3) -> Vec3:
+		"""Adds two Vec3 instances together and returns the result as a new Vector
+
+		Args:
+				other (Vec3): vector to add
+
+		Returns:
+				Vec3: resulting vector
+		"""
+		if not other:
+			raise ValueError("no vector for addition provided")
 		return Vec3(self._v[0] + other[0], self._v[1] + other[1], self._v[2] + other[2])
 
 	def __sub__(self, other):
@@ -28,7 +38,21 @@ class Vec3(object):
 		return Vec3(-self._v[0], -self._v[1], -self._v[2])
 
 	@staticmethod
-	def dot(u, v):
+	def dot(u:Vec3, v:Vec3) -> float:
+		"""Computes the dot or scalar product for two vectors u and v.
+
+		Args:
+				u (Vec3): first vector
+				v (Vec3): second vector
+
+		Raises:
+				ValueError: Raised if either u or v are not provided
+
+		Returns:
+				float: The dot product between the two vectors
+		"""
+		if not u or not v:
+			raise ValueError("No vectors provided for dot-product computation")
 		return u[0] * v[0] + u[1] * v[1] + u[2] * v[2]
 
 	@staticmethod
