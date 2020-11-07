@@ -29,8 +29,12 @@ This is a simple example, building on geometric primitives provided by the pygam
 - **elisa_8_moving_in_environment.py**:
 - **elisa_9_particles.py**:
 - **elisa_10_screens.py**:
-- **elisa_12_sound.py**:
+- **elisa_12_sound.py**:  
 Play a single sound.
+- **elisa_14_camera.py**:
+- **elisa_16_-_ecs.py**:
+- **elisa_18_actor_camera.py**:  
+This is an integrated example binding together the composition of scenes via the entity-component-system approach (shown in elisa_16_-_ecs) and allowing for independent of game world specification and its depiction via a camera (introduced in elisa_14_camera). Now, what this example does is the following. The player represented by a simple circle, moves through a simple environment depicted by multiple somewhat arbitrarily placed boxes. A camera is setup that follows the player, i.e. the camera is offset by -50 in x and y from the player's position. When moving through the scene, you will see that objects are moved and eventually drop out of view, which is the expected behaviour. Furthermore, through the camera's internal transformation pipeline from world space to normalized clip space and then to viewport space, a very simple visibility test is implemented, which does not draw objects that are fully outside of the camera's field of reception.
 
 ## Credits and References
 
