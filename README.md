@@ -10,7 +10,9 @@ There is a host of topics that is typically associated with programming a game. 
 Note, as this is a living project you will (initially) not find elisa files for all aspects of a somewhat advanced game, but only
 some starter code that deals with standard (and simple but fun) issues you would encounter researching the topic yourself.  You may realize that over time the code files change or certain topics are introduced "between" alrady existing topics - whenever I feel there should have been something explained differently, a bug needs fixing, etc. ... invariably this will happen. Furthermore, the code presented may not be the most advanced or best optimized piece of finished work, but it should get you and myself off the ground.
 
-Lastly, in certain cases you will see files with no actual content. In these cases the files act as a placeholder, for content I believe s relevant at that state but needs to be fleshed out.
+In certain cases you will see files with no actual content. In these cases the files act as a placeholder, for content I believe s relevant at that state but needs to be fleshed out.
+
+Lastly, our github-based blog discusses some of the developments happening here. So if you are the reader type, just head over to <https://christianbitter.github.io/>.
 
 With that - Enjoy and Build!
 
