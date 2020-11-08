@@ -180,23 +180,15 @@ class Camera2D(Camera):
         xc, yc = c[0], c[1]
         _x = self._hclip_left + self._hclip_range_x * self._cam_range_xinv * (xc - self._cam_left)
         _y = self._hclip_bottom + self._hclip_range_y * self._cam_range_yinv * (yc - self._cam_bottom)
-        # print("__cam_to_hclip_space__: ({}) => ({})".format((xc, yc), (_x, _y)))
         return _x, _y
 
     def __hclip_to_screen_space__(self, c):
         xc, yc = c[0], c[1]
         _x = self._screen_left + self._screen_range_x * self._hclip_range_xinv * (xc - self._hclip_left)
         _y = self._screen_bottom + self._screen_range_y * self._hclip_range_yinv * (yc - self._hclip_bottom)
-        # print("__hclip_to_screen_space__: ({}) => ({})".format((xc, yc), (_x, _y)))
         return _x, _y
 
     def __clip__(self, c):
-        # TODO: clip
-        # xc, yc = c[0], c[1]
-        # if not (self._hclip_left <= xc <= self._hclip_right) and (self._hclip_bottom <= yc <= self._hclip_top):
-        #     # print("Clipped: ", c)
-        #     return True, c
-        # else:
         return False, c
 
     @property

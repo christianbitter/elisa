@@ -9,7 +9,9 @@
 # We compose a simple world from individual boxes sprinkled in the somewhat close perimeter. This should simulate the notion of
 # us actually moving in the environment. Note, we do not implement collision detection here.
 
-# TODO: setup the camera so that the camera follows the sprite
+# links to content:
+# https://www.cs.usfca.edu/~galles/cs420S13/lecture/Transform/Transformation.html
+# https://gamedev.stackexchange.com/questions/44256/how-to-add-a-scrolling-camera-to-a-2d-java-game
 
 from pygame.locals import *
 import os

@@ -21,7 +21,7 @@ import enum
 from math import pi, sin, cos
 import pygame
 from elisa.arch.ecs import Entity, Component, Message, System
-from elisa import Point2, Vec2, Point2
+from elisa.linalg import Point2, Vec2, Point2
 import elisa.linalg
 from elisa.linalg import Ray2, Plane2
 

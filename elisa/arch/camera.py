@@ -1,8 +1,5 @@
 from elisa.linalg import Vec2, zero2, zero3, eye3, eye2, one2, one3, Point2, Mat2, Mat3, Point3, Vec3
 
-# TODO: this should be expressed as matrices (when moved to library)
-# TODO: add a lense mask - this should be a separate camera or a separate camera effect
-
 class Camera2D:
 	def __init__(self, ws_xmin:float, ws_xmax:float, ws_ymin:float, ws_ymax:float, vw_width:int, vw_height:int):
 		"""Create a new 2D Camera.

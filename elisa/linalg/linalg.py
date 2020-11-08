@@ -2,13 +2,6 @@
 # name: linalg.py
 # desc: some math routines needed for our elisa things
 
-# TODO: vec2d
-# TODO: vec3d
-# TODO: vec4d
-# TODO: matrix2x2
-# TODO: matrix3x3
-# TODO: matrix4x4
-
 from math import sqrt, pi
 
 ALPHA_PI_INV = 1./ 180.

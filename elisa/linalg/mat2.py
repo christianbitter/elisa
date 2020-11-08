@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 import math
 from .linalg import is_numeric
 
-# TODO: general functions ... is orthogonal, is orthonormal
+# TODO: is orthogonal
+# TODO: is orthonormal
 
 class Mat2:
     """
@@ -24,36 +27,75 @@ class Mat2:
         else:
             raise ValueError("index wrong")
 
-    def __add__(self, other):
+    def __add__(self, other) -> Mat2:
+        """Add a Mat2 with a numeric or a Mat2. If the other value is a numeric it is broadcasted onto all of the matrix elements.
+
+        Args:
+            other (numeric, Mat2): Other value to add
+
+        Raises:
+            ValueError: if no other value is provided or the other value is of an unrecognized type.
+
+        Returns:
+            Mat2: result of the addition
+        """
+        if not other:
+            raise ValueError("Cannot add with none")
         if is_numeric(other):
             return self.__add__(Mat2(other, other, other, other))
-        else:
+        elif isinstance(other, Mat2):
             return Mat2(self._v[0] + other[0],
                         self._v[1] + other[1],
                         self._v[2] + other[2],
                         self._v[3] + other[3])
+        else:
+            raise ValueError("Cannot add with this type: {}".format(type(other)))
 
-    def __sub__(self, other):
+    def __sub__(self, other) -> Mat2:
+        """Subtract two matrices. If the other value is a numeric it is broadcasted onto all of the matrix elements.
+
+        Args:
+            other (numeric, Mat2): Other value to subtract
+
+        Raises:
+            ValueError: if no other value is provided or the other value is of an unrecognized type.
+
+        Returns:
+            Mat2: result of the subtraction
+        """
+        if not other:
+            raise ValueError("Cannot sub with none")
         if is_numeric(other):
             return self.__sub__(Mat2(other, other, other, other))
-        else:
+        elif isinstance(other, Mat2):
             return Mat2(self._v[0] - other[0],
                         self._v[1] - other[1],
                         self._v[2] - other[2],
                         self._v[3] - other[3])
+        else:
+            raise ValueError("Cannot sub with this type: {}".format(type(other)))
 
     def __mul__(self, other):
+        if not other:
+            raise ValueError("Cannot multiply with none")        
         if is_numeric(other):
             return Mat2(self._v[0] * other, self._v[1] * other, self._v[2] * other, self._v[3] * other)
+        elif isinstance(other, Mat2):
+            return Mat2(self._v[0] * other[1], self._v[1] * other[2], self._v[0] * other[1], self._v[1] * other[3],
+                        self._v[2] * other[0], self._v[3] * other[2], self._v[2] * other[3], self._v[1] * other[3])
         else:
-            raise ValueError("Not implemented")
+            raise ValueError("Cannot mul with this type: {}".format(type(other)))
 
     def __truediv__(self, other):
+        if not other:
+            raise ValueError("Cannot divide by none")        
         if is_numeric(other):
             other_inv = 1. / other
             return Mat2(self._v[0] * other_inv, self._v[1] * other_inv, self._v[2] * other_inv, self._v[3] * other_inv)
-        else:
+        elif isinstance(other, Mat2):
             return self * Mat2.inverse(other)
+        else:
+            raise ValueError("Cannot divide with this type: {}".format(type(other)))        
 
     @property
     def a(self):
