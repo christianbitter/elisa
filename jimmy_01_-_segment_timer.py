@@ -2,12 +2,8 @@
 # name: jimmy_01_-_segment_timer.py
 # desc: a digital 60 second timer via a segment display
 
-# TODO: jimmy needs to move to his own space, depending on the library
-
 import pygame
 from elisa.ui import uifx
-
-
 
 def main():
     if not pygame.font:

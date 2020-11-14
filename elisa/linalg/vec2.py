@@ -48,9 +48,14 @@ class Vec2(Vec):
 		return self._v[0] == 0. and self._v[1] == 0.
 
 	def __add__(self, other):
+		if not other:
+			raise ValueError("other not provided")
+
 		return Vec2(self._v[0] + other[0], self._v[1] + other[1])
 
 	def __sub__(self, other):
+		if not other:
+			raise ValueError("other not provided")
 		return Vec2(self._v[0] - other[0], self._v[1] - other[1])
 
 	def __neg__(self):

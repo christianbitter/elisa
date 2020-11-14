@@ -28,13 +28,15 @@ This is a simple example, building on geometric primitives provided by the pygam
 - **elisa_2_animation.py**:
 - **elisa_3_multiple_animation.py**:
 - **elisa_5_statemachine.py**:
-- **elisa_6_environment_map.py**:
+- **elisa_6_environment_map.py**:  
+In this example, we take what we learnt about displaying sprites and define a simple list-based environment map structure. This structure lays out our game world in terms of different atomic environmental entities, i.e. tiles. For this example, there are only a limited number of tiles and the game world is really just a 2D grid with no life in it.
 - **elisa_7_anim_statemachine.py**:
-- **elisa_8_moving_in_environment.py**:
+- **elisa_8_-_tilemap.py**:  
+This example combines our foray into drawing a tiled game world introduced in elisa_6 and what we learnt in terms of expressing behaviour and animation using a statemachine. Consequently, this example greets you with a simple tile map world in which you can steer a simplistic game character up, down, left or right. The steering is controlled by the mentioned state machine. Since, the visual for our moving friend are somewhat simplistic no animation highlights the notion of dynamic behaviour. But for that we have our beloved elise character, who is waiting idly in the middle of the screen.
 - **elisa_9_particles.py**:
 - **elisa_10_screens.py**:
 - **elisa_12_sound.py**:  
-Play a single sound.
+This is a quite simplistic example that does not involve a lot of visual trickery (apart from the instructional text). Here, we simply play a single sound when the player presses a mouse button. The longer the mouse button is pressed, the longer the sound is played.
 - **elisa_14_camera.py**:
 - **elisa_16_-_ecs.py**:
 - **elisa_18_actor_camera.py**:  
@@ -42,4 +44,4 @@ This is an integrated example binding together the composition of scenes via the
 
 ## Credits and References
 
-(c) Copyright Christian Bitter 2019
+(c) Copyright Christian Bitter 2020

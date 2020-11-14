@@ -1,5 +1,7 @@
 # auth: christian bitter
 # desc: create a simple map showing some environment for elisa to move in.
+# The environment is defined in a simple array structure. It is composed of a limited number of
+# environmental instance types.
 
 import os
 import pygame

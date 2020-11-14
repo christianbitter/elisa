@@ -6,7 +6,8 @@ from pygame import Surface, PixelArray
 
 from .sprites import load_image, load_png
 
-# TODO: serialize to json/dict struct, remove the internal id
+# TODO: serialize the meta-data to json/dict struct, remove the internal id
+# avoid to serialize the image data
 class Sprite(object):
 	def __init__(self, name:str, w: int, h: int, img, img_fp:str, z: int = 0):
 		"""
@@ -106,5 +107,3 @@ class Sprite(object):
 
 	def __repr__(self):
 		return "{} (w, h => {}, {}, {}, {})".format(self._id, self._width, self._height, self._z_order, self._visible)
-
-Tile = Sprite

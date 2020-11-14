@@ -1,0 +1,19 @@
+{
+	"name": "moz-character-tiles",
+	"description": "the character tilemap",
+	"source": "",
+	"image_path": "asset/tile_map_mozilla/character.png",
+	"width": 64,
+	"height": 64,
+	"no_sprites": 1,
+	"color_key": { },
+	"sprites": [
+		{
+			"name": "main",
+			"x": 0,
+			"y": 0,
+			"width": 64,
+			"height": 64
+		}
+	]
+}

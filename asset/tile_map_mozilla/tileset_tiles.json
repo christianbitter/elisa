@@ -1,0 +1,47 @@
+{
+	"name": "moz-tiles",
+	"description": "a set of tiles used in the mozilla example",
+	"source": "",
+	"image_path": "asset/tile_map_mozilla/tiles.png",
+	"width": 320,
+	"height": 64,
+	"no_sprites": 5,
+	"color_key": { },
+	"sprites": [
+		{
+			"name": "grass_1",
+			"x": 0,
+			"y": 0,
+			"width": 64,
+			"height": 64
+		},
+		{
+			"name": "mud_1",
+			"x": 64,
+			"y": 0,
+			"width": 64,
+			"height": 64
+		},
+		{
+			"name": "tree_1",
+			"x": 128,
+			"y": 0,
+			"width": 64,
+			"height": 64
+		},
+		{
+			"name": "bush_1",
+			"x": 192,
+			"y": 0,
+			"width": 64,
+			"height": 64
+		},
+		{
+			"name": "bush_2",
+			"x": 256,
+			"y": 0,
+			"width": 64,
+			"height": 64
+		}		
+	]
+}

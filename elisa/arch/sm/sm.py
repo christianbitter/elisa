@@ -4,6 +4,9 @@
 from .state import State
 from uuid import uuid4
 
+# TODO: allow attaching a transition from any previous state to a target state
+# TODO: allow attaching a transition from a single previous state to any other target state
+
 class StateMachine(object):
 	"""The state machine object, i.e. the abstract machine that executes state transitions based on external input.
 	"""

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import json
 from uuid import uuid4
@@ -127,7 +129,18 @@ class SpriteSheet(object):
 			
 			self._initialized = True
 
-	def __getitem__(self, item):
+	def __getitem__(self, item) -> Sprite:
+		"""Returns a sprite from the sprite sheet by using the Sprite's name (preference) or the index in the sprite map.
+
+		Args:
+				item (string or int): name of the sprite as defined in the sprite sheets metadata descriptor, or the index in the sprite sheet.
+
+		Raises:
+				ValueError: if the key is not provided or the sprite could not be retrieved
+
+		Returns:
+				Sprite: the underlying pygame Sprite instance
+		"""
 		if item is None:
 			raise ValueError("SpriteMap.get - key not provided")
 
@@ -153,7 +166,8 @@ class SpriteSheet(object):
 		return self._no_sprites
 
 	def __repr__(self):
-		return "Sprite Map: {} # sprites {} -> {}".format(self._id, len(self._sprite_names), self._sprite_names)
+		_sn = self.sprite_names
+		return "Sprite Map: {} # sprites {} -> {}".format(self._id, len(_sn), _sn)
 
 	@property
 	def image(self) -> Surface:
@@ -179,10 +193,19 @@ class SpriteSheet(object):
 	def image_rect(self):
 		return self._image.get_rect()
 
-class TextureAtlas(SpriteSheet):
-	def __init__(self):
-		super(TileAtlas, self).__init__()
+	@staticmethod
+	def create(json_descriptor_fp:str, **kwargs) -> SpriteSheet:
+		if not json_descriptor_fp or json_descriptor_fp.strip() == '':
+			raise ValueError("json descriptor not provided")
+		if not os.path.exists(json_descriptor_fp):
+			raise ValueError("Json descriptor does not exist")
 
-class TileAtlas(SpriteSheet):
+		verbose = kwargs.get('verbose', False)
+
+		_sheet = SpriteSheet(json_descriptor_fp)
+		_sheet.initialize(verbose=verbose)
+		return _sheet
+
+class TextureAtlas(SpriteSheet):
 	def __init__(self):
 		super(TileAtlas, self).__init__()
