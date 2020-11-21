@@ -24,6 +24,8 @@ A simple template to kick our coding off. It is based on the official pygame sta
 Based of the initial template, we are going to look into pygame initialization procedures to arrive at a point where we have a displayed window and a double-buffer based drawing setup. For simplicity's sake we only fill the drawing canvas with white colour. But stay tuned for future examples.
 - **elisa_0_1_drawing_shapes.py**:  
 This is a simple example, building on geometric primitives provided by the pygame.draw module. Specifically, we are going to draw a circle, square, polygon and some lines. Part of the drawing, will make use of some basic linear algebra (projection of 2D vectors). This is a very basic, non-animated example, to show the composition of scenes from basic pygame elements.
+- **elisa_0_2_-_fonts_and_text.py**:  
+In this simple example we are going to make use of the pygame.font module in order to select and modify fonts and render simple text to the screen. Text is one of the many (and in some cases core) building blocks when writing user interfaces or mechanics for your game.
 - **elisa_1_spritesheet.py**:
 - **elisa_2_animation.py**:
 - **elisa_3_multiple_animation.py**:
