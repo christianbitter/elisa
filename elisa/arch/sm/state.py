@@ -21,11 +21,21 @@ class State(object):
 		pass
 
 	@property
-	def id(self):
-		return self._id
+	def id(self) -> str:
+		"""Gets the state's id.
+
+		Returns:
+				str: the state id
+		"""
+		return str(self._id)
 
 	@property
-	def name(self):
+	def name(self) -> str:
+		"""Gets the state's name.
+
+		Returns:
+				uuid4: the state name
+		"""
 		return self._name
 
 	@name.setter
@@ -34,7 +44,12 @@ class State(object):
 		return self
 
 	@property
-	def description(self):
+	def description(self) -> str:
+		"""Gets the state's description.
+
+		Returns:
+				uuid4: the state description
+		"""
 		return self._description
 
 	@description.setter
@@ -43,4 +58,7 @@ class State(object):
 		return self
 
 	def __eq__(self, other:State):
-		return other._id == self._id
+		return other.id == self.id
+
+	def __repr__(self):
+		return "State({}) = {}".format(self.id, self.name)

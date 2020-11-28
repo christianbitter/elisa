@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from uuid import uuid4
 from .state import State
 
@@ -26,6 +28,10 @@ class Transition(object):
 		self._description = description
 		self._on_fire = on_fire_handler
 
+	@property
+	def id(self) -> str:
+		return str(self._id)
+
 	def __repr__(self):
 		return "{} ({}) : {} => {}".format(self._id, self._name, self._from, self._to)
 
@@ -34,7 +40,10 @@ class Transition(object):
 
 	def fire(self, **kwargs):
 		if self._on_fire:
-			self._on_fire(self._from, self._to)
+			return self._on_fire(self._from, self._to)
+
+	def __eq__(self, other:Transition) -> bool:
+		return self.id == other.id
 
 	@property
 	def from_state(self):
@@ -43,3 +52,16 @@ class Transition(object):
 	@property
 	def to_state(self):
 		return self._to
+
+	@staticmethod
+	def from_many(f:list, t:State, trigger_fn, on_fire_handler, name=None, desc=None):
+		# TODO: we allow the to state to be connected from many source states, such as a final state that is fanned in from
+		# all the relevant input states
+		pass
+
+	@staticmethod
+	def to_many(f:State, t:list, trigger_fn, on_fire_handler, name=None, desc=None):
+		# TODO: we allow to have the from state connect to many to states
+		# in this case we may use trigger_fn, on_fire_handler, name, desc is one
+		# or it has to have the same cardinality as the t list
+		pass

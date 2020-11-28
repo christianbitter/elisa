@@ -23,6 +23,8 @@
 # todo: screen transitions either in the screen or in the UI
 # todo: initialization needs to be fixed, because for some ui elements we need to set fields that are used in the super
 #       initialization routine
+# TODO: rework
+# TODO: allow specification of UI in a json file or something similar
 
 import os
 import pygame

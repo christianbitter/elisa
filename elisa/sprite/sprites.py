@@ -40,7 +40,7 @@ def load_image(fp, colorkey=None, image_only: bool = False, verbose: bool = Fals
         return image, image.get_rect()
 
 
-def load_png(fp, image_only=False):
+def load_png(fp, image_only=False, colorkey=None, verbose: bool = False):
     """ Load image and return image object"""
     if not fp:
         raise ValueError("load_png - fp not provided")
@@ -54,6 +54,13 @@ def load_png(fp, image_only=False):
             image = image.convert()
         else:
             image = image.convert_alpha()
+
+        if colorkey is not None:
+            if colorkey is -1:
+                colorkey = image.get_at((0, 0))
+            if verbose:
+                print("Setting colour key: ", colorkey)
+            image.set_colorkey(colorkey, pygame.RLEACCEL)
     except pygame.error as message:
         print('Cannot load image:', fullname)
         raise SystemExit(message)
