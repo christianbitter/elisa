@@ -13,12 +13,12 @@ import math
 def _to_unit_vector(v):
     vx = v[0]
     vy = v[1]
-    mag = math.sqrt(vx*vx + vy*vy)
+    mag = math.sqrt(vx * vx + vy * vy)
     return vx / mag, vy / mag
 
 
 def alpha2rad(alpha):
-    return (alpha * math.pi) / 180.
+    return (alpha * math.pi) / 180.0
 
 
 def _angle_to_dir(angle):
@@ -31,9 +31,18 @@ class Particle(object):
     The particle is some object moving around in space. it is visible due to the heat it emits.
     Over time the particle cools down until it is cold. A cold particle does not emit energy/light.
     """
-    def __init__(self, pos, size: int,
-                 temperature:float, temp_decrease,
-                 velocity, max_velocity, acceleration, max_acceleration):
+
+    def __init__(
+        self,
+        pos,
+        size: int,
+        temperature: float,
+        temp_decrease,
+        velocity,
+        max_velocity,
+        acceleration,
+        max_acceleration,
+    ):
         """Constructor for Particle"""
         super(Particle, self).__init__()
         self._pos = pos
@@ -104,9 +113,13 @@ class Particle(object):
         x, y = self._pos[0], self._pos[1]
         vx, vy = self._velocity[0], self._velocity[1]
         ax, ay = self._acceleration[0], self._acceleration[1]
-        return "Particle ({}, {}) = {}\r\n{}\r\n{}".format(x, y, self._temperature,
-                                                           "(x, vx, ax): {}, {}, {}".format(x, vx, ax),
-                                                           "(y, vy, ay): {}, {}, {}".format(y, vy, ay))
+        return "Particle ({}, {}) = {}\r\n{}\r\n{}".format(
+            x,
+            y,
+            self._temperature,
+            "(x, vx, ax): {}, {}, {}".format(x, vx, ax),
+            "(y, vy, ay): {}, {}, {}".format(y, vy, ay),
+        )
 
 
 class ParticleSystem(object):
@@ -193,6 +206,7 @@ class ParticleSystem(object):
 
 class Renderer:
     """"""
+
     def __init__(self):
         """Constructor for Renderer"""
         super(Renderer, self).__init__()
@@ -202,19 +216,18 @@ class Renderer:
 
 
 class ParticleSystemRenderer(Renderer):
-    """
-    """
+    """"""
 
     def __init__(self):
         """Constructor for ParticleSystemRenderer"""
         super(ParticleSystemRenderer, self).__init__()
 
-    def temperature2colour(self, temperature:float) -> tuple:
+    def temperature2colour(self, temperature: float) -> tuple:
         """
         converts the particle's temperature into a displayable colour
         :return: a 4-tuple representing an RGBA colour
         """
-        return int(temperature*255), 0, int(temperature*128), 255
+        return int(temperature * 255), 0, int(temperature * 128), 255
 
     def render(self, buffer, render_items: list, x: int = None, y: int = None):
         if not render_items or len(render_items) < 1:
@@ -236,4 +249,6 @@ class ParticleSystemRenderer(Renderer):
             if len(col) != 4:
                 raise ValueError("temperature2colour must yield an RGBA tuple")
             if 0 <= particle.x < w and 0 <= particle.y < h:
-                pg.draw.circle(buffer, col, (int(particle.x), int(particle.y)), particle.size, 0)
+                pg.draw.circle(
+                    buffer, col, (int(particle.x), int(particle.y)), particle.size, 0
+                )

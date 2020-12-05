@@ -15,7 +15,7 @@ def load_image(fp, colorkey=None, image_only: bool = False, verbose: bool = Fals
     try:
         image = pygame.image.load(fullname)
     except pygame.error as message:
-        print('Cannot load image:', fp)
+        print("Cannot load image:", fp)
         raise SystemExit(message)
 
     if image.get_alpha() is None:
@@ -57,7 +57,7 @@ def load_png(fp, image_only=False):
         else:
             image = image.convert_alpha()
     except pygame.error as message:
-        print('Cannot load image:', fullname)
+        print("Cannot load image:", fullname)
         raise SystemExit(message)
     if image_only:
         return image
@@ -95,7 +95,7 @@ class PSprite(object):
         return self._visible
 
     @is_visible.setter
-    def is_visible(self, v:bool):
+    def is_visible(self, v: bool):
         if v is None:
             raise ValueError("v not provided")
         self._visible = v
@@ -137,7 +137,9 @@ class PSprite(object):
         return self._image.get_rect()
 
     def __repr__(self):
-        return "{} (w, h => {}, {}, {}, {})".format(self._id, self._width, self._height, self._z_order, self._visible)
+        return "{} (w, h => {}, {}, {}, {})".format(
+            self._id, self._width, self._height, self._z_order, self._visible
+        )
 
 
 class SpriteMap(object):
@@ -179,41 +181,52 @@ class SpriteMap(object):
 
     def initialize(self, verbose: bool = False):
         if not self._initialized:
-            with open(self._descriptor, mode='r+') as fp:
+            with open(self._descriptor, mode="r+") as fp:
                 self._sprite_map = json.load(fp)
 
-            if 'id' not in self._sprite_map: raise ValueError("SpriteMap - id missing")
-            if 'width' not in self._sprite_map: raise ValueError("SpriteMap - width missing")
-            if 'height' not in self._sprite_map: raise ValueError("SpriteMap - height missing")
-            if 'image_path' not in self._sprite_map: raise ValueError("SpriteMap - image path missing")
-            if 'no_sprites' not in self._sprite_map: raise ValueError("SpriteMap - no_sprites missing")
-            self._id = self._sprite_map['id']
-            self._width = self._sprite_map['width']
-            self._height = self._sprite_map['height']
-            self._image_path = self._sprite_map['image_path']
-            self._no_sprites = self._sprite_map['no_sprites']
-            self._colour_key = self._sprite_map['color_key']
+            if "id" not in self._sprite_map:
+                raise ValueError("SpriteMap - id missing")
+            if "width" not in self._sprite_map:
+                raise ValueError("SpriteMap - width missing")
+            if "height" not in self._sprite_map:
+                raise ValueError("SpriteMap - height missing")
+            if "image_path" not in self._sprite_map:
+                raise ValueError("SpriteMap - image path missing")
+            if "no_sprites" not in self._sprite_map:
+                raise ValueError("SpriteMap - no_sprites missing")
+            self._id = self._sprite_map["id"]
+            self._width = self._sprite_map["width"]
+            self._height = self._sprite_map["height"]
+            self._image_path = self._sprite_map["image_path"]
+            self._no_sprites = self._sprite_map["no_sprites"]
+            self._colour_key = self._sprite_map["color_key"]
 
-            self._description = self._sprite_map['description']
-            self._source = self._sprite_map['source']
+            self._description = self._sprite_map["description"]
+            self._source = self._sprite_map["source"]
 
             self._load_image()
             # load sprites
-            sprites = self._sprite_map['sprites']
+            sprites = self._sprite_map["sprites"]
             for i, sprite_def in enumerate(sprites):
-                id = sprite_def['id']
-                x = sprite_def['x']
-                y = sprite_def['y']
-                w = sprite_def['width']
-                h = sprite_def['height']
+                id = sprite_def["id"]
+                x = sprite_def["x"]
+                y = sprite_def["y"]
+                w = sprite_def["width"]
+                h = sprite_def["height"]
                 if verbose:
-                    print("Loading subsurface:{}/ {}".format((x, y, w, h), (self._image.get_rect())))
+                    print(
+                        "Loading subsurface:{}/ {}".format(
+                            (x, y, w, h), (self._image.get_rect())
+                        )
+                    )
                 sprite_img = self._image.subsurface(x, y, w, h)
                 self._sprites[id] = PSprite(id, w, h, sprite_img)
                 self._idx2key.append(id)
 
             if self._no_sprites > 0 and self._no_sprites != len(self._sprites):
-                raise ValueError("Number of defined sprites does not match declared sprites")
+                raise ValueError(
+                    "Number of defined sprites does not match declared sprites"
+                )
 
             self._sprite_names = [k for k, v in self._sprites.items()]
             self._initialized = True
@@ -242,7 +255,9 @@ class SpriteMap(object):
         return self._no_sprites
 
     def __repr__(self):
-        return "Sprite Map: {} # sprites {} -> {}".format(self._id, len(self._sprite_names), self._sprite_names)
+        return "Sprite Map: {} # sprites {} -> {}".format(
+            self._id, len(self._sprite_names), self._sprite_names
+        )
 
 
 class SpriteAssetManager(object):
@@ -264,15 +279,21 @@ class SpriteAssetManager(object):
     def number_of_sprite_maps(self):
         return len(self._items)
 
-    def add_sprite_map(self, name: str, metadata_fp: str, initialize:bool = True, verbose: bool = False):
+    def add_sprite_map(
+        self,
+        name: str,
+        metadata_fp: str,
+        initialize: bool = True,
+        verbose: bool = False,
+    ):
         if not name:
-            raise ValueError('name not provided')
+            raise ValueError("name not provided")
         if not metadata_fp:
-            raise ValueError('metadata file not provided')
+            raise ValueError("metadata file not provided")
         if name in self._items:
-            raise ValueError('asset already registered')
+            raise ValueError("asset already registered")
         if not os.path.exists(metadata_fp):
-            raise ValueError('metadata file does not exist')
+            raise ValueError("metadata file does not exist")
 
         if verbose:
             print("Adding Sprite Map: ", name)
@@ -287,10 +308,10 @@ class SpriteAssetManager(object):
 
     def remove_sprite_map(self, name):
         if not name:
-            raise ValueError('name not provided')
+            raise ValueError("name not provided")
         if name not in self._items:
-            raise ValueError('asset not registered')
-        del(self._items[name])
+            raise ValueError("asset not registered")
+        del self._items[name]
 
     def get_sprite(self, sprite_map_name: str, sprite: str = None):
         if not sprite_map_name:
@@ -326,6 +347,6 @@ class SpriteAssetManager(object):
                     a.initialize()
         else:
             if name not in self._items:
-                raise ValueError('not an asset')
+                raise ValueError("not an asset")
             if not self._items[name].initialized:
                 self._items[name].initialize()

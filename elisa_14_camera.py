@@ -33,7 +33,7 @@ class Point2(Primitive):
         self._points.append((x, y))
 
     @staticmethod
-    def from_tuple(t:tuple):
+    def from_tuple(t: tuple):
         if len(t) != 2:
             raise ValueError("Not a 2d tuple")
         return Point2(t[0], t[1])
@@ -66,8 +66,8 @@ class Rect2(Primitive):
         self._bottom = lb.y
         self._w = rt.x - lb.x
         self._h = rt.y - lb.y
-        self._w2 = self._w * .5
-        self._h2 = self._h * .5
+        self._w2 = self._w * 0.5
+        self._h2 = self._h * 0.5
 
         self._center_x = self._left + self._w2
         self._center_y = self._bottom + self._h2
@@ -111,13 +111,16 @@ class Rect2(Primitive):
         self._points = [lb, rt]
 
     def __str__(self):
-        return "[Rect2]: (cx={}, cy={}, w={}, h={})".format(self._center_x, self._center_y, self._w, self._h)
+        return "[Rect2]: (cx={}, cy={}, w={}, h={})".format(
+            self._center_x, self._center_y, self._w, self._h
+        )
 
 
 class Camera:
     """
     Abstract camera
     """
+
     def __init__(self):
         pass
 
@@ -131,15 +134,18 @@ class Camera:
 # we take a primitive from world space (we ignore object space for now)
 # into the clip space
 # normalize it to be in normalized clip space (-1, -1, 1, 1)
-    # everything that is outside of this normalized space is clipped or removed
+# everything that is outside of this normalized space is clipped or removed
 # and transform it to screen/ device space (0, 0, w, h)
 
+
 class Camera2D(Camera):
-    def __init__(self,
-                 world_space,
-                 cam_space,
-                 screen_space=(0, 0, 640, 480),
-                 inverted_screen_space=True):
+    def __init__(
+        self,
+        world_space,
+        cam_space,
+        screen_space=(0, 0, 640, 480),
+        inverted_screen_space=True,
+    ):
         super(Camera2D, self).__init__()
 
         self._world_space = world_space
@@ -149,12 +155,12 @@ class Camera2D(Camera):
         self._cam_right = self._cam_space[2]
         self._cam_top = self._cam_space[3]
         self._cam_range_x = self._cam_space[2] - self._cam_space[0]
-        self._cam_range_xinv = 1. / self._cam_range_x
+        self._cam_range_xinv = 1.0 / self._cam_range_x
         self._cam_range_y = self._cam_space[3] - self._cam_space[1]
-        self._cam_range_yinv = 1. / self._cam_range_y
+        self._cam_range_yinv = 1.0 / self._cam_range_y
 
-        self._cam_x = self._cam_range_x / 2.
-        self._cam_y = self._cam_range_y / 2.
+        self._cam_x = self._cam_range_x / 2.0
+        self._cam_y = self._cam_range_y / 2.0
 
         self._hclip_space = [-1, -1, 1, 1]
         self._hclip_left = self._hclip_space[0]
@@ -178,14 +184,22 @@ class Camera2D(Camera):
 
     def __cam_to_hclip_space__(self, c):
         xc, yc = c[0], c[1]
-        _x = self._hclip_left + self._hclip_range_x * self._cam_range_xinv * (xc - self._cam_left)
-        _y = self._hclip_bottom + self._hclip_range_y * self._cam_range_yinv * (yc - self._cam_bottom)
+        _x = self._hclip_left + self._hclip_range_x * self._cam_range_xinv * (
+            xc - self._cam_left
+        )
+        _y = self._hclip_bottom + self._hclip_range_y * self._cam_range_yinv * (
+            yc - self._cam_bottom
+        )
         return _x, _y
 
     def __hclip_to_screen_space__(self, c):
         xc, yc = c[0], c[1]
-        _x = self._screen_left + self._screen_range_x * self._hclip_range_xinv * (xc - self._hclip_left)
-        _y = self._screen_bottom + self._screen_range_y * self._hclip_range_yinv * (yc - self._hclip_bottom)
+        _x = self._screen_left + self._screen_range_x * self._hclip_range_xinv * (
+            xc - self._hclip_left
+        )
+        _y = self._screen_bottom + self._screen_range_y * self._hclip_range_yinv * (
+            yc - self._hclip_bottom
+        )
         return _x, _y
 
     def __clip__(self, c):
@@ -202,7 +216,7 @@ class Camera2D(Camera):
     @cam_x.setter
     def cam_x(self, v):
         self._cam_x = v
-        r2 = .5 * self._cam_range_x
+        r2 = 0.5 * self._cam_range_x
         self._cam_left = v - r2
         self._cam_right = v + r2
 
@@ -213,7 +227,10 @@ class Camera2D(Camera):
     def is_visible(self, primitive):
         visibility = []
         for _p in primitive:
-            p_vis = self._cam_left <= _p.x <= self._cam_right and self._cam_bottom <= _p.y <= self._cam_top
+            p_vis = (
+                self._cam_left <= _p.x <= self._cam_right
+                and self._cam_bottom <= _p.y <= self._cam_top
+            )
             visibility.append(p_vis)
         # partial visibility included
         return any(visibility)
@@ -241,6 +258,7 @@ class Camera2D(Camera):
     def __str__(self):
         return "Cam({},{}): {}".format(self._cam_x, self._cam_y, self._cam_space)
 
+
 def rect_coord2pygame(b, c, w, r0, r1):
     if r0 is None or r1 is None:
         return
@@ -259,17 +277,21 @@ def main():
 
     w, h, t = 640, 480, "Elisa 14 - A 2D camera example"
     c_white = (255, 255, 255)
-    c_red   = (255, 0, 0)
-    c_blue  = (0, 0, 255)
+    c_red = (255, 0, 0)
+    c_blue = (0, 0, 255)
     c_black = (0, 0, 0)
 
-    virtual_camera = Camera2D(world_space=(-5, 0, 20, 10),
-                              cam_space=(0, 0, 10, 10),
-                              screen_space=(0, 0, 320, 240))
+    virtual_camera = Camera2D(
+        world_space=(-5, 0, 20, 10),
+        cam_space=(0, 0, 10, 10),
+        screen_space=(0, 0, 320, 240),
+    )
 
-    follower_camera = Camera2D(world_space=(-5, 0, 20, 10),
-                               cam_space=(2, 2, 8, 8),
-                               screen_space=(320, 240, 640, 480))
+    follower_camera = Camera2D(
+        world_space=(-5, 0, 20, 10),
+        cam_space=(2, 2, 8, 8),
+        screen_space=(320, 240, 640, 480),
+    )
 
     # now test with a point which should be inside the screen space - should be in the center ...
     p0 = Point2(5, 5)
@@ -296,11 +318,11 @@ def main():
     fps_watcher = pygame.time.Clock()
     is_done = False
 
-    dir_x = .1
-    dir_by = .1
+    dir_x = 0.1
+    dir_by = 0.1
 
     while not is_done:
-        elapsed_millis = fps_watcher.tick(60)
+        _ = fps_watcher.tick(60)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -336,9 +358,11 @@ def main():
         # update the blue rect to move up and down
         r1.centery = r1.centery + dir_by
 
-        if r1.centery >= 8. or r1.centery <= 1:
+        if r1.centery >= 8.0 or r1.centery <= 1:
             dir_by *= -1
-        if virtual_camera.cam_x >= 20 or virtual_camera.cam_x <= -5:  # outside of world space
+        if (
+            virtual_camera.cam_x >= 20 or virtual_camera.cam_x <= -5
+        ):  # outside of world space
             dir_x *= -1
 
         if not is_done:
@@ -346,5 +370,5 @@ def main():
             pygame.display.flip()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

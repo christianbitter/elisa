@@ -5,7 +5,7 @@
 
 import os
 import pygame
-from pygame.locals import *
+from pygame.locals import QUIT
 import json
 
 # gfx: https://ansimuz.itch.io/tiny-rpg-town
@@ -17,7 +17,9 @@ def tileno2spritemap(tileno, sprite_map):
     return sprite_map[tile_id]
 
 
-def render_map(buffer, sprite_map, world_map, start_x, start_y, map_width = 10, map_height = 10):
+def render_map(
+    buffer, sprite_map, world_map, start_x, start_y, map_width=10, map_height=10
+):
     i_idx = 0
     _y = start_y
     for y in range(map_height):
@@ -28,7 +30,7 @@ def render_map(buffer, sprite_map, world_map, start_x, start_y, map_width = 10, 
             buffer.blit(sprite_def.image, (_x, _y))
             i_idx += 1
             _x = _x + sprite_def.width
-        _y = _y + sprite_def.height #
+        _y = _y + sprite_def.height  #
 
 
 def load_image(fp, colorkey=None, image_only=False):
@@ -39,13 +41,13 @@ def load_image(fp, colorkey=None, image_only=False):
     try:
         image = pygame.image.load(fullname)
     except pygame.error as message:
-        print('Cannot load image:', fp)
+        print("Cannot load image:", fp)
         raise SystemExit(message)
 
     image = image.convert()
     if colorkey is not None:
         if colorkey is -1:
-            colorkey = image.get_at((0,0))
+            colorkey = image.get_at((0, 0))
         image.set_colorkey(colorkey, pygame.RLEACCEL)
 
     if image_only:
@@ -69,7 +71,7 @@ def load_png(fp, image_only=False):
         else:
             image = image.convert_alpha()
     except pygame.error as message:
-        print('Cannot load image:', fullname)
+        print("Cannot load image:", fullname)
         raise SystemExit(message)
     if image_only:
         return image
@@ -139,38 +141,45 @@ class SpriteMap(object):
 
     def initialize(self):
         if not self._initialized:
-            with open(self._descriptor, mode='r+') as fp:
+            with open(self._descriptor, mode="r+") as fp:
                 self._sprite_map = json.load(fp)
 
-            if 'id' not in self._sprite_map: raise ValueError("SpriteMap - id missing")
-            if 'width' not in self._sprite_map: raise ValueError("SpriteMap - width missing")
-            if 'height' not in self._sprite_map: raise ValueError("SpriteMap - height missing")
-            if 'image_path' not in self._sprite_map: raise ValueError("SpriteMap - image path missing")
-            if 'no_sprites' not in self._sprite_map: raise ValueError("SpriteMap - no_sprites missing")
-            self._id = self._sprite_map['id']
-            self._width = self._sprite_map['width']
-            self._height = self._sprite_map['height']
-            self._image_path = self._sprite_map['image_path']
-            self._no_sprites = self._sprite_map['no_sprites']
-            self._colour_key = self._sprite_map['color_key']
+            if "id" not in self._sprite_map:
+                raise ValueError("SpriteMap - id missing")
+            if "width" not in self._sprite_map:
+                raise ValueError("SpriteMap - width missing")
+            if "height" not in self._sprite_map:
+                raise ValueError("SpriteMap - height missing")
+            if "image_path" not in self._sprite_map:
+                raise ValueError("SpriteMap - image path missing")
+            if "no_sprites" not in self._sprite_map:
+                raise ValueError("SpriteMap - no_sprites missing")
+            self._id = self._sprite_map["id"]
+            self._width = self._sprite_map["width"]
+            self._height = self._sprite_map["height"]
+            self._image_path = self._sprite_map["image_path"]
+            self._no_sprites = self._sprite_map["no_sprites"]
+            self._colour_key = self._sprite_map["color_key"]
 
-            self._description = self._sprite_map['description']
-            self._source = self._sprite_map['source']
+            self._description = self._sprite_map["description"]
+            self._source = self._sprite_map["source"]
 
             self._load_image()
             # load sprites
-            sprites = self._sprite_map['sprites']
+            sprites = self._sprite_map["sprites"]
             for i, sprite_def in enumerate(sprites):
-                id = sprite_def['id']
-                x = sprite_def['x']
-                y = sprite_def['y']
-                w = sprite_def['width']
-                h = sprite_def['height']
+                id = sprite_def["id"]
+                x = sprite_def["x"]
+                y = sprite_def["y"]
+                w = sprite_def["width"]
+                h = sprite_def["height"]
                 sprite_img = self._image.subsurface(x, y, w, h)
                 self._sprites[id] = PSprite(id, w, h, sprite_img)
 
             if self._no_sprites > 0 and self._no_sprites != len(self._sprites):
-                raise ValueError("Number of defined sprites does not match declared sprites")
+                raise ValueError(
+                    "Number of defined sprites does not match declared sprites"
+                )
             self._initialized = True
 
     def __getitem__(self, item):
@@ -191,16 +200,106 @@ def main():
     pygame.init()
 
     world_map = [
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        1, 2, 2, 2, 2, 2, 2, 2, 2, 1,
-        1, 1, 3, 1, 3, 1, 3, 1, 3, 1,
-        1, 2, 2, 2, 2, 2, 2, 2, 2, 1,
-        1, 1, 3, 1, 3, 1, 3, 1, 3, 1,
-        1, 2, 2, 2, 2, 2, 2, 2, 2, 1,
-        1, 1, 3, 1, 3, 1, 3, 1, 3, 1,
-        1, 2, 2, 2, 2, 2, 2, 2, 2, 1,
-        1, 1, 3, 1, 3, 1, 3, 1, 3, 1,
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        1,
+        1,
+        1,
+        3,
+        1,
+        3,
+        1,
+        3,
+        1,
+        3,
+        1,
+        1,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        1,
+        1,
+        1,
+        3,
+        1,
+        3,
+        1,
+        3,
+        1,
+        3,
+        1,
+        1,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        1,
+        1,
+        1,
+        3,
+        1,
+        3,
+        1,
+        3,
+        1,
+        3,
+        1,
+        1,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        1,
+        1,
+        1,
+        3,
+        1,
+        3,
+        1,
+        3,
+        1,
+        3,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
     ]
 
     MAP_WIDTH, MAP_HEIGHT = 10, 10
@@ -234,9 +333,18 @@ def main():
                 break
 
         back_buffer.fill(c_white)
-        render_map(back_buffer, grass_sprite_map, world_map, MAP_OFFSET_X, MAP_OFFSET_Y, MAP_WIDTH, MAP_HEIGHT)
+        render_map(
+            back_buffer,
+            grass_sprite_map,
+            world_map,
+            MAP_OFFSET_X,
+            MAP_OFFSET_Y,
+            MAP_WIDTH,
+            MAP_HEIGHT,
+        )
         screen_buffer.blit(back_buffer, (0, 0))
         pygame.display.flip()
 
 
-if __name__ == '__main__': main()
+if __name__ == "__main__":
+    main()

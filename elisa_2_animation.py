@@ -1,7 +1,8 @@
 # auth: christian bitter
 # desc: this builds on elisa_1 by adding the animation through sprite sheet
 
-import os, sys
+import os
+import sys
 import pygame
 
 
@@ -13,7 +14,7 @@ def load_image(fp, colorkey=None, image_only=False):
     try:
         image = pygame.image.load(fullname)
     except pygame.error as message:
-        print('Cannot load image:', fp)
+        print("Cannot load image:", fp)
         raise SystemExit(message)
 
     image = image.convert()
@@ -43,7 +44,7 @@ def load_png(fp, image_only=False):
         else:
             image = image.convert_alpha()
     except pygame.error as message:
-        print('Cannot load image:', fullname)
+        print("Cannot load image:", fullname)
         raise SystemExit(message)
     if image_only:
         return image
@@ -58,7 +59,10 @@ class Elisa(pygame.sprite.Sprite):
         self.asset_base_path = asset_base_path
         self.gfx_width = 256
         self.gfx_height = 256
-        self.animation_asset = {k: os.path.join(self.asset_base_path, v) for k, v in zip(["WALK"], ["elise_walk@8x.png"])}
+        self.animation_asset = {
+            k: os.path.join(self.asset_base_path, v)
+            for k, v in zip(["WALK"], ["elise_walk@8x.png"])
+        }
         self.animation_tile = {}
         self.animation_sprite = {}
         self.animation_frame = {k: f for k, f in zip(["WALK"], [6])}
@@ -73,13 +77,17 @@ class Elisa(pygame.sprite.Sprite):
         self.current_animation = "WALK"
         self.current_animation_frame = 0
 
-        self.animation_tile = {k: load_png(fp, image_only=True) for k, fp in self.animation_asset.items()}
+        self.animation_tile = {
+            k: load_png(fp, image_only=True) for k, fp in self.animation_asset.items()
+        }
 
         for k, regions in self.animation_idx.items():
             v_surface = []
             for xmin, ymin in regions:
                 anim_img = self.animation_tile[k]
-                sprite = anim_img.subsurface(xmin, ymin, self.gfx_width, self.gfx_height)
+                sprite = anim_img.subsurface(
+                    xmin, ymin, self.gfx_width, self.gfx_height
+                )
                 v_surface.append(sprite)
             self.animation_sprite[k] = v_surface
 
@@ -98,12 +106,16 @@ class Elisa(pygame.sprite.Sprite):
         max_frames = self.animation_frame[self.current_animation]
         self.current_animation_frame += 1
         self.current_animation_frame = self.current_animation_frame % max_frames
-        self.current_sprite = self.animation_sprite[self.current_animation][self.current_animation_frame]
+        self.current_sprite = self.animation_sprite[self.current_animation][
+            self.current_animation_frame
+        ]
 
 
 def main():
-    if not pygame.font: print("Pygame - Font")
-    if not pygame.mixer: print("Pygame - Mixer")
+    if not pygame.font:
+        print("Pygame - Font")
+    if not pygame.mixer:
+        print("Pygame - Mixer")
 
     pygame.init()
     elisa = Elisa("asset/elise_character/")
@@ -137,4 +149,5 @@ def main():
         pygame.display.flip()
 
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()

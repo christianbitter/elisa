@@ -3,15 +3,17 @@
 #       we couple the state machine with animation and make movement slightly more realistic.
 #       that is, moving right, will move the player right until an imaginary wall is hit
 
-from pygame.locals import *
-from sm import *
+# TODO: fix bug TypeError: 'str' object is not callable
+
+from pygame.locals import QUIT, K_LEFT, K_RIGHT, K_DOWN, K_UP
+from elisa.arch.sm import State, Transition, StateMachine
 from sprites import SpriteMap
 import os
 import pygame
 
 
 class Elisa(pygame.sprite.Sprite):
-    def __init__(self, sm:StateMachine, pos):
+    def __init__(self, sm: StateMachine, pos):
         super(Elisa, self).__init__()
         self._state_machine = sm
         self._current_animation_frame = 0
@@ -20,17 +22,19 @@ class Elisa(pygame.sprite.Sprite):
         self._assets = SpriteAssetManager()
         self._position = pos
         anims = ["WALK_RIGHT", "WALK_LEFT", "JUMP", "IDLE"]
-        descfps = ['asset/elise_character/tileset_elisa_walk@8x.json',
-                   'asset/elise_character/tileset_elisa_walk@8x.json',
-                   'asset/elise_character/tileset_elisa_walk_jump@8x.json',
-                   'asset/elise_character/tileset_elisa_idle@8x.json']
+        descfps = [
+            "asset/elise_character/tileset_elisa_walk@8x.json",
+            "asset/elise_character/tileset_elisa_walk@8x.json",
+            "asset/elise_character/tileset_elisa_walk_jump@8x.json",
+            "asset/elise_character/tileset_elisa_idle@8x.json",
+        ]
         for key, fp in zip(anims, descfps):
             self._assets.add_sprite_map(name=key, metadata_fp=fp)
         self._sprites = {
-            'Idle': self._assets.get_sprite(sprite_map_name='IDLE'),
-            'Walk_Right': self._assets.get_sprite(sprite_map_name='WALK_RIGHT'),
-            'Walk_Left': self._assets.get_sprite(sprite_map_name='WALK_LEFT'),
-            'Jump': self._assets.get_sprite(sprite_map_name='JUMP')
+            "Idle": self._assets.get_sprite(sprite_map_name="IDLE"),
+            "Walk_Right": self._assets.get_sprite(sprite_map_name="WALK_RIGHT"),
+            "Walk_Left": self._assets.get_sprite(sprite_map_name="WALK_LEFT"),
+            "Jump": self._assets.get_sprite(sprite_map_name="JUMP"),
         }
 
     def _right(self):
@@ -49,17 +53,22 @@ class Elisa(pygame.sprite.Sprite):
             self._current_state = self._state_machine.current.name
         else:
             self._current_animation_frame += 1
-            if self._current_animation_frame >= self._sprites[self._current_state].no_sprites:
+            if (
+                self._current_animation_frame
+                >= self._sprites[self._current_state].no_sprites
+            ):
                 self._current_animation_frame = 0
 
-        if self._current_state == 'Walk_Right':
+        if self._current_state == "Walk_Right":
             self._right()
-        elif self._current_state == 'Walk_Left':
+        elif self._current_state == "Walk_Left":
             self._left()
         else:
             pass
 
-        self._current_sprite = self._sprites[self._current_state][self._current_animation_frame]
+        self._current_sprite = self._sprites[self._current_state][
+            self._current_animation_frame
+        ]
 
     @property
     def assets(self):
@@ -89,19 +98,25 @@ class SpriteAssetManager(object):
         self._assets = {}
 
     def __repr__(self):
-        return "Registered Assets ({}): {}".format(len(self._assets), self._assets.keys())
+        return "Registered Assets ({}): {}".format(
+            len(self._assets), self._assets.keys()
+        )
 
-    def add_sprite_map(self, name:str, metadata_fp:str, initialize:bool = True):
-        if not name: raise ValueError('name not provided')
-        if not metadata_fp: raise ValueError('metadata file not provided')
-        if name in self._assets: raise ValueError('asset already registered')
-        if not os.path.exists(metadata_fp): raise ValueError('metadata file does not exist')
+    def add_sprite_map(self, name: str, metadata_fp: str, initialize: bool = True):
+        if not name:
+            raise ValueError("name not provided")
+        if not metadata_fp:
+            raise ValueError("metadata file not provided")
+        if name in self._assets:
+            raise ValueError("asset already registered")
+        if not os.path.exists(metadata_fp):
+            raise ValueError("metadata file does not exist")
 
         self._assets[name] = SpriteMap(metadata_fp)
         if initialize:
             self._assets[name].initialize()
 
-    def get_sprite(self, sprite_map_name:str, sprite:str = None):
+    def get_sprite(self, sprite_map_name: str, sprite: str = None):
         if not sprite_map_name:
             raise ValueError("Asset cannot be none")
         if sprite_map_name not in self._assets:
@@ -113,25 +128,29 @@ class SpriteAssetManager(object):
             raise ValueError("Undefined sprite '{}' selected".format(sprite))
         return sm[sprite]
 
-    def initialize(self, name:str = None):
+    def initialize(self, name: str = None):
         if not name:
             for a in self._assets:
                 if not a.initialized:
                     a.initialize()
         else:
-            if name not in self._assets: raise ValueError('not an asset')
+            if name not in self._assets:
+                raise ValueError("not an asset")
             if not self._assets[name].initialized:
                 self._assets[name].initialize()
 
+
 def main():
-    if not pygame.font: print("Pygame - fonts not loaded")
-    if not pygame.mixer: print("Pygame - audio not loaded")
+    if not pygame.font:
+        print("Pygame - fonts not loaded")
+    if not pygame.mixer:
+        print("Pygame - audio not loaded")
 
     # init pygame - create the main window, and a background surface
     pygame.init()
 
     S_WIDTH = 800
-    S_HEIGHT= 600
+    S_HEIGHT = 600
     S_TITLE = "Elisa - Statemachine and GFX"
 
     C_WHITE = (250, 250, 250)
@@ -157,9 +176,9 @@ def main():
     textpos.centery = back_buffer.get_rect().centery + 100
 
     key_map = pygame.key.get_pressed()
-    pressed = False
 
     idle = State("Idle", "The idle state")
+    s_final = State("Final", "The final state")
     walk_r = State("Walk_Right", "The walking state")
     walk_l = State("Walk_Left", "The walking state")
 
@@ -183,19 +202,64 @@ def main():
     def walk_left_to_idle():
         return not key_map[K_LEFT]
 
-    t_idle_walk_left = Transition(idle, walk_l, idle_to_walk_left, "IDLE_WALK_LEFT", "From Idle to Walk Left")
-    t_idle_walk_right= Transition(idle, walk_r, idle_to_walk_right, "IDLE_WALK_RIGHT", "From Idle to Walk Right")
+    t_idle_walk_left = Transition(
+        idle,
+        walk_l,
+        trigger_fn=idle_to_walk_left,
+        name="IDLE_WALK_LEFT",
+        description="From Idle to Walk Left",
+    )
+    t_idle_walk_right = Transition(
+        idle,
+        walk_r,
+        trigger_fn=idle_to_walk_right,
+        name="IDLE_WALK_RIGHT",
+        description="From Idle to Walk Right",
+    )
 
-    t_walk_left_idle = Transition(walk_l, idle, walk_left_to_idle, "WALK_LEFT_IDLE", "From Walk Left To Idle")
-    t_walk_right_idle = Transition(walk_r, idle, walk_right_to_idle, "WALK_RIGHT_IDLE", "From Walk Right To Idle")
+    t_walk_left_idle = Transition(
+        walk_l,
+        idle,
+        trigger_fn=walk_left_to_idle,
+        name="WALK_LEFT_IDLE",
+        description="From Walk Left To Idle",
+    )
+    t_walk_right_idle = Transition(
+        walk_r,
+        idle,
+        trigger_fn=walk_right_to_idle,
+        name="WALK_RIGHT_IDLE",
+        description="From Walk Right To Idle",
+    )
 
-    t_idle_jump = Transition(idle, jump, idle_to_jump, "IDLE_JUMP", "From Idle to Jump")
-    t_jump_idle = Transition(jump, idle, jump_to_idle, "JUMP_IDLE", "From Jump to Idle")
+    t_idle_jump = Transition(
+        idle,
+        jump,
+        trigger_fn=idle_to_jump,
+        name="IDLE_JUMP",
+        description="From Idle to Jump",
+    )
+    t_jump_idle = Transition(
+        jump,
+        idle,
+        trigger_fn=jump_to_idle,
+        name="JUMP_IDLE",
+        description="From Jump to Idle",
+    )
 
-    sm = StateMachine(states=[idle, walk_l, walk_r, jump],
-                      transitions=[t_idle_walk_left, t_idle_walk_right, t_idle_jump,
-                                   t_walk_left_idle, t_walk_right_idle, t_jump_idle],
-                      initial_state=idle)
+    sm = StateMachine(
+        states=[idle, walk_l, walk_r, jump, s_final],
+        transitions=[
+            t_idle_walk_left,
+            t_idle_walk_right,
+            t_idle_jump,
+            t_walk_left_idle,
+            t_walk_right_idle,
+            t_jump_idle,
+        ],
+        initial_state=idle,
+        final_state=s_final,
+    )
 
     elisa = Elisa(sm=sm, pos=(100, 100))
 
@@ -210,7 +274,11 @@ def main():
             key_map = pygame.key.get_pressed()
 
         elisa.update()
-        text = font.render("Current State: {} ({})".format(elisa.current_state.name, elisa.position), 1, C_BLUE)
+        text = font.render(
+            "Current State: {} ({})".format(elisa.current_state.name, elisa.position),
+            1,
+            C_BLUE,
+        )
         back_buffer.fill(C_WHITE)
         back_buffer.blit(text, textpos)
         back_buffer.blit(elisa.current_sprite.image, elisa.position)
@@ -219,4 +287,5 @@ def main():
         pygame.display.flip()
 
 
-if __name__ == '__main__': main()
+if __name__ == "__main__":
+    main()

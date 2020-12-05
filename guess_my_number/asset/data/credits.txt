@@ -1,7 +1,0 @@
-Thank you for playing Guess My Number. Guess my Number is my first foray into game development using the Python
-programming language. In particular, the game is built using the pygame framework. While the core mechanic of
-a number guessing game is outright simple - you have to guess a number - all of the auxiliary components around producing
-and finishing a game (like this ui) took me quite some time. And even to this day, the game is not finished.
-There is many things that I marked as a todo for a next version.
-
-Christian B.

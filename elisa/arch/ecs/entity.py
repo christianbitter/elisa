@@ -1,122 +1,131 @@
 from __future__ import annotations
 from .core import ECSBase
+from .component import Component
+from .ecs import Message
+
 
 class Entity(ECSBase):
-	"""An entity is a named collection of components. You can add, remove, or search for components that the entity has registered. Additionally,
-	entities can send messages to other entities and receive messages from other objects.
-	"""		
-	def __init__(self):
-		self._components = dict()
-		self._ctypes = dict()
+    """An entity is a named collection of components. You can add, remove, or search for components that the entity has registered. Additionally,
+    entities can send messages to other entities and receive messages from other objects.
 
-		super(Entity, self).__init__()
+    Consider overriding the following method:
+        - send_msg(self, msg)
+    """
 
-	def add(self, c:Component):
-		"""Add a component to an entity. Only one component per type is allowed on an entity.
+    def __init__(self):
+        self._components = dict()
+        self._ctypes = dict()
 
-		Args:
-				c (Component): Component to register
+        super(Entity, self).__init__()
 
-		Raises:
-				ValueError: if the component is not provided/ is None
-				ValueError: if the component has been registered before
+    def add(self, c: Component):
+        """Add a component to an entity. Only one component per type is allowed on an entity.
 
-		Returns:
-				[Entity]: the entity
-		"""
-		if not c:
-			raise ValueError("No component provided")
-		cid   = str(c._id)
-		if cid in self._components:
-			raise ValueError("Component already exists")
+        Args:
+                        c (Component): Component to register
 
-		ctype = c._component_type		
-		self._components[str(c._id)] = c
-		self._ctypes[ctype] = c
-		
-		return self
+        Raises:
+                        ValueError: if the component is not provided/ is None
+                        ValueError: if the component has been registered before
 
-	def __getitem__(self, key):
-		if isinstance(key, int):
-			if key > len(self._components):
-				raise ValueError("index outside of registered components")
-			for i, k in enumerate(self._components):
-				if i == key:
-					return self._components[k]
-		else:
-			return self._components[key]
+        Returns:
+                        [Entity]: the entity
+        """
+        if not c:
+            raise ValueError("No component provided")
+        cid = str(c._id)
+        if cid in self._components:
+            raise ValueError("Component already exists")
 
-	def get_of_type(self, component_type:str) -> Component:
-		"""Get the first component of a specific type associated with the entity.
+        ctype = c._component_type
+        self._components[str(c._id)] = c
+        self._ctypes[ctype] = c
 
-		Args:
-				component_type (str): type of the component, you wish to retrieve
+        return self
 
-		Raises:
-				ValueError: if the component type is not provided, or is not found among the entities components.
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            if key > len(self._components):
+                raise ValueError("index outside of registered components")
+            for i, k in enumerate(self._components):
+                if i == key:
+                    return self._components[k]
+        else:
+            return self._components[key]
 
-		Returns:
-				Component: The component of the specified type.
-		"""
-		if not component_type:
-			raise ValueError("component_type not provided")
-		if len(self._components) < 1:
-			raise ValueError("entity does not have any associated component")
-		
-		ci = self._ctypes[component_type]
-		return ci
+    def get_of_type(self, component_type: str) -> Component:
+        """Get the first component of a specific type associated with the entity.
 
-	def has_component_type(self, component_type) -> bool:
-		"""Interrogates the underlying entity about the presence of a component of a specific type. In the case of a single type query,
-		the entity is checked for the presence and a True/False result is delivered. If a list of type names is passed, all component
-		types have to be defined on the entity for a True result.
+        Args:
+                        component_type (str): type of the component, you wish to retrieve
 
-		Args:
-				component_type (str or list of str): the component type name to query the entity for.
+        Raises:
+                        ValueError: if the component type is not provided, or is not found among the entities components.
 
-		Raises:
-				ValueError: if component type is none, an empty list or the empty string
+        Returns:
+                        Component: The component of the specified type.
+        """
+        if not component_type:
+            raise ValueError("component_type not provided")
+        if len(self._components) < 1:
+            raise ValueError("entity does not have any associated component")
 
-		Returns:
-				bool: result of the type query
-		"""
-		if not component_type or component_type == "":
-			raise ValueError("component_type not provided")
+        ci = self._ctypes[component_type]
+        return ci
 
-		if isinstance(component_type, str):
-			return component_type in self._ctypes
-		elif isinstance(component_type, list):
-			if len(component_type):
-				raise ValueError("component_type cannot be an empty list")
+    def has_component_type(self, component_type) -> bool:
+        """Interrogates the underlying entity about the presence of a component of a specific type. In the case of a single type query,
+        the entity is checked for the presence and a True/False result is delivered. If a list of type names is passed, all component
+        types have to be defined on the entity for a True result.
 
-			_types = [(t in self._ctypes) for t in component_type]
-			return all(_types)
-		else:
-			raise ValueError("component type has to be a list of strings or an individual string")
+        Args:
+                        component_type (str or list of str): the component type name to query the entity for.
 
-	def remove(self, component_id:str):
-		if not component_id or component_id == "":
-			raise ValueError("No component id provided")
-		
-		if component_id in self._components:
-			ctype = self._components[component_id]._component_type
-			delattr(self._components, component_id)
-			delattr(self._ctypes[ctype], component_id)
+        Raises:
+                        ValueError: if component type is none, an empty list or the empty string
 
-		# support chaining
-		return self
+        Returns:
+                        bool: result of the type query
+        """
+        if not component_type or component_type == "":
+            raise ValueError("component_type not provided")
 
-	def send_msg(self, msg:Message):
-		pass
+        if isinstance(component_type, str):
+            return component_type in self._ctypes
+        elif isinstance(component_type, list):
+            if len(component_type):
+                raise ValueError("component_type cannot be an empty list")
 
-	def __repr__(self):		
-		c_str = f"Entity: {self._id}\r\n"
-		if len(self._components) == 0:
-			c_str += "No registered components"
-		else:
-			for i, k in enumerate(self._components):
-				c_str += "[+{}] = {}\r\n".format(i, self._components[k])
-		return c_str
+            _types = [(t in self._ctypes) for t in component_type]
+            return all(_types)
+        else:
+            raise ValueError(
+                "component type has to be a list of strings or an individual string"
+            )
 
-	def __str__(self):
-		return self.__repr__()
+    def remove(self, component_id: str):
+        if not component_id or component_id == "":
+            raise ValueError("No component id provided")
+
+        if component_id in self._components:
+            ctype = self._components[component_id]._component_type
+            delattr(self._components, component_id)
+            delattr(self._ctypes[ctype], component_id)
+
+        # support chaining
+        return self
+
+    def send_msg(self, msg: Message):
+        pass
+
+    def __repr__(self):
+        c_str = f"Entity: {self._id}\r\n"
+        if len(self._components) == 0:
+            c_str += "No registered components"
+        else:
+            for i, k in enumerate(self._components):
+                c_str += "[+{}] = {}\r\n".format(i, self._components[k])
+        return c_str
+
+    def __str__(self):
+        return self.__repr__()

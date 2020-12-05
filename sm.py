@@ -4,11 +4,12 @@
 
 import uuid
 
+
 class State(object):
-    def __init__(self, name:str, description:str = None):
+    def __init__(self, name: str, description: str = None):
         super(State, self).__init__()
 
-        self._id   = uuid.uuid1()
+        self._id = uuid.uuid1()
         self._name = name
         self._description = description
 
@@ -32,7 +33,9 @@ class State(object):
 
 
 class Transition(object):
-    def __init__(self, f: State, t: State, trigger_fn, name: str = None, description: str = None):
+    def __init__(
+        self, f: State, t: State, trigger_fn, name: str = None, description: str = None
+    ):
         super(Transition, self).__init__()
         self._id = uuid.uuid1()
         self._from = f
@@ -57,9 +60,8 @@ class Transition(object):
 
 
 class StateMachine(object):
-
     def __init__(self, states: list, transitions: list, initial_state: State):
-        self._id   = uuid.uuid1()
+        self._id = uuid.uuid1()
         self._init = initial_state
         self._current_state = self._init
         self._states = states.copy()

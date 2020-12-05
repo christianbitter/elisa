@@ -1,6 +1,10 @@
-# name: elisa_0_init.py
+# name: elisa_19_-_collision_detection.py
 # auth: (c) 2020 christian bitter
-# desc: based off our template we are going to explore the initialization process
+# desc: implementing collision detection mechanisms and the like
+# TODO: this needs to be implemented
+# source for reference:
+# Computer Science 420 (University of San Francisco): Game Engineering
+# https://www.cs.usfca.edu/~galles/cs420S13/lecture/intersection2D.pdf
 
 import pygame
 
@@ -67,15 +71,13 @@ def main():
     # here we setup a pygamer clock - we will discuss this in a later example
     fps_watcher = pygame.time.Clock()
     is_done = False
-    verbose = False
+
     # Now, we are ready to setup our game loop, where we loop until our application/ game is done - then we break from the loop.
     # As you can see, there is only condition that exits from the loop - and that is when the application receives a QUIT event message.
     # One way to receive this message is by clicking the closing button of the window.
     # Another way is to send ctrl+c in the console window.
     while not is_done:
-        elapsed_millis = fps_watcher.tick(60)
-        if verbose:
-            print("Milli Seconds Elapsed: ", elapsed_millis)
+        _ = fps_watcher.tick(60)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

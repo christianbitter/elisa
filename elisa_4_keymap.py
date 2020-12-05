@@ -3,7 +3,7 @@
 #       specifically, we are going to listen for the 4 arrow keys
 
 import pygame
-from pygame.locals import *
+from pygame.locals import K_LEFT, K_RIGHT, K_DOWN, K_UP, QUIT
 
 if not pygame.font:
     print("Pygame - fonts not loaded")
@@ -12,14 +12,18 @@ if not pygame.mixer:
 
 
 def update_keytext(pressed, keymap):
-    if not pressed: 
+    if not pressed:
         return "None"
     txt = ""
 
-    if keymap[K_UP]: txt += "UP"
-    if keymap[K_DOWN]: txt += " DOWN"
-    if keymap[K_LEFT]: txt += " LEFT"
-    if keymap[K_RIGHT]: txt += " RIGHT"
+    if keymap[K_UP]:
+        txt += "UP"
+    if keymap[K_DOWN]:
+        txt += " DOWN"
+    if keymap[K_LEFT]:
+        txt += " LEFT"
+    if keymap[K_RIGHT]:
+        txt += " RIGHT"
 
     return txt.lstrip()
 
@@ -61,7 +65,9 @@ while not is_done:
             key_map = pygame.key.get_pressed()
 
     text_help = font.render("Press any of the arrow keys ...", 1, c_blue)
-    text = font.render("You pressed: {}".format(update_keytext(pressed, key_map)), 1, c_blue)
+    text = font.render(
+        "You pressed: {}".format(update_keytext(pressed, key_map)), 1, c_blue
+    )
 
     back_buffer.fill(c_white)
     back_buffer.blit(text_help, (100, 100))

@@ -10,7 +10,9 @@ import pygame
 from sprites import SpriteAssetManager
 
 
-def clear_colour(px_surf: pygame.Surface, c: pygame.Color = pygame.Color(128, 192, 255, 255)):
+def clear_colour(
+    px_surf: pygame.Surface, c: pygame.Color = pygame.Color(128, 192, 255, 255)
+):
     """
     for starters make all pixels the same colour in this highly inefficient manner
     :param px_surf: (Surface) Object representing the surface to be modified
@@ -30,7 +32,9 @@ def clear_colour(px_surf: pygame.Surface, c: pygame.Color = pygame.Color(128, 19
     return s
 
 
-def lighten_colour(px_surf: pygame.Surface, colorkey: pygame.Color, lighten_val: int = 30):
+def lighten_colour(
+    px_surf: pygame.Surface, colorkey: pygame.Color, lighten_val: int = 30
+):
     """
     lighten all pixels in the image
     :param px_surf: (Surface) Object representing the surface to be modified
@@ -48,9 +52,11 @@ def lighten_colour(px_surf: pygame.Surface, colorkey: pygame.Color, lighten_val:
             c_old = px_array.surface.get_at((ix, iy))
             # debug: print("c_old vs. ckey: {} vs. {}".format(c_old, colorkey))
             if c_old != colorkey:
-                c_new = pygame.Color(min(255, c_old.r + lighten_val),
-                                     min(255, c_old.g + lighten_val),
-                                     min(255, c_old.b + lighten_val))
+                c_new = pygame.Color(
+                    min(255, c_old.r + lighten_val),
+                    min(255, c_old.g + lighten_val),
+                    min(255, c_old.b + lighten_val),
+                )
                 px_array[ix, iy] = c_new
     s = px_array.make_surface()
     if colorkey is not None:
@@ -59,7 +65,9 @@ def lighten_colour(px_surf: pygame.Surface, colorkey: pygame.Color, lighten_val:
     return s
 
 
-def darken_colour(px_surf: pygame.Surface, colorkey: pygame.Color, darken_val: int = 30):
+def darken_colour(
+    px_surf: pygame.Surface, colorkey: pygame.Color, darken_val: int = 30
+):
     """
     darken all pixels in the image
     :param px_surf: (Surface) Object representing the surface to be modified
@@ -76,9 +84,11 @@ def darken_colour(px_surf: pygame.Surface, colorkey: pygame.Color, darken_val: i
             c_old = px_array.surface.get_at((ix, iy))
             # debug: print("c_old vs. ckey: {} vs. {}".format(c_old, colorkey))
             if c_old != colorkey:
-                c_new = pygame.Color(max(0, c_old.r - darken_val),
-                                     max(0, c_old.g - darken_val),
-                                     max(0, c_old.b - darken_val))
+                c_new = pygame.Color(
+                    max(0, c_old.r - darken_val),
+                    max(0, c_old.g - darken_val),
+                    max(0, c_old.b - darken_val),
+                )
                 px_array[ix, iy] = c_new
     s = px_array.make_surface()
     if colorkey is not None:
@@ -87,7 +97,9 @@ def darken_colour(px_surf: pygame.Surface, colorkey: pygame.Color, darken_val: i
     return s
 
 
-def filter_image(px_surf: pygame.Surface, colorkey: pygame.Color, filter_name: str = 'identity'):
+def filter_image(
+    px_surf: pygame.Surface, colorkey: pygame.Color, filter_name: str = "identity"
+):
     """
     Applies a filter (3x3 operator) to the provided surface
     :param px_surf: (Surface) Object representing the surface to be modified
@@ -101,27 +113,17 @@ def filter_image(px_surf: pygame.Surface, colorkey: pygame.Color, filter_name: s
     px_array = pygame.PixelArray(px_surf)
     # notice that the sharpen and edge filters have some trouble with the image, since it is and upscaled
     # pixel art image, which contains some small almost non-visible noise.
-    filter_zero = [[0, 0, 0],
-                   [0, 0, 0],
-                   [0, 0, 0]]
-    filter_edge = [[-1, -1, -1],
-                   [-1,  8, -1],
-                   [-1, -1, -1]]
-    filter_identity = [[0, 0, 0],
-                       [0, 1, 0],
-                       [0, 0, 0]]
-    filter_sharpen = [[ 0, -1,  0],
-                      [-1,  5, -1],
-                      [ 0, -1,  0]]
-    blr = 1./ 9.
-    filter_blur = [[blr, blr, blr],
-                   [blr, blr, blr],
-                   [blr, blr, blr]]
+    filter_zero = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+    filter_edge = [[-1, -1, -1], [-1, 8, -1], [-1, -1, -1]]
+    filter_identity = [[0, 0, 0], [0, 1, 0], [0, 0, 0]]
+    filter_sharpen = [[0, -1, 0], [-1, 5, -1], [0, -1, 0]]
+    blr = 1.0 / 9.0
+    filter_blur = [[blr, blr, blr], [blr, blr, blr], [blr, blr, blr]]
     filter_mat = {
-        'sharpen': filter_sharpen,
-        'identity': filter_identity,
-        'blur': filter_blur,
-        'edge': filter_edge
+        "sharpen": filter_sharpen,
+        "identity": filter_identity,
+        "blur": filter_blur,
+        "edge": filter_edge,
     }.get(filter_name, filter_zero)
 
     k_h, k_w = 3, 3
@@ -145,10 +147,12 @@ def filter_image(px_surf: pygame.Surface, colorkey: pygame.Color, filter_name: s
                             accum_g += i_val_g * k_val
                             accum_b += i_val_b * k_val
 
-            c_new = pygame.Color(min(255, max(0, int(accum_r))),
-                                 min(255, max(0, int(accum_g))),
-                                 min(255, max(0, int(accum_b))),
-                                 255)
+            c_new = pygame.Color(
+                min(255, max(0, int(accum_r))),
+                min(255, max(0, int(accum_g))),
+                min(255, max(0, int(accum_b))),
+                255,
+            )
             px_array[ix, iy] = c_new
 
     s = px_array.make_surface()
@@ -177,10 +181,10 @@ def main():
 
     # load a sprite map, and extract a particular sprite - idle_1 - from it
     am = SpriteAssetManager()
-    sm_meta_json_fp = 'asset/elise_character/tileset_elisa_idle@8x.json'
-    am.add_sprite_map(name='ELISA_IDLE', metadata_fp=sm_meta_json_fp, verbose=True)
-    sprite_map = am['ELISA_IDLE']
-    sprite_idle_1 = sprite_map['idle_1']
+    sm_meta_json_fp = "asset/elise_character/tileset_elisa_idle@8x.json"
+    am.add_sprite_map(name="ELISA_IDLE", metadata_fp=sm_meta_json_fp, verbose=True)
+    sprite_map = am["ELISA_IDLE"]
+    sprite_idle_1 = sprite_map["idle_1"]
     img_elisa_idle = sprite_idle_1.image
     # set a colour key
     ck = pygame.Color(0, 0, 0, 0)
@@ -190,7 +194,7 @@ def main():
     pac_sprite = clear_colour(img_elisa_idle.copy(), pygame.Color(192, 128, 64, 255))
     pal_sprite = lighten_colour(img_elisa_idle.copy(), colorkey=ck)
     pad_sprite = darken_colour(img_elisa_idle.copy(), colorkey=ck)
-    pad_edge   = filter_image(img_elisa_idle.copy(), colorkey=ck, filter_name='blur')
+    pad_edge = filter_image(img_elisa_idle.copy(), colorkey=ck, filter_name="blur")
 
     # show the resulting images until we are done
     while not is_done:
@@ -203,10 +207,11 @@ def main():
         back_buffer.blit(img_elisa_idle, (50, 100))
         back_buffer.blit(pal_sprite, (100, 100))
         back_buffer.blit(pad_sprite, (150, 100))
-        back_buffer.blit(pad_edge,   (300, 100))
+        back_buffer.blit(pad_edge, (300, 100))
 
         screen_buffer.blit(back_buffer, (0, 0))
         pygame.display.flip()
 
 
-if __name__ == '__main__': main()
+if __name__ == "__main__":
+    main()

@@ -29,7 +29,8 @@ class Game(object):
         self._name = name
         self._players = {}
         self._no_max_players = max_players
-        if 'description' in kwargs: self._description = kwargs['description']
+        if "description" in kwargs:
+            self._description = kwargs["description"]
 
     def init(self, **kwargs) -> None:
         """
@@ -111,7 +112,9 @@ class Game(object):
 class GameRenderer(object):
     """"""
 
-    def __init__(self, ):
+    def __init__(
+        self,
+    ):
         """Constructor for GameRenderer"""
         super(GameRenderer, self).__init__()
         self._game_state = None

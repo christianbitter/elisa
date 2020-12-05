@@ -5,26 +5,27 @@ from uuid import uuid4
 # TODO: Logger
 # TODO: Manager -> EntityManager, ComponentManager, EventManager
 
+
 class ECSBase(object):
-	"""This is the ECS base entity
+    """This is the ECS base entity
 
-	Args:
-			object ([type]): [description]
-	"""
-	def __init__(self):
-		"""Initializes the instance, setting internal id to new uuid4 value
-		"""
-		self._id = uuid4()
+    Args:
+                    object ([type]): [description]
+    """
 
-	@property
-	def id(self):
-		return self._id
+    def __init__(self):
+        """Initializes the instance, setting internal id to new uuid4 value"""
+        self._id = uuid4()
 
-	def __repr__(self):
-		return f"ECSBase[{self.id}]"
+    @property
+    def id(self):
+        return self._id
 
-	def serialize(self) -> str:
-		raise ValueError("serialize not implemented")
+    def __repr__(self):
+        return f"ECSBase[{self.id}]"
 
-	def deserialize(self, str) -> ECSBase:
-		raise ValueError("deserialize not implemented")
+    def serialize(self) -> str:
+        raise ValueError("serialize not implemented")
+
+    def deserialize(self, str) -> ECSBase:
+        raise ValueError("deserialize not implemented")

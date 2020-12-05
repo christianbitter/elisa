@@ -6,8 +6,11 @@
 import os
 import pygame
 
-if not pygame.font: print("Pygame - Font not loaded")
-if not pygame.mixer: print("Pygame - Mixer not loaded")
+if not pygame.font:
+    print("Pygame - Font not loaded")
+if not pygame.mixer:
+    print("Pygame - Mixer not loaded")
+
 
 def load_image(fp, colorkey=None):
     if not fp:
@@ -17,24 +20,28 @@ def load_image(fp, colorkey=None):
     try:
         image = pygame.image.load(fullname)
     except pygame.error as message:
-        print('Cannot load image:', name)
+        print("Cannot load image:", fullname)
         raise SystemExit(message)
 
     image = image.convert()
     if colorkey is not None:
         if colorkey is -1:
-            colorkey = image.get_at((0,0))
+            colorkey = image.get_at((0, 0))
         image.set_colorkey(colorkey, pygame.RLEACCEL)
     return image, image.get_rect()
 
+
 class Elisa(pygame.sprite.Sprite):
-    def __init__(self, asset_base:str, *groups):
+    def __init__(self, asset_base: str, *groups):
         super().__init__(*groups)
         self.asset_base_dir = asset_base
 
-        self.animation_assets = {"IDLE": os.path.join(self.asset_base_dir, "elise_gun_walk@8x.png")}
+        self.animation_assets = {
+            "IDLE": os.path.join(self.asset_base_dir, "elise_gun_walk@8x.png")
+        }
         self.image, self.rect = load_image(self.animation_assets["IDLE"], -1)
         self.idle = 0
+
 
 pygame.init()
 

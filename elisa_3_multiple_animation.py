@@ -1,10 +1,16 @@
-# auth: christian bitter
-# desc: this builds on elisa_2 by
-#       adding multiple animations that are triggered by keys
-#       please note, that we cannot re-enter the idle state
+# auth: (c) 2020 christian bitter
+# name: elisa_3_multiple_animation.py
+# desc:
+#   this builds on elisa_2 by
+#   adding multiple animations that are triggered by keys
+#   please note, that we cannot re-enter the idle state.
+#   By pressing the Right Arrow Key you will trigger the right movement animation.
+#   Pressing the Space bar triggers the jump animation
 
-import os, sys
+import os
+import sys
 import pygame
+
 
 def load_image(fp, colorkey=None, image_only=False):
     if not fp:
@@ -14,13 +20,13 @@ def load_image(fp, colorkey=None, image_only=False):
     try:
         image = pygame.image.load(fullname)
     except pygame.error as message:
-        print('Cannot load image:', fp)
+        print("Cannot load image:", fp)
         raise SystemExit(message)
 
     image = image.convert()
     if colorkey is not None:
         if colorkey is -1:
-            colorkey = image.get_at((0,0))
+            colorkey = image.get_at((0, 0))
         image.set_colorkey(colorkey, pygame.RLEACCEL)
 
     if image_only:
@@ -44,7 +50,7 @@ def load_png(fp, image_only=False):
         else:
             image = image.convert_alpha()
     except pygame.error as message:
-        print('Cannot load image:', fullname)
+        print("Cannot load image:", fullname)
         raise SystemExit(message)
     if image_only:
         return image
@@ -61,14 +67,17 @@ class Elisa(pygame.sprite.Sprite):
         self.gfx_height = 256
         self.behaviours = ["WALK", "JUMP", "IDLE"]
         path = ["elise_gun_walk@8x.png", "elise_gun_jump@8x.png", "elise_idle@8x.png"]
-        self.animation_asset = {k: os.path.join(self.asset_base_path, v) for k, v in zip(self.behaviours, path)}
+        self.animation_asset = {
+            k: os.path.join(self.asset_base_path, v)
+            for k, v in zip(self.behaviours, path)
+        }
         self.animation_tile = {}
         self.animation_sprite = {}
         self.animation_frame = {k: f for k, f in zip(self.behaviours, [5, 6, 3])}
         self.animation_idx = {
             "WALK": [(0, 0), (256, 0), (512, 0), (768, 0), (1024, 0)],
             "JUMP": [(0, 0), (256, 0), (512, 0), (768, 0), (1024, 0), (1280, 0)],
-            "IDLE": [(0, 0), (256, 0), (512, 0)]
+            "IDLE": [(0, 0), (256, 0), (512, 0)],
         }
         self.current_animation = None
         self.current_animation_frame = -1
@@ -78,14 +87,18 @@ class Elisa(pygame.sprite.Sprite):
         self.current_animation = "IDLE"
         self.current_animation_frame = 0
 
-        self.animation_tile = {k: load_png(fp, image_only=True) for k, fp in self.animation_asset.items()}
+        self.animation_tile = {
+            k: load_png(fp, image_only=True) for k, fp in self.animation_asset.items()
+        }
 
         for k, regions in self.animation_idx.items():
             v_surface = []
             for xmin, ymin in regions:
                 anim_img = self.animation_tile[k]
                 print(anim_img)
-                sprite = anim_img.subsurface(xmin, ymin, self.gfx_width, self.gfx_height)
+                sprite = anim_img.subsurface(
+                    xmin, ymin, self.gfx_width, self.gfx_height
+                )
                 v_surface.append(sprite)
             self.animation_sprite[k] = v_surface
 
@@ -104,7 +117,9 @@ class Elisa(pygame.sprite.Sprite):
         max_frames = self.animation_frame[self.current_animation]
         self.current_animation_frame += 1
         self.current_animation_frame = self.current_animation_frame % max_frames
-        self.current_sprite = self.animation_sprite[self.current_animation][self.current_animation_frame]
+        self.current_sprite = self.animation_sprite[self.current_animation][
+            self.current_animation_frame
+        ]
 
     def jump(self):
         if self.current_animation != "JUMP":

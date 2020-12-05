@@ -1,24 +1,24 @@
 import sys
 from math import floor, ceil
 from .linalg import lerp1D
+
 # https://mzucker.github.io/html/perlin-noise-math-faq.html
 # http://staff.fh-hagenberg.at/burger/publications/reports/2008GradientNoise/Burger-GradientNoiseGerman-2008.pdf
 
 
 def perlin_noise(x, y=None):
-
     def ease_curve(p):
-        return (3. * (p**2.)) - (2. * (p**3.))
+        return (3.0 * (p ** 2.0)) - (2.0 * (p ** 3.0))
 
-    def g1(x_:int):
+    def g1(x_: int):
         """
         one dimensional pseudo-random gradient vector function. mapping values from [0, n] to [-1, 1]
         :param x_:
         :return:
         """
-        if x_ == 0.:
+        if x_ == 0.0:
             return -1
-        return 2. * (1. / hash(x_)) - 1.
+        return 2.0 * (1.0 / hash(x_)) - 1.0
 
     def g2(x_, y_):
         pass
@@ -38,8 +38,8 @@ def perlin_noise(x, y=None):
         return a
 
     def pnoise2(x_, y_):
-        x0, x1, y0, y1 = floor(x_), ceil(_x), floor(y_), ceil(y_)
-        pass
+        # TODO: pnoise2
+        raise ValueError("TODO: Not implemented")
 
     if x is None:
         raise ValueError("x cannot be None")

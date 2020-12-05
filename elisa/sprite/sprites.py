@@ -5,6 +5,7 @@ import uuid
 from pygame import Surface, PixelArray
 from uuid import uuid4
 
+
 def load_image(fp, colorkey=None, image_only: bool = False, verbose: bool = False):
     if not fp:
         raise ValueError("load_image - fp not provided")
@@ -13,7 +14,7 @@ def load_image(fp, colorkey=None, image_only: bool = False, verbose: bool = Fals
     try:
         image = pygame.image.load(fullname)
     except pygame.error as message:
-        print('Cannot load image:', fp)
+        print("Cannot load image:", fp)
         raise SystemExit(message)
 
     if image.get_alpha() is None:
@@ -62,7 +63,7 @@ def load_png(fp, image_only=False, colorkey=None, verbose: bool = False):
                 print("Setting colour key: ", colorkey)
             image.set_colorkey(colorkey, pygame.RLEACCEL)
     except pygame.error as message:
-        print('Cannot load image:', fullname)
+        print("Cannot load image:", fullname)
         raise SystemExit(message)
     if image_only:
         return image

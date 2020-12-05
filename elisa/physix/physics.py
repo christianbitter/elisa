@@ -7,6 +7,7 @@ def force(m: float, a):
     """
     return m * a
 
+
 def weight(m: float, gravitational_force: float) -> float:
     return m * gravitational_force
 
@@ -14,7 +15,9 @@ def weight(m: float, gravitational_force: float) -> float:
 class constants:
     """"""
 
-    def __init__(self, ):
+    def __init__(
+        self,
+    ):
         """Constructor for constants"""
         super(constants, self).__init__()
 
@@ -23,9 +26,9 @@ class constants:
     """
     G: float = 6.674e-11  # N * m^2/ kg^2
 
-    Mass_Earth: float = 5.9736e+24  # kg
-    Radius_Earth: float = 6.375e+6  # m
+    Mass_Earth: float = 5.9736e24  # kg
+    Radius_Earth: float = 6.375e6  # m
 
 
-def gravitational_force(m1:float, m2:float, r:float):
-    return constants.G * m1 * m2 / r**2
+def gravitational_force(m1: float, m2: float, r: float):
+    return constants.G * m1 * m2 / r ** 2

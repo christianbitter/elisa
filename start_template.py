@@ -29,7 +29,7 @@ def main():
     is_done = False
 
     while not is_done:
-        elapsed_millis = fps_watcher.tick(60)
+        _ = fps_watcher.tick(60)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -41,5 +41,5 @@ def main():
             pygame.display.flip()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

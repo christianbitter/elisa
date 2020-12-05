@@ -7,10 +7,13 @@ import pygame
 from enum import Enum, IntFlag
 from sprites import SpriteMap
 
+
 def main():
 
-    if not pygame.font: raise("Pygame - fonts not loaded")
-    if not pygame.mixer: print("Pygame - audio not loaded")
+    if not pygame.font:
+        raise ("Pygame - fonts not loaded")
+    if not pygame.mixer:
+        print("Pygame - audio not loaded")
 
     # init pygame - create the main window, and a background surface
 
@@ -64,6 +67,5 @@ def main():
             alpha = 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
-

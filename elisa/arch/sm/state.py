@@ -1,64 +1,62 @@
 from __future__ import annotations
 from uuid import uuid4
 
+
 class State(object):
-	"""The primary object in a state machine is the individual state of that machine. It represents a set of configurations
-	that state machine possesses at given point in time.
-	"""
-	def __init__(self, name:str, description:str = None):
-		super(State, self).__init__()
+    """The primary object in a state machine is the individual state of that machine. It represents a set of configurations
+    that state machine possesses at given point in time.
+    """
 
-		self._id   = uuid4()
-		self._name = name
-		self._description = description
+    def __init__(self, name: str, description: str = None):
+        super(State, self).__init__()
 
-	def __repr__(self):
-		return "{} ({})".format(self._name, self._id)
+        self._id = uuid4()
+        self._name = name
+        self._description = description
 
-	def act(self, **kwargs):
-		"""When entering the state, this function is executed
-		"""
-		pass
+    def __repr__(self):
+        return "{} ({})".format(self._name, self._id)
 
-	@property
-	def id(self) -> str:
-		"""Gets the state's id.
+    def act(self, **kwargs):
+        """When entering the state, this function is executed"""
+        pass
 
-		Returns:
-				str: the state id
-		"""
-		return str(self._id)
+    @property
+    def id(self) -> str:
+        """Gets the state's id.
 
-	@property
-	def name(self) -> str:
-		"""Gets the state's name.
+        Returns:
+                        str: the state id
+        """
+        return str(self._id)
 
-		Returns:
-				uuid4: the state name
-		"""
-		return self._name
+    @property
+    def name(self) -> str:
+        """Gets the state's name.
 
-	@name.setter
-	def name(self, v:str) -> State:
-		self._name = v
-		return self
+        Returns:
+                        uuid4: the state name
+        """
+        return self._name
 
-	@property
-	def description(self) -> str:
-		"""Gets the state's description.
+    @name.setter
+    def name(self, v: str) -> State:
+        self._name = v
+        return self
 
-		Returns:
-				uuid4: the state description
-		"""
-		return self._description
+    @property
+    def description(self) -> str:
+        """Gets the state's description.
 
-	@description.setter
-	def description(self, v:str) -> State:
-		self._description = v
-		return self
+        Returns:
+                        uuid4: the state description
+        """
+        return self._description
 
-	def __eq__(self, other:State):
-		return other.id == self.id
+    @description.setter
+    def description(self, v: str) -> State:
+        self._description = v
+        return self
 
-	def __repr__(self):
-		return "State({}) = {}".format(self.id, self.name)
+    def __eq__(self, other: State):
+        return other.id == self.id

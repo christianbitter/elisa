@@ -1,19 +1,21 @@
-# auth: christian bitter
+# auth: (c) 2020 christian bitter
+# name: elisa_5_statemachine.py
 # desc: in this tutorial we are going to develop a simple state machine.
 #       the state machine registers simple-named states like walk, jump, idle.
 #       when you press the arrow keys right or up, the machine transitions from
 #       idle to a moving state like jump or walk. after that the machine transitions back to idle.
+#       Note: there is no final state defined, currently.
 
 import pygame
-from pygame.locals import *
+from pygame.locals import K_LEFT, K_RIGHT, K_UP, K_DOWN, QUIT
 import uuid
 
 
 class State(object):
-    def __init__(self, name:str, description:str = None):
+    def __init__(self, name: str, description: str = None):
         super(State, self).__init__()
 
-        self._id   = uuid.uuid1()
+        self._id = uuid.uuid1()
         self._name = name
         self._description = description
 
@@ -37,7 +39,9 @@ class State(object):
 
 
 class Transition(object):
-    def __init__(self, f: State, t: State, trigger_fn, name: str = None, description: str = None):
+    def __init__(
+        self, f: State, t: State, trigger_fn, name: str = None, description: str = None
+    ):
         super(Transition, self).__init__()
         self._id = uuid.uuid1()
         self._from = f
@@ -62,9 +66,8 @@ class Transition(object):
 
 
 class StateMachine(object):
-
     def __init__(self, states: list, transitions: list, initial_state: State):
-        self._id   = uuid.uuid1()
+        self._id = uuid.uuid1()
         self._init = initial_state
         self._current_state = self._init
         self._states = states.copy()
@@ -104,7 +107,7 @@ def main():
     pygame.init()
 
     S_WIDTH = 800
-    S_HEIGHT= 600
+    S_HEIGHT = 600
     S_TITLE = "PyBlocks"
 
     C_WHITE = (250, 250, 250)
@@ -129,9 +132,7 @@ def main():
     textpos.centerx = back_buffer.get_rect().centerx - 200
     textpos.centery = back_buffer.get_rect().centery - 18
 
-
     key_map = pygame.key.get_pressed()
-    pressed = False
 
     idle = State("Idle", "The idle state")
     walk = State("Walk", "The walking state")
@@ -154,9 +155,11 @@ def main():
     t_idle_jump = Transition(idle, jump, idle_to_jump, "IDLE_JUMP", "From Idle to Jump")
     t_jump_idle = Transition(jump, idle, jump_to_idle, "JUMP_IDLE", "From Jump to Idle")
 
-    sm = StateMachine(states=[idle, walk, jump],
-                      transitions=[t_idle_walk, t_idle_jump, t_walk_idle, t_jump_idle],
-                      initial_state=idle)
+    sm = StateMachine(
+        states=[idle, walk, jump],
+        transitions=[t_idle_walk, t_idle_jump, t_walk_idle, t_jump_idle],
+        initial_state=idle,
+    )
 
     while not is_done:
         fps_watcher.tick(60)
@@ -176,4 +179,5 @@ def main():
         pygame.display.flip()
 
 
-if __name__ == '__main__': main()
+if __name__ == "__main__":
+    main()

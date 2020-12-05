@@ -47,16 +47,18 @@ def xy_inside(x: int, y: int, x0: int, y0: int, w: int, h: int) -> bool:
 
 
 class UIEvent:
-    SCREEN_TRANSITION:int = 99999
+    SCREEN_TRANSITION: int = 99999
 
     @staticmethod
-    def transition_screen(event_from:str, event_to:str):
-        return pygame.event.Event(pygame.USEREVENT,
-                                  {
-                                      "mode": UIEvent.SCREEN_TRANSITION,
-                                      "source": event_from,
-                                      "target": event_to
-                                  })
+    def transition_screen(event_from: str, event_to: str):
+        return pygame.event.Event(
+            pygame.USEREVENT,
+            {
+                "mode": UIEvent.SCREEN_TRANSITION,
+                "source": event_from,
+                "target": event_to,
+            },
+        )
 
 
 class FillStyle(Enum):
@@ -87,9 +89,10 @@ class FontStyle(IntFlag):
     """
     Style of a font
     """
-    Normal = 0,
-    Bold = 1,
-    Italic = 2,
+
+    Normal = (0,)
+    Bold = (1,)
+    Italic = (2,)
     Underline = 8
 
     def __str__(self):
@@ -102,8 +105,9 @@ class UIElement(object):
     spatial location and extent.
     """
 
-    def __init__(self, name, x: int = None, y: int = None, w: int = 0, h: int = 0,
-                 **kwargs):
+    def __init__(
+        self, name, x: int = None, y: int = None, w: int = 0, h: int = 0, **kwargs
+    ):
         """Constructor for UIElement"""
         super().__init__()
         self._name = name
@@ -118,8 +122,8 @@ class UIElement(object):
         if self._y0 is not None and self._h is not None:
             self._y1 = y + h
         self._client_rect = (0, 0, self._w, self._h)
-        self._invalidated = kwargs.get('invalidated', False)
-        self._has_focus = kwargs.get('has_focus', False)
+        self._invalidated = kwargs.get("invalidated", False)
+        self._has_focus = kwargs.get("has_focus", False)
 
     @property
     def name(self):
@@ -162,7 +166,7 @@ class UIElement(object):
         return self._w
 
     @width.setter
-    def width(self, w:int):
+    def width(self, w: int):
         if w is None:
             raise ValueError("w cannot be None")
         if w < 0:
@@ -225,20 +229,26 @@ class Renderable(UIElement):
     The basic class for all ui renderable elements
     """
 
-    def __init__(self, name, x: int = None, y: int = None, w: int = None, h: int = None, **kwargs):
+    def __init__(
+        self, name, x: int = None, y: int = None, w: int = None, h: int = None, **kwargs
+    ):
         """Constructor for Renderable"""
         super().__init__(name, x=x, y=y, w=w, h=h, kwargs=kwargs)
 
-        self._fill_style = kwargs.get('fill_style', FillStyle.Empty)
-        self._background_colour = kwargs.get('background_colour', (128, 128, 128, 255))
-        self._background_image = kwargs.get('background_image', None)
-        self._colour = kwargs.get('colour', (0, 0, 0, 255))
-        self._show_border = kwargs.get('show_border', True)
-        self._show_caption = kwargs.get('show_caption', False)
-        self._font_size = kwargs.get('font_size', 20)  # width and height is determined by font
-        self._font_style = kwargs.get('font_style', FontStyle.Normal)
-        self._font = pygame.font.Font(kwargs.get('font', pygame.font.get_default_font()), self._font_size)
-        self._font_colour = kwargs.get('font_colour', C_BLACK)
+        self._fill_style = kwargs.get("fill_style", FillStyle.Empty)
+        self._background_colour = kwargs.get("background_colour", (128, 128, 128, 255))
+        self._background_image = kwargs.get("background_image", None)
+        self._colour = kwargs.get("colour", (0, 0, 0, 255))
+        self._show_border = kwargs.get("show_border", True)
+        self._show_caption = kwargs.get("show_caption", False)
+        self._font_size = kwargs.get(
+            "font_size", 20
+        )  # width and height is determined by font
+        self._font_style = kwargs.get("font_style", FontStyle.Normal)
+        self._font = pygame.font.Font(
+            kwargs.get("font", pygame.font.get_default_font()), self._font_size
+        )
+        self._font_colour = kwargs.get("font_colour", C_BLACK)
         self._text_caption = None
         self._text_bounds = None
         self._caption = None
@@ -247,21 +257,25 @@ class Renderable(UIElement):
         self._caption = kwargs.get("caption", "")
         self.__update_caption()
 
-        self._is_visible = kwargs.get('visible', True)
-        self._z_order = kwargs.get('z', 0)
+        self._is_visible = kwargs.get("visible", True)
+        self._z_order = kwargs.get("z", 0)
 
-        self._caption_halign = kwargs.get('caption_halign', HorizontalAlignment.Left)
-        self._caption_valign = kwargs.get('caption_valign', VerticalAlignment.Center)
+        self._caption_halign = kwargs.get("caption_halign", HorizontalAlignment.Left)
+        self._caption_valign = kwargs.get("caption_valign", VerticalAlignment.Center)
 
         self._apply_font_style()
 
         if self.width is not None and self.height is not None:
             if self.width == 0 or self.height == 0:
                 print("{} has set width and/or height to 0 px".format(self._name))
-            self._surface = pygame.Surface((self.width, self.height), flags=pygame.SRCALPHA)
+            self._surface = pygame.Surface(
+                (self.width, self.height), flags=pygame.SRCALPHA
+            )
         else:
-            print("{}' surface was not initialized, because either width ({}) or height ({}) was not provided {}.".format(
-                self._name, self.width, self.height, (w, h))
+            print(
+                "{}' surface was not initialized, because either width ({}) or height ({}) was not provided {}.".format(
+                    self._name, self.width, self.height, (w, h)
+                )
             )
 
         self.invalidate()
@@ -271,7 +285,10 @@ class Renderable(UIElement):
         self._text_bounds = self._text_caption.get_rect()
 
         # we add a safety buffer around the text bounds to allow for the real bounds
-        _w, _h = self._text_bounds[2] + 2 * I_MARGIN, self._text_bounds[3] + 2 * I_MARGIN
+        _w, _h = (
+            self._text_bounds[2] + 2 * I_MARGIN,
+            self._text_bounds[3] + 2 * I_MARGIN,
+        )
         if self.width is None or self.width < _w:
             self.width = _w
         if self.height is None or self.height < _h:
@@ -308,12 +325,14 @@ class Renderable(UIElement):
     def invalidate(self, **kwargs):
         UIElement.invalidate(self, **kwargs)
         # if we need to create a new surface we do otherwise we just clear
-        if 'clear_only' in kwargs:
+        if "clear_only" in kwargs:
             self._surface.fill(C_BLACK)
         else:
             if self._w is not None and self._h is not None:
                 # TODO: we need to see if we need per pixel alpha
-                self._surface = pygame.Surface((self._w, self._h), flags=pygame.SRCALPHA)
+                self._surface = pygame.Surface(
+                    (self._w, self._h), flags=pygame.SRCALPHA
+                )
                 self._client_rect = (0, 0, self._w, self._h)
 
     @property
@@ -334,15 +353,21 @@ class Renderable(UIElement):
     def _paint(self):
         if self._invalidated:
             if self._surface is None:
-                raise ValueError("Cannot paint into None surface: {}".format(self._name))
+                raise ValueError(
+                    "Cannot paint into None surface: {}".format(self._name)
+                )
 
             if self._fill_style == FillStyle.Colour:
-                pygame.draw.rect(self._surface, self._background_colour, self._client_rect, 0)
+                pygame.draw.rect(
+                    self._surface, self._background_colour, self._client_rect, 0
+                )
             elif self._fill_style == FillStyle.Image:
                 if not self._background_image:
                     raise ValueError("background fill image but image not provided")
 
-                scaled_bgimg = pygame.transform.scale(self._background_image, (self._w, self._h))
+                scaled_bgimg = pygame.transform.scale(
+                    self._background_image, (self._w, self._h)
+                )
                 self._surface.blit(scaled_bgimg, dest=self._client_rect)
             else:
                 pass
@@ -350,7 +375,7 @@ class Renderable(UIElement):
             if self._show_border:
                 pygame.draw.rect(self._surface, self._colour, self._client_rect, 1)
 
-            if self._show_caption and self._caption != '':
+            if self._show_caption and self._caption != "":
                 # We place text in accordance with the chosen alignment.
                 # This means vertically and horizontally, inside the parent's bounding box. The parent's
                 # bounding box is at least so wide, so as to be able to capture the text.
@@ -362,20 +387,24 @@ class Renderable(UIElement):
                 if c_halign == HorizontalAlignment.Left:
                     dest_pos[0] = I_MARGIN
                 elif c_halign == HorizontalAlignment.Center:
-                    dest_pos[0] = int(.5 * (self._w - self._text_bounds[2]))
+                    dest_pos[0] = int(0.5 * (self._w - self._text_bounds[2]))
                 elif c_halign == HorizontalAlignment.Right:
                     dest_pos[0] = self._w - I_MARGIN - self._text_bounds[2]
                 else:
-                    raise ValueError("unknown horizontal alignment setting {}".format(c_halign))
+                    raise ValueError(
+                        "unknown horizontal alignment setting {}".format(c_halign)
+                    )
 
                 if c_valign == VerticalAlignment.Top:
                     dest_pos[1] = I_MARGIN
                 elif c_valign == VerticalAlignment.Center:
-                    dest_pos[1] = int(.5 * (self._h - self._text_bounds[3]))
+                    dest_pos[1] = int(0.5 * (self._h - self._text_bounds[3]))
                 elif c_valign == VerticalAlignment.Bottom:
                     dest_pos[1] = self._h - I_MARGIN - self._text_bounds[3]
                 else:
-                    raise ValueError("unknown vertical alignment setting {}".format(c_valign))
+                    raise ValueError(
+                        "unknown vertical alignment setting {}".format(c_valign)
+                    )
 
                 self._surface.blit(self._text_caption, dest=tuple(dest_pos))
 
@@ -394,10 +423,12 @@ class Renderable(UIElement):
 class Clickable(Renderable):
     """"""
 
-    def __init__(self, name, x: int = None, y: int = None, w: int = None, h: int = None, **kwargs):
+    def __init__(
+        self, name, x: int = None, y: int = None, w: int = None, h: int = None, **kwargs
+    ):
         """Constructor for Clickable"""
         super().__init__(name, x=x, y=y, w=w, h=h, **kwargs)
-        self._is_clicked = kwargs.get('is_clicked', False)
+        self._is_clicked = kwargs.get("is_clicked", False)
 
     def unclick(self):
         self._is_clicked = False
@@ -425,24 +456,30 @@ class UIImage(Clickable):
     A component to show an image
     """
 
-    def __init__(self, name: str, image_fp: str, x: int, y: int, w: int = None, h: int = None, **kwargs):
+    def __init__(
+        self,
+        name: str,
+        image_fp: str,
+        x: int,
+        y: int,
+        w: int = None,
+        h: int = None,
+        **kwargs
+    ):
         """Constructor for UIImage"""
         if not image_fp or not os.path.exists(image_fp):
             raise ValueError("Image path not provided or does not exist")
         img = pygame.image.load(image_fp)
-        rescale = False
         if w is None:
             w = img.get_width()
-            rescale  = True
         if h is None:
             h = img.get_height()
-            rescale = True
         s_img = pygame.transform.scale(img, (w, h))
         s = pygame.Surface((w, h))
         s.blit(s_img, (0, 0))
         del img
-        kwargs['background_image'] = s
-        kwargs['fill_style'] = FillStyle.Image
+        kwargs["background_image"] = s
+        kwargs["fill_style"] = FillStyle.Image
         self._image_fp = image_fp
         super(UIImage, self).__init__(name=name, x=x, y=y, w=w, h=h, **kwargs)
 
@@ -461,7 +498,9 @@ class UIImage(Clickable):
         if self._invalidated:
             self._paint()
         Renderable.render(self, buffer)
-        buffer.blit(self._background_image, (self._x0, self._y0, self.width, self.height))
+        buffer.blit(
+            self._background_image, (self._x0, self._y0, self.width, self.height)
+        )
 
 
 class Canvas(Clickable):
@@ -471,8 +510,8 @@ class Canvas(Clickable):
 
     def __init__(self, name: str, x: int, y: int, w: int, h: int, **kwargs):
         """Constructor for Canvas"""
-        kwargs['show_border'] = False
-        kwargs['show_caption'] = False
+        kwargs["show_border"] = False
+        kwargs["show_caption"] = False
         super(Canvas, self).__init__(name=name, x=x, y=y, w=w, h=h, **kwargs)
 
     def render(self, buffer):
@@ -494,27 +533,31 @@ class Label(Renderable):
         """Constructor for TextLabel"""
         if caption is None:
             print("Caption ({}) cannot be none - set to empty string".format(name))
-            caption = ''
+            caption = ""
         if os.linesep in caption:
-            print("Label ({}) does not support multiple lines of text/ line breaks".format(name))
+            print(
+                "Label ({}) does not support multiple lines of text/ line breaks".format(
+                    name
+                )
+            )
 
-        kwargs['caption'] = caption
-        kwargs['show_caption'] = True
+        kwargs["caption"] = caption
+        kwargs["show_caption"] = True
 
-        if 'background_colour' not in kwargs:
-            kwargs['background_colour'] = C_MENUGRAY
+        if "background_colour" not in kwargs:
+            kwargs["background_colour"] = C_MENUGRAY
 
-        if 'fill_style' not in kwargs:
-            kwargs['fill_style'] = FillStyle.Colour
+        if "fill_style" not in kwargs:
+            kwargs["fill_style"] = FillStyle.Colour
 
-        if 'caption_halign' not in kwargs:
-            kwargs['caption_halign'] = HorizontalAlignment.Left
+        if "caption_halign" not in kwargs:
+            kwargs["caption_halign"] = HorizontalAlignment.Left
 
-        if 'caption_valign' not in kwargs:
-            kwargs['caption_valign'] = VerticalAlignment.Center
+        if "caption_valign" not in kwargs:
+            kwargs["caption_valign"] = VerticalAlignment.Center
 
-        if 'colour' not in kwargs:
-            kwargs['colour'] = C_ELEMENT_BORDER_DARKGRAY
+        if "colour" not in kwargs:
+            kwargs["colour"] = C_ELEMENT_BORDER_DARKGRAY
 
         super(Label, self).__init__(name=name, x=x, y=y, **kwargs)
 
@@ -524,17 +567,19 @@ class TextBox(Label):
     A simple text box with a blinking cursor
     """
 
-    __CURSOR__ = '|'
+    __CURSOR__ = "|"
 
-    __BLINK_ON__  = 1
+    __BLINK_ON__ = 1
     __BLINK_OFF__ = 0
 
     __IGNORE_KEYS__ = [pygame.K_LSHIFT, pygame.K_LALT, pygame.K_LCTRL]
 
-    def __init__(self, name: str, x: int, y: int, max_chars: int = 20, w: int = 200, **kwargs):
+    def __init__(
+        self, name: str, x: int, y: int, max_chars: int = 20, w: int = 200, **kwargs
+    ):
         """Constructor for TextBox"""
-        kwargs['show_border'] = True
-        kwargs['background_colour'] = C_WHITE
+        kwargs["show_border"] = True
+        kwargs["background_colour"] = C_WHITE
         self._is_clicked = False
         self._blink_state = 0
         self._change_state_millis = 200
@@ -551,11 +596,17 @@ class TextBox(Label):
         if self._has_focus:
             self._dmillis += t
 
-            if self._blink_state == TextBox.__BLINK_OFF__ and self._dmillis >= self._change_state_millis:
+            if (
+                self._blink_state == TextBox.__BLINK_OFF__
+                and self._dmillis >= self._change_state_millis
+            ):
                 self._blink_state = TextBox.__BLINK_ON__
                 self._dmillis = 0
 
-            if self._blink_state == TextBox.__BLINK_ON__ and self._dmillis >= self._change_state_millis:
+            if (
+                self._blink_state == TextBox.__BLINK_ON__
+                and self._dmillis >= self._change_state_millis
+            ):
                 self._blink_state = TextBox.__BLINK_OFF__
                 self._dmillis = 0
 
@@ -578,9 +629,9 @@ class TextBox(Label):
             self.caption = self.caption + c
 
     def remove_char(self) -> None:
-        l = len(self.caption)
-        if l > 0:
-            self.caption = self.caption[0:(l - 1)]
+        _len = len(self.caption)
+        if _len > 0:
+            self.caption = self.caption[0 : (_len - 1)]
 
     def _paint(self):
         # add the blinking ...
@@ -610,16 +661,19 @@ class MultiLineLabel(Label):
 
     def __init__(self, name: str, x: int, y: int, caption: str, **kwargs):
         """Constructor for MultiLineLabel"""
-        w = kwargs.get('width', 200)
-        kwargs['width'] = w
-        kwargs['show_caption'] = False
+        w = kwargs.get("width", 200)
+        kwargs["width"] = w
+        kwargs["show_caption"] = False
 
-        super(MultiLineLabel, self).__init__(name=name, x=x, y=y, caption=caption,  **kwargs)
+        super(MultiLineLabel, self).__init__(
+            name=name, x=x, y=y, caption=caption, **kwargs
+        )
         w_available = w - 2 * I_MARGIN
 
-        self._lines = MultiLineLabel.split_text(self._font, text=caption, label_width=w_available)
-        self._text_lines = [''.join(l).strip() for l in self._lines]
-        x_i, y_i = x, y
+        self._lines = MultiLineLabel.split_text(
+            self._font, text=caption, label_width=w_available
+        )
+        self._text_lines = ["".join(_line).strip() for _line in self._lines]
         h_i = I_MARGIN
         for l_i in self._text_lines:
             s_i = self._font.render(l_i, 0, self._font_colour)
@@ -641,22 +695,28 @@ class MultiLineLabel(Label):
         if label_width < 0:
             raise ValueError("Label width < 1")
 
-        if text == '':
+        if text == "":
             return text
-        frag_delim = '.,!?();:'
+        frag_delim = ".,!?();:"
         s = text.strip()
-        s = re.sub('([{}])'.format(frag_delim), r' \1 ', s)  # put space around the first match group
-        s = re.sub('\s{2,}', ' ', s)  # collapse 2 white space characters into a single space
+        s = re.sub(
+            "([{}])".format(frag_delim), r" \1 ", s
+        )  # put space around the first match group
+        s = re.sub(
+            r"\s{2,}", " ", s
+        )  # collapse 2 white space characters into a single space
 
         # now simply split on space and get as many tokens into a line as possible
-        s = re.split(r'(\s+)', s)
+        s = re.split(r"(\s+)", s)
         sx = []
         for i, t in enumerate(s):
-            if t == '':
+            if t == "":
                 continue
-            if t == os.linesep or t == '\n':
-                t = ' '
-            if i < len(s) - 1 and s[i] == ' ' and s[i + 1] in frag_delim:  # collapse ' ', '.' into '.'
+            if t == os.linesep or t == "\n":
+                t = " "
+            if (
+                i < len(s) - 1 and s[i] == " " and s[i + 1] in frag_delim
+            ):  # collapse ' ', '.' into '.'
                 continue
 
             sx.append(t)
@@ -676,10 +736,12 @@ class MultiLineLabel(Label):
             if temp_width + w >= label_width:
                 # remove ending spaces from the temps
                 x_sentence = temp_sentence.copy()
-                l = len(x_sentence) - 1
-                if x_sentence[l] == ' ':
-                    x_sentence = x_sentence[0:l]
-                if t in frag_delim:  # if t is a sentence/ fragement delimiter, we do not put on the next line
+                _seq_len = len(x_sentence) - 1
+                if x_sentence[_seq_len] == " ":
+                    x_sentence = x_sentence[0:_seq_len]
+                if (
+                    t in frag_delim
+                ):  # if t is a sentence/ fragement delimiter, we do not put on the next line
                     x_sentence.append(t)
                     t = None
 
@@ -699,39 +761,33 @@ class MultiLineLabel(Label):
     def _destpos_from_aligment(self, text_bounds):
         dest_pos = [0, 0]
         c_halign = self._caption_halign
-        c_valign = self._caption_valign
 
         if c_halign == HorizontalAlignment.Left:
             dest_pos[0] = I_MARGIN
         elif c_halign == HorizontalAlignment.Center:
-            dest_pos[0] = int(.5 * (self._w - text_bounds[2]))
+            dest_pos[0] = int(0.5 * (self._w - text_bounds[2]))
         elif c_halign == HorizontalAlignment.Right:
             dest_pos[0] = self._w - I_MARGIN - text_bounds[2]
         else:
             raise ValueError("unknown horizontal alignment setting {}".format(c_halign))
 
         dest_pos[1] = I_MARGIN
-        # TODO:
-        # if c_valign == VerticalAlignment.Top:
-        #     dest_pos[1] = I_MARGIN
-        # elif c_valign == VerticalAlignment.Center:
-        #     dest_pos[1] = int(.5 * (self._h - self._text_bounds[3]))
-        # elif c_valign == VerticalAlignment.Bottom:
-        #     dest_pos[1] = self._h - I_MARGIN - self._text_bounds[3]
-        # else:
-        #     raise ValueError("unknown vertical alignment setting {}".format(c_valign))
         return dest_pos
 
     def _paint(self):
         if self._surface is None:
             raise ValueError("Cannot paint into None surface: {}".format(self._name))
         if self._fill_style == FillStyle.Colour:
-            pygame.draw.rect(self._surface, self._background_colour, self._client_rect, 0)
+            pygame.draw.rect(
+                self._surface, self._background_colour, self._client_rect, 0
+            )
         elif self._fill_style == FillStyle.Image:
             if not self._background_image:
                 raise ValueError("background fill image but image not provided")
 
-            scaled_bgimg = pygame.transform.scale(self._background_image, (self._w, self._h))
+            scaled_bgimg = pygame.transform.scale(
+                self._background_image, (self._w, self._h)
+            )
             self._surface.blit(scaled_bgimg, dest=self._client_rect)
         else:
             pass
@@ -739,7 +795,7 @@ class MultiLineLabel(Label):
         if self._show_border:
             pygame.draw.rect(self._surface, self._colour, self._client_rect, 1)
 
-        if self._show_caption and self._caption != '':
+        if self._show_caption and self._caption != "":
             # We place text in accordance with the chosen alignment.
             # This means vertically and horizontally, inside the parent's bounding box. The parent's
             # bounding box is at least so wide, so as to be able to capture the text.
@@ -771,19 +827,28 @@ class Button(Clickable):
     When the user clicks a button an event is fired and you may react to it.
     """
 
-    def __init__(self, name, x: int, y: int, w: int = None, h: int = None, image_fp: str = None, **kwargs):
+    def __init__(
+        self,
+        name,
+        x: int,
+        y: int,
+        w: int = None,
+        h: int = None,
+        image_fp: str = None,
+        **kwargs
+    ):
         """Constructor for Button"""
         # if we do have a caption but not an explicit show_caption, assume the default of show
-        if 'caption' in kwargs and 'show_caption' not in kwargs:
-            kwargs['show_caption'] = True
-        if 'background_colour' not in kwargs:
-            kwargs['background_colour'] = C_BTN_FACE
-        if 'fill_style' not in kwargs:
-            kwargs['fill_style'] = FillStyle.Colour
-        if 'colour' not in kwargs:
-            kwargs['colour'] = C_BTN_BORDER
+        if "caption" in kwargs and "show_caption" not in kwargs:
+            kwargs["show_caption"] = True
+        if "background_colour" not in kwargs:
+            kwargs["background_colour"] = C_BTN_FACE
+        if "fill_style" not in kwargs:
+            kwargs["fill_style"] = FillStyle.Colour
+        if "colour" not in kwargs:
+            kwargs["colour"] = C_BTN_BORDER
         if image_fp is not None and os.path.exists(image_fp):
-            kwargs['background_image'] = pygame.image.load(image_fp)
+            kwargs["background_image"] = pygame.image.load(image_fp)
         super().__init__(name=name, x=x, y=y, w=w, h=h, **kwargs)
 
     def _paint(self):
@@ -798,10 +863,10 @@ class MenuItem(Button):
 
     def __init__(self, name: str, caption: str, w: int = None, h: int = None, **kwargs):
         """Constructor for MenuItem"""
-        kwargs['caption'] = caption
-        kwargs['show_caption'] = True
-        kwargs['show_border'] = True
-        kwargs['fill_style'] = FillStyle.Colour
+        kwargs["caption"] = caption
+        kwargs["show_caption"] = True
+        kwargs["show_border"] = True
+        kwargs["fill_style"] = FillStyle.Colour
         super().__init__(name=name, x=0, y=0, w=w, h=h, **kwargs)
 
 
@@ -810,20 +875,23 @@ class ClickableContainer(Clickable):
     TODO: most of the menu stuff belongs into a clickable container
     """
 
-    def __init__(self, name: str, x: int, y: int, w: int = None, h: int = None, **kwargs):
+    def __init__(
+        self, name: str, x: int, y: int, w: int = None, h: int = None, **kwargs
+    ):
         """Constructor for ClickableContainer"""
         super(ClickableContainer, self).__init__(x=x, y=y, w=w, h=h)
         self._items = {}
         self._item_names = []
-        self._iterm_inner_margin = kwargs.get('item_inner_margin', 2)
-
+        self._iterm_inner_margin = kwargs.get("item_inner_margin", 2)
 
     @property
     def item_names(self):
         return self._item_names
 
     def __repr__(self):
-        return "ClickableContainer: {} - {} items".format(self._name, len(self._item_names))
+        return "ClickableContainer: {} - {} items".format(
+            self._name, len(self._item_names)
+        )
 
     @property
     def items(self):
@@ -904,23 +972,28 @@ class Menu(Clickable):
     It does not support hotkeys, nesting and more common gui functionalty.
     TODO: reuse the clicable container.
     """
+
     MENU_ITEM_INNER_MARGIN = 3
 
     def __init__(self, name, x, y, **kwargs):
         """Constructor for Menu"""
         # if the user did not override these settings then we add our defaults
-        if 'colour' not in kwargs:
-            kwargs['colour'] = C_BLACK
-        if 'background_colour' not in kwargs:
-            kwargs['background_colour'] = C_MENUGRAY
-        if 'show_border' not in kwargs:
-            kwargs['show_border'] = True
-        if 'fill_style' not in kwargs:
-            kwargs['fill_style'] = FillStyle.Colour
-        super().__init__(name=name, x=x, y=y,
-                         w=2 * Menu.MENU_ITEM_INNER_MARGIN,
-                         h=2 * Menu.MENU_ITEM_INNER_MARGIN,
-                         **kwargs)
+        if "colour" not in kwargs:
+            kwargs["colour"] = C_BLACK
+        if "background_colour" not in kwargs:
+            kwargs["background_colour"] = C_MENUGRAY
+        if "show_border" not in kwargs:
+            kwargs["show_border"] = True
+        if "fill_style" not in kwargs:
+            kwargs["fill_style"] = FillStyle.Colour
+        super().__init__(
+            name=name,
+            x=x,
+            y=y,
+            w=2 * Menu.MENU_ITEM_INNER_MARGIN,
+            h=2 * Menu.MENU_ITEM_INNER_MARGIN,
+            **kwargs
+        )
         self._items = {}
         self._item_names = []
 
@@ -1011,7 +1084,11 @@ class Menu(Clickable):
             m._paint()
 
     def render(self, buffer):
-        if not self._show_caption and not self._show_border and len(self._item_names) < 1:
+        if (
+            not self._show_caption
+            and not self._show_border
+            and len(self._item_names) < 1
+        ):
             return
 
         if self._invalidated:
@@ -1032,10 +1109,10 @@ class Screen(Clickable):
 
     def __init__(self, name: str, title: str, width: int, height: int, **kwargs):
         """Constructor for GameScreen"""
-        if 'fill_style' not in kwargs:
-            kwargs['fill_style'] = FillStyle.Colour
-        if 'background_colour' not in kwargs:
-            kwargs['background_colour'] = C_FORMBLUE
+        if "fill_style" not in kwargs:
+            kwargs["fill_style"] = FillStyle.Colour
+        if "background_colour" not in kwargs:
+            kwargs["background_colour"] = C_FORMBLUE
 
         super().__init__(name, x=0, y=0, w=width, h=height, **kwargs)
         self._title = title
@@ -1059,15 +1136,19 @@ class Screen(Clickable):
         :return:
         """
         if self._surface is None:
-            raise ValueError("Cannot render {} - surface is none - check ui element creation.".format(self._name))
+            raise ValueError(
+                "Cannot render {} - surface is none - check ui element creation.".format(
+                    self._name
+                )
+            )
         if self._invalidated:
             self._paint()
 
         def can_render(o):
-            return (isinstance(o, Renderable) and o.is_visible) or hasattr(o, 'render')
+            return (isinstance(o, Renderable) and o.is_visible) or hasattr(o, "render")
 
         def sorter(o):
-            if hasattr(o, 'z_order'):
+            if hasattr(o, "z_order"):
                 return o.z_order
             else:
                 return 0
@@ -1140,7 +1221,7 @@ class Screen(Clickable):
         is_clicked, sender = Clickable.clicked(self, mx, my, button)
 
         for _, c in self._components.items():
-            if isinstance(c, Clickable) or hasattr(c, 'clicked'):
+            if isinstance(c, Clickable) or hasattr(c, "clicked"):
                 is_clicked_i, sender_i = c.clicked(mx, my, button)
                 if is_clicked_i:
                     is_clicked, sender = is_clicked_i, sender_i
@@ -1173,7 +1254,7 @@ class WindowManager:
     def active_screen(self):
         return self._active_screen
 
-    def add_screen(self, s:Screen, is_active:bool = False):
+    def add_screen(self, s: Screen, is_active: bool = False):
         if not s:
             raise ValueError("screen not provided")
 
@@ -1183,16 +1264,16 @@ class WindowManager:
         if is_active:
             self._active_screen = s
 
-    def remove_screen(self, s_name:str):
+    def remove_screen(self, s_name: str):
         if not s_name:
             raise ValueError("screen not provided")
 
         # remove transitions and the actual screen ...
         to_remove = [k for k, v in self._transitions if v[0].name == s_name]
         for r in to_remove:
-            del(self._transitions[r])
+            del self._transitions[r]
 
-        del(self._items[s_name])
+        del self._items[s_name]
         self._item_names.remove(s_name)
 
     def transition(self, from_name, to_name):
@@ -1217,7 +1298,9 @@ class WindowManager:
         """
         return None
 
-    def add_transition(self, from_screen: Screen, to_screen: Screen, add_reverse: bool = False):
+    def add_transition(
+        self, from_screen: Screen, to_screen: Screen, add_reverse: bool = False
+    ):
         if not from_screen:
             raise ValueError("from screen missing")
         if not to_screen:
@@ -1235,7 +1318,7 @@ class WindowManager:
         if not to_name:
             raise ValueError("to name missing")
         t_name = "{}-{}".format(from_name, to_name)
-        del(self._transitions[t_name])
+        del self._transitions[t_name]
 
     def __getitem__(self, item):
         if item is None:

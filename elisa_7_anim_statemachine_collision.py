@@ -5,15 +5,15 @@
 #       The second state machine listens on the a, d and w keys for left, right and jump.
 #       When elisas collides with each other further movement is restricted, i.e. they cannot pass each other
 
-from pygame.locals import *
-from sm import *
+from pygame.locals import QUIT, K_LEFT, K_RIGHT, K_DOWN, K_UP, K_a, K_s, K_w, K_d
+from elisa.arch.sm import State, Transition, StateMachine
 from sprites import SpriteMap, PSprite
 import os
 import pygame
 
 
 class Elisa(pygame.sprite.Sprite):
-    def __init__(self, sm:StateMachine, pos, **kwargs):
+    def __init__(self, sm: StateMachine, pos, **kwargs):
         super(Elisa, self).__init__()
         self._state_machine = sm
         self._current_animation_frame = 0
@@ -23,21 +23,22 @@ class Elisa(pygame.sprite.Sprite):
         self._assets = SpriteAssetManager()
         self._position = pos
         anims = ["WALK_RIGHT", "WALK_LEFT", "JUMP", "IDLE"]
-        descfps = ['asset/elise_character/tileset_elisa_walk@8x.json',
-                   'asset/elise_character/tileset_elisa_walk@8x.json',
-                   'asset/elise_character/tileset_elisa_walk_jump@8x.json',
-                   'asset/elise_character/tileset_elisa_idle@8x.json']
+        descfps = [
+            "asset/elise_character/tileset_elisa_walk@8x.json",
+            "asset/elise_character/tileset_elisa_walk@8x.json",
+            "asset/elise_character/tileset_elisa_walk_jump@8x.json",
+            "asset/elise_character/tileset_elisa_idle@8x.json",
+        ]
         for key, fp in zip(anims, descfps):
             self._assets.add_sprite_map(name=key, metadata_fp=fp, verbose=True)
         self._sprites = {
-            'Idle': self._assets.get_sprite(sprite_map_name='IDLE'),
-            'Walk_Right': self._assets.get_sprite(sprite_map_name='WALK_RIGHT'),
-            'Walk_Left': self._assets.get_sprite(sprite_map_name='WALK_LEFT'),
-            'Jump': self._assets.get_sprite(sprite_map_name='JUMP')
+            "Idle": self._assets.get_sprite(sprite_map_name="IDLE"),
+            "Walk_Right": self._assets.get_sprite(sprite_map_name="WALK_RIGHT"),
+            "Walk_Left": self._assets.get_sprite(sprite_map_name="WALK_LEFT"),
+            "Jump": self._assets.get_sprite(sprite_map_name="JUMP"),
         }
-        self._mirror_x = kwargs.get('mirror_x', False)
-        self._mirror_y = kwargs.get('mirror_y', False)
-
+        self._mirror_x = kwargs.get("mirror_x", False)
+        self._mirror_y = kwargs.get("mirror_y", False)
 
     @property
     def x(self):
@@ -75,21 +76,31 @@ class Elisa(pygame.sprite.Sprite):
             self._current_state = self._state_machine.current.name
         else:
             self._current_animation_frame += 1
-            if self._current_animation_frame >= self._sprites[self._current_state].no_sprites:
+            if (
+                self._current_animation_frame
+                >= self._sprites[self._current_state].no_sprites
+            ):
                 self._current_animation_frame = 0
 
-        if self._current_state == 'Walk_Right':
+        if self._current_state == "Walk_Right":
             self._right()
-        elif self._current_state == 'Walk_Left':
+        elif self._current_state == "Walk_Left":
             self._left()
         else:
             pass
 
-        self._current_sprite = self._sprites[self._current_state][self._current_animation_frame]
+        self._current_sprite = self._sprites[self._current_state][
+            self._current_animation_frame
+        ]
 
     @property
     def rect(self):
-        return pygame.Rect(self._position[0], self._position[1], self._current_sprite.width, self._current_sprite.height)
+        return pygame.Rect(
+            self._position[0],
+            self._position[1],
+            self._current_sprite.width,
+            self._current_sprite.height,
+        )
 
     @property
     def assets(self):
@@ -128,17 +139,25 @@ class SpriteAssetManager(object):
         self._assets = {}
 
     def __repr__(self):
-        return "Registered Assets ({}): {}".format(len(self._assets), self._assets.keys())
+        return "Registered Assets ({}): {}".format(
+            len(self._assets), self._assets.keys()
+        )
 
-    def add_sprite_map(self, name: str, metadata_fp: str, initialize: bool = True, verbose: bool = False):
+    def add_sprite_map(
+        self,
+        name: str,
+        metadata_fp: str,
+        initialize: bool = True,
+        verbose: bool = False,
+    ):
         if not name:
-            raise ValueError('name not provided')
+            raise ValueError("name not provided")
         if not metadata_fp:
-            raise ValueError('metadata file not provided')
+            raise ValueError("metadata file not provided")
         if name in self._assets:
-            raise ValueError('asset already registered')
+            raise ValueError("asset already registered")
         if not os.path.exists(metadata_fp):
-            raise ValueError('metadata file does not exist')
+            raise ValueError("metadata file does not exist")
 
         if verbose:
             print("Adding Sprite Map: ", name)
@@ -147,7 +166,7 @@ class SpriteAssetManager(object):
         if initialize:
             self._assets[name].initialize(verbose=verbose)
 
-    def get_sprite(self, sprite_map_name:str, sprite:str = None):
+    def get_sprite(self, sprite_map_name: str, sprite: str = None):
         if not sprite_map_name:
             raise ValueError("Asset cannot be none")
         if sprite_map_name not in self._assets:
@@ -166,7 +185,7 @@ class SpriteAssetManager(object):
                     a.initialize()
         else:
             if name not in self._assets:
-                raise ValueError('not an asset')
+                raise ValueError("not an asset")
             if not self._assets[name].initialized:
                 self._assets[name].initialize()
 
@@ -175,12 +194,12 @@ def main():
     pygame.init()
 
     S_WIDTH = 800
-    S_HEIGHT= 600
+    S_HEIGHT = 600
     S_TITLE = "Elisa 7 - Statemachine, GFX and pygame collision detection"
 
     C_WHITE = (255, 255, 255, 255)
     C_BLUE = (0, 0, 255, 255)
-    C_RED  = (255, 0, 0, 255)
+    C_RED = (255, 0, 0, 255)
 
     screen_buffer = pygame.display.set_mode(size=(S_WIDTH, S_HEIGHT))
     pygame.display.set_caption(S_TITLE)
@@ -196,32 +215,129 @@ def main():
     fps_watcher = pygame.time.Clock()
 
     idle = State("Idle", "The idle state")
+    s_final = State("Final", "Final State")
     walk_r = State("Walk_Right", "The walking state")
     walk_l = State("Walk_Left", "The walking state")
 
     jump = State("Jump", "The jumping state")
 
-    t_idle_walk_left1 = Transition(idle, walk_l, lambda: key_map[K_LEFT], "IDLE_WALK_LEFT", "From Idle to Walk Left")
-    t_idle_walk_left2 = Transition(idle, walk_l, lambda: key_map[K_a], "IDLE_WALK_LEFT", "From Idle to Walk Left")
-    t_idle_walk_right1= Transition(idle, walk_r, lambda: key_map[K_RIGHT], "IDLE_WALK_RIGHT", "From Idle to Walk Right")
-    t_idle_walk_right2= Transition(idle, walk_r, lambda: key_map[K_d], "IDLE_WALK_RIGHT", "From Idle to Walk Right")
+    t_idle_walk_left1 = Transition(
+        idle,
+        walk_l,
+        trigger_fn=lambda: key_map[K_LEFT],
+        name="IDLE_WALK_LEFT",
+        description="From Idle to Walk Left",
+    )
+    t_idle_walk_left2 = Transition(
+        idle, walk_l, lambda: key_map[K_a], "IDLE_WALK_LEFT", "From Idle to Walk Left"
+    )
+    t_idle_walk_right1 = Transition(
+        idle,
+        walk_r,
+        trigger_fn=lambda: key_map[K_RIGHT],
+        name="IDLE_WALK_RIGHT",
+        description="From Idle to Walk Right",
+    )
+    t_idle_walk_right2 = Transition(
+        idle,
+        walk_r,
+        trigger_fn=lambda: key_map[K_d],
+        name="IDLE_WALK_RIGHT",
+        description="From Idle to Walk Right",
+    )
 
-    t_walk_left_idle1 = Transition(walk_l, idle, lambda: not key_map[K_LEFT], "WALK_LEFT_IDLE", "From Walk Left To Idle")
-    t_walk_left_idle2 = Transition(walk_l, idle, lambda: not key_map[K_a], "WALK_LEFT_IDLE", "From Walk Left To Idle")
-    t_walk_right_idle1 = Transition(walk_r, idle, lambda: not key_map[K_RIGHT], "WALK_RIGHT_IDLE", "From Walk Right To Idle")
-    t_walk_right_idle2 = Transition(walk_r, idle, lambda: not key_map[K_d], "WALK_RIGHT_IDLE", "From Walk Right To Idle")
+    t_walk_left_idle1 = Transition(
+        walk_l,
+        idle,
+        trigger_fn=lambda: not key_map[K_LEFT],
+        name="WALK_LEFT_IDLE",
+        description="From Walk Left To Idle",
+    )
+    t_walk_left_idle2 = Transition(
+        walk_l,
+        idle,
+        trigger_fn=lambda: not key_map[K_a],
+        name="WALK_LEFT_IDLE",
+        description="From Walk Left To Idle",
+    )
+    t_walk_right_idle1 = Transition(
+        walk_r,
+        idle,
+        trigger_fn=lambda: not key_map[K_RIGHT],
+        name="WALK_RIGHT_IDLE",
+        description="From Walk Right To Idle",
+    )
+    t_walk_right_idle2 = Transition(
+        walk_r,
+        idle,
+        trigger_fn=lambda: not key_map[K_d],
+        name="WALK_RIGHT_IDLE",
+        description="From Walk Right To Idle",
+    )
 
-    t_idle_jump1 = Transition(idle, jump, lambda: key_map[K_UP], "IDLE_JUMP", "From Idle to Jump")
-    t_idle_jump2 = Transition(idle, jump, lambda: key_map[K_w], "IDLE_JUMP", "From Idle to Jump")
-    t_jump_idle1 = Transition(jump, idle, lambda: not key_map[K_UP], "JUMP_IDLE", "From Jump to Idle")
-    t_jump_idle2 = Transition(jump, idle, lambda: not key_map[K_w], "JUMP_IDLE", "From Jump to Idle")
+    t_idle_jump1 = Transition(
+        idle,
+        jump,
+        trigger_fn=lambda: key_map[K_UP],
+        name="IDLE_JUMP",
+        description="From Idle to Jump",
+    )
+    t_idle_jump2 = Transition(
+        idle,
+        jump,
+        trigger_fn=lambda: key_map[K_w],
+        name="IDLE_JUMP",
+        description="From Idle to Jump",
+    )
+    t_jump_idle1 = Transition(
+        jump,
+        idle,
+        trigger_fn=lambda: not key_map[K_UP],
+        name="JUMP_IDLE",
+        description="From Jump to Idle",
+    )
+    t_jump_idle2 = Transition(
+        jump,
+        idle,
+        trigger_fn=lambda: not key_map[K_w],
+        name="JUMP_IDLE",
+        description="From Jump to Idle",
+    )
 
-    states = [idle, walk_l, walk_r, jump]
-    transitions1 = [t_idle_walk_left1, t_idle_walk_right1, t_idle_jump1, t_walk_left_idle1, t_walk_right_idle1, t_jump_idle1]
-    transitions2 = [t_idle_walk_left2, t_idle_walk_right2, t_idle_jump2, t_walk_left_idle2, t_walk_right_idle2, t_jump_idle2]
+    t_idle_final = Transition(
+        idle,
+        s_final,
+        trigger_fn=lambda x=None: False,
+        name="T_Idle_Final",
+        description="Moving from idle to final",
+    )
 
-    sm1 = StateMachine(states=states, transitions=transitions1, initial_state=idle)
-    sm2 = StateMachine(states=states, transitions=transitions2, initial_state=idle)
+    states = [idle, walk_l, walk_r, jump, s_final]
+    transitions1 = [
+        t_idle_walk_left1,
+        t_idle_walk_right1,
+        t_idle_jump1,
+        t_walk_left_idle1,
+        t_walk_right_idle1,
+        t_jump_idle1,
+        t_idle_final,
+    ]
+    transitions2 = [
+        t_idle_walk_left2,
+        t_idle_walk_right2,
+        t_idle_jump2,
+        t_walk_left_idle2,
+        t_walk_right_idle2,
+        t_jump_idle2,
+        t_idle_final,
+    ]
+
+    sm1 = StateMachine(
+        states=states, transitions=transitions1, initial_state=idle, final_state=s_final
+    )
+    sm2 = StateMachine(
+        states=states, transitions=transitions2, initial_state=idle, final_state=s_final
+    )
 
     elisa1 = Elisa(sm=sm1, pos=(100, 100))
     # elisa2 faces elisa1 - so let's flip - small abuse so that instead of the original image
@@ -256,8 +372,18 @@ def main():
             elisa1.can_walk_right = True
             elisa2.can_walk_left = True
 
-        pygame.draw.rect(back_buffer, C_BLUE, (elisa1.x, elisa1.y, elisa1.sprite_width, elisa1.sprite_height), 1)
-        pygame.draw.rect(back_buffer, C_RED, (elisa2.x, elisa2.y, elisa2.sprite_width, elisa2.sprite_height), 1)
+        pygame.draw.rect(
+            back_buffer,
+            C_BLUE,
+            (elisa1.x, elisa1.y, elisa1.sprite_width, elisa1.sprite_height),
+            1,
+        )
+        pygame.draw.rect(
+            back_buffer,
+            C_RED,
+            (elisa2.x, elisa2.y, elisa2.sprite_width, elisa2.sprite_height),
+            1,
+        )
 
         sprites.draw(back_buffer)
         screen_buffer.blit(back_buffer, (0, 0))
@@ -265,4 +391,5 @@ def main():
         pygame.display.flip()
 
 
-if __name__ == '__main__': main()
+if __name__ == "__main__":
+    main()

@@ -1,6 +1,7 @@
 from __future__ import annotations
 from math import sqrt
 
+
 class Vec:
     def __init__(self):
         super(Vec, self).__init__()
@@ -18,22 +19,22 @@ class Vec:
         return sqrt(self.length_squared)
 
     def length_inv(self):
-        return 1. / self.length
+        return 1.0 / self.length
 
     @property
     def length_squared(self):
-        s = [i*i for i in self._v]
-        s_i = 0.
+        s = [i * i for i in self._v]
+        s_i = 0.0
         for i in s:
             s_i += i
         return s_i
 
     def length_squared_inv(self):
-        return 1. / self.length_squared
+        return 1.0 / self.length_squared
 
     @property
     def is_zero(self):
-        p0 = [x == 0. for x in self._v]
+        p0 = [x == 0.0 for x in self._v]
         return all(p0)
 
     def __getitem__(self, a):
@@ -86,6 +87,7 @@ class Vec:
     def cross(self, v):
         raise ValueError("Not implemented")
 
+
 def lerp1D(u, v, t: float) -> float:
     """
     lerp1D ( u, v, t ) = u + t * (v - u)
@@ -96,6 +98,7 @@ def lerp1D(u, v, t: float) -> float:
     """
     w = v - u
     return u + (w * t)
+
 
 def angle(u: Vec, v: Vec) -> float:
     """
@@ -110,6 +113,7 @@ def angle(u: Vec, v: Vec) -> float:
     l_v = v.length
     return u.dot(v) / (l_u * l_v)
 
+
 def proj_u_v(u: Vec, v: Vec) -> Vec:
     """
     Returns the projection of vector u onto vector v
@@ -120,7 +124,7 @@ def proj_u_v(u: Vec, v: Vec) -> Vec:
     if v.is_zero():
         raise ValueError("v cannot be the zero vector")
     uv = u.dot(v)
-    k  = v.length_squared_inv() * uv
+    k = v.length_squared_inv() * uv
     return k * v
 
 

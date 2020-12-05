@@ -4,121 +4,103 @@ import pygame
 # TODO: scrolling text effect
 
 sd_chars = {
-    0:
-    [
+    0: [
         [1, 1, 1, 1],
         [1, 0, 0, 1],
         [1, 0, 0, 1],
         [1, 0, 0, 1],
         [1, 0, 0, 1],
         [1, 0, 0, 1],
-        [1, 1, 1, 1]
+        [1, 1, 1, 1],
     ],
-    1:
-    [
+    1: [
         [0, 0, 0, 1],
         [0, 0, 0, 1],
         [0, 0, 0, 1],
         [0, 0, 0, 1],
         [0, 0, 0, 1],
         [0, 0, 0, 1],
-        [0, 0, 0, 1]
+        [0, 0, 0, 1],
     ],
-    2:
-    [
+    2: [
         [1, 1, 1, 1],
         [0, 0, 0, 1],
         [0, 0, 0, 1],
         [1, 1, 1, 1],
         [1, 0, 0, 0],
         [1, 0, 0, 0],
-        [1, 1, 1, 1]
+        [1, 1, 1, 1],
     ],
-    3:
-    [
+    3: [
         [1, 1, 1, 1],
         [0, 0, 0, 1],
         [0, 0, 0, 1],
         [1, 1, 1, 1],
         [0, 0, 0, 1],
         [0, 0, 0, 1],
-        [1, 1, 1, 1]
+        [1, 1, 1, 1],
     ],
-    4:
-    [
+    4: [
         [1, 0, 0, 1],
         [1, 0, 0, 1],
         [1, 0, 0, 1],
         [1, 1, 1, 1],
         [0, 0, 0, 1],
         [0, 0, 0, 1],
-        [0, 0, 0, 1]
+        [0, 0, 0, 1],
     ],
-    5:
-    [
+    5: [
         [1, 1, 1, 1],
         [1, 0, 0, 0],
         [1, 0, 0, 0],
         [1, 1, 1, 1],
         [0, 0, 0, 1],
         [0, 0, 0, 1],
-        [1, 1, 1, 1]
+        [1, 1, 1, 1],
     ],
-    6:
-    [
+    6: [
         [1, 1, 1, 1],
         [1, 0, 0, 0],
         [1, 0, 0, 0],
         [1, 1, 1, 1],
         [1, 0, 0, 1],
         [1, 0, 0, 1],
-        [1, 1, 1, 1]
+        [1, 1, 1, 1],
     ],
-    7:
-    [
+    7: [
         [1, 1, 1, 1],
         [0, 0, 0, 1],
         [0, 0, 0, 1],
         [0, 0, 0, 1],
         [0, 0, 0, 1],
         [0, 0, 0, 1],
-        [0, 0, 0, 1]
+        [0, 0, 0, 1],
     ],
-    8:
-    [
+    8: [
         [1, 1, 1, 1],
         [1, 0, 0, 1],
         [1, 0, 0, 1],
         [1, 1, 1, 1],
         [1, 0, 0, 1],
         [1, 0, 0, 1],
-        [1, 1, 1, 1]
+        [1, 1, 1, 1],
     ],
-    9:
-    [
+    9: [
         [1, 1, 1, 1],
         [1, 0, 0, 1],
         [1, 0, 0, 1],
         [1, 1, 1, 1],
         [0, 0, 0, 1],
         [0, 0, 0, 1],
-        [1, 1, 1, 1]
-    ]
+        [1, 1, 1, 1],
+    ],
 }
 
-sd_size = {
-    "small" : 9,
-    "medium": 11,
-    "large" : 15
-}
+sd_size = {"small": 9, "medium": 11, "large": 15}
 
 
 def digit_inner_margin(size):
-    return {
-        "small" : 1,
-        "medium": 2,
-        "large" : 3
-    }.get(size, "medium")
+    return {"small": 1, "medium": 2, "large": 3}.get(size, "medium")
 
 
 def digit_outer_margin(size):
@@ -126,11 +108,16 @@ def digit_outer_margin(size):
 
 
 def digit_width(size):
-    return 4 * sd_size[size] + 2 * digit_outer_margin(size) + 3 * digit_inner_margin(size)
+    return (
+        4 * sd_size[size] + 2 * digit_outer_margin(size) + 3 * digit_inner_margin(size)
+    )
 
 
 def digit_height(size):
-    return 7 * sd_size[size] + 2 * digit_outer_margin(size) + 6 * digit_inner_margin(size)
+    return (
+        7 * sd_size[size] + 2 * digit_outer_margin(size) + 6 * digit_inner_margin(size)
+    )
+
 
 # TODO: we render the segment display at x, y
 # individual circles with some define spacing in-between and a defined colour
@@ -141,21 +128,23 @@ class SegmentDisplay(pygame.sprite.Sprite):
     A simple graphical segment display
     """
 
-    def __init__(self, x:int, y:int, value, size, colour = (255, 255, 255, 255), **kwargs):
+    def __init__(
+        self, x: int, y: int, value, size, colour=(255, 255, 255, 255), **kwargs
+    ):
         """Constructor for SegmentDisplay"""
         pygame.sprite.Sprite.__init__(self)
         self._x = x
         self._y = y
         self._surface_width = digit_width(size)
-        self._surface_height= digit_height(size)
+        self._surface_height = digit_height(size)
 
         self.image = pygame.Surface((self._surface_width, self._surface_height))
-        self.rect  = pygame.Rect(x, y, self._surface_width, self._surface_height)
+        self.rect = pygame.Rect(x, y, self._surface_width, self._surface_height)
 
-        self._background_colour = kwargs.get('backgound_colour', (0, 0, 0, 255))
+        self._background_colour = kwargs.get("backgound_colour", (0, 0, 0, 255))
         self._value = value
-        self._invalid= True
-        self._size   = size
+        self._invalid = True
+        self._size = size
         self._colour = colour
 
     @property
@@ -198,8 +187,12 @@ class SegmentDisplay(pygame.sprite.Sprite):
                 _x = x0
                 for ix, d in enumerate(ry):
                     if d == 1:
-                        pygame.draw.circle(buffer, self._colour, (int(_x), int(_y)), r2, 0)
-                    pygame.draw.circle(buffer, (64, 64, 64, 255), (int(_x), int(_y)), r2, 1)
+                        pygame.draw.circle(
+                            buffer, self._colour, (int(_x), int(_y)), r2, 0
+                        )
+                    pygame.draw.circle(
+                        buffer, (64, 64, 64, 255), (int(_x), int(_y)), r2, 1
+                    )
                     _x = _x + mi + r
                 _y = _y + mi + r
             self._invalid = False
@@ -223,9 +216,18 @@ class TwoDigitCounter(pygame.sprite.Sprite):
     A graphical two digit counter, siuch as a timer clock realized via the segment display
     """
 
-    def __init__(self, name:str, x:int, y:int, size: str = "medium", initial_value: int = 0, dv:int = 1,
-                 colour=(64, 224, 64, 255),
-                 decrement: bool = False, **kwargs):
+    def __init__(
+        self,
+        name: str,
+        x: int,
+        y: int,
+        size: str = "medium",
+        initial_value: int = 0,
+        dv: int = 1,
+        colour=(64, 224, 64, 255),
+        decrement: bool = False,
+        **kwargs
+    ):
         """Constructor for DigitalClock"""
         pygame.sprite.Sprite.__init__(self)
         self._initial_value = initial_value
@@ -234,16 +236,32 @@ class TwoDigitCounter(pygame.sprite.Sprite):
         self._size = size
         self._x = x
         self._y = y
-        self._background_colour = kwargs.get('backgound_colour', (0, 0, 0, 255))
+        self._background_colour = kwargs.get("backgound_colour", (0, 0, 0, 255))
         self._value = self._initial_value
         v0, v1 = int(initial_value / 10), initial_value % 10
-        self._d0 = SegmentDisplay(size=self._size, x=self._x, y=self._y, value=v0, colour=colour, backgound_colour=self._background_colour)
-        self._d1 = SegmentDisplay(size=self._size, x=self._x+self._d0.surface_width, y=self._y, value=v1, colour=colour, backgound_colour=self._background_colour)
+        self._d0 = SegmentDisplay(
+            size=self._size,
+            x=self._x,
+            y=self._y,
+            value=v0,
+            colour=colour,
+            backgound_colour=self._background_colour,
+        )
+        self._d1 = SegmentDisplay(
+            size=self._size,
+            x=self._x + self._d0.surface_width,
+            y=self._y,
+            value=v1,
+            colour=colour,
+            backgound_colour=self._background_colour,
+        )
         self._surface_width = self._d0.surface_width + self._d1.surface_width
-        self._surface_height= self._d0.surface_height
+        self._surface_height = self._d0.surface_height
         self._change_by = dv
         self.image = pygame.Surface((self._surface_width, self._surface_height))
-        self.rect = pygame.Rect(self._x, self._y, self._surface_width, self._surface_height)
+        self.rect = pygame.Rect(
+            self._x, self._y, self._surface_width, self._surface_height
+        )
         self._on_limit_reached = None
         if dv > 0 and decrement:
             raise ValueError("Cannot decrement with positive change value")

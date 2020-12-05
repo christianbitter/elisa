@@ -2,6 +2,7 @@ from __future__ import annotations
 import os
 from .spritesheet import SpriteSheet
 
+
 # TODO: create image index across different sprite sheets ... names may clash
 class SpriteAssetManager(object):
     """
@@ -23,7 +24,14 @@ class SpriteAssetManager(object):
     def number_of_sprite_maps(self):
         return len(self._items)
 
-    def add_sprite_sheet(self, sheet:SpriteSheet = None, name: str = None, metadata_fp: str = None, initialize:bool = True, verbose: bool = False):
+    def add_sprite_sheet(
+        self,
+        sheet: SpriteSheet = None,
+        name: str = None,
+        metadata_fp: str = None,
+        initialize: bool = True,
+        verbose: bool = False,
+    ):
         """Add a Sprite Sheet to the Manager either directly, i.e. the SpriteSheet instance or register from an underlying descriptor.
 
         Args:
@@ -34,7 +42,7 @@ class SpriteAssetManager(object):
             verbose (bool, optional): [description]. Defaults to False.
 
         Raises:
-            ValueError: An exception is raised if no SpriteSheet instance is provided and/ or no name, a duplicate name, no descriptor, or no valid descriptor are given.            
+            ValueError: An exception is raised if no SpriteSheet instance is provided and/ or no name, a duplicate name, no descriptor, or no valid descriptor are given.
 
         Returns:
             SpriteSheet: The added SpriteSheet
@@ -42,13 +50,13 @@ class SpriteAssetManager(object):
         _sheet = None
         if not sheet:
             if not name:
-                raise ValueError('name not provided')
+                raise ValueError("name not provided")
             if not metadata_fp:
-                raise ValueError('metadata file not provided')
+                raise ValueError("metadata file not provided")
             if name in self._items:
-                raise ValueError('asset already registered')
+                raise ValueError("asset already registered")
             if not os.path.exists(metadata_fp):
-                raise ValueError('metadata file does not exist')
+                raise ValueError("metadata file does not exist")
 
             if verbose:
                 print("Adding Sprite Sheet: ", name)
@@ -57,7 +65,9 @@ class SpriteAssetManager(object):
         elif sheet:
             _sheet = sheet
         else:
-            raise ValueError("Neither SpriteSheet instance nor descriptor provided to register a new SpriteSheet")
+            raise ValueError(
+                "Neither SpriteSheet instance nor descriptor provided to register a new SpriteSheet"
+            )
 
         self._sheets[_sheet.id] = _sheet
         if initialize:
@@ -67,10 +77,10 @@ class SpriteAssetManager(object):
 
     def remove_sprite_sheet(self, name):
         if not name:
-            raise ValueError('name not provided')
+            raise ValueError("name not provided")
         if name not in self._items:
-            raise ValueError('asset not registered')
-        del(self._items[name])
+            raise ValueError("asset not registered")
+        del self._items[name]
 
     def get_sprite(self, sprite_sheet_name: str, sprite: str = None):
         if not sprite_sheet_name:
@@ -99,12 +109,12 @@ class SpriteAssetManager(object):
     def __len__(self):
         return len(self._items)
 
-    def _add_images_to_index(self, sheet:str):
+    def _add_images_to_index(self, sheet: str):
         pass
 
     def initialize(self, name: str = None, verbose: bool = False):
         if name and name not in self._sheets:
-            raise ValueError('Spritesheet not registered')
+            raise ValueError("Spritesheet not registered")
 
         names = set(self._sheets.keys()) if not name else [name]
         for a in names:

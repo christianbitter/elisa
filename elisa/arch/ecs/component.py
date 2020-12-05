@@ -2,36 +2,39 @@ from __future__ import annotations
 
 from .core import ECSBase
 
+
 class Component(ECSBase):
-	"""The Component in the ECS decomposition approach. The Component is derived from ECS base, and for that matter has assigned an internal id.
-	the allow_multiple_on_entity should indicate if an entity can have multiple components of the respective type.
-	However, this is not enforced at the component level but needs to be ensured by the entity or some outside entity.
-	"""	
-	allow_multiple_on_entity = True
+    """The Component in the ECS decomposition approach. The Component is derived from ECS base, and for that matter has assigned an internal id.
+    the allow_multiple_on_entity should indicate if an entity can have multiple components of the respective type.
+    However, this is not enforced at the component level but needs to be ensured by the entity or some outside entity.
+    """
 
-	"""A component is simply a collection of state that defines an entity in the game world. Components can bind properties
-	like position, velocity or health.
-	Args:
-			ECSBase ([type]): [description]
-	"""
-	def __init__(self, component_type):
-		super(Component, self).__init__()
-		self._component_type = component_type
+    allow_multiple_on_entity = True
 
-	@property
-	def component_type(self):
-		return self._component_type
+    """A component is simply a collection of state that defines an entity in the game world. Components can bind properties
+    like position, velocity or health.
+    Args:
+            ECSBase ([type]): [description]
+    """
 
-	def __repr__(self):
-	 return f"[Component/ {self._component_type}]: {self._id}"
+    def __init__(self, component_type):
+        super(Component, self).__init__()
+        self._component_type = component_type
 
-	def __str__(self):
-		return self.__repr__()
+    @property
+    def component_type(self):
+        return self._component_type
 
-	def serialize(self):
-	# TODO: component serialize
-	 return super().serialize()
+    def __repr__(self):
+        return f"[Component/ {self._component_type}]: {self._id}"
 
-	def deserialize(self, str):
-	# TODO: component deserialize
-	 return super().deserialize(str)
+    def __str__(self):
+        return self.__repr__()
+
+    def serialize(self):
+        # TODO: component serialize
+        return super().serialize()
+
+    def deserialize(self, str):
+        # TODO: component deserialize
+        return super().deserialize(str)

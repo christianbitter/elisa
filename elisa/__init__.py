@@ -5,3 +5,5 @@ from .linalg.vec4 import Vec4
 
 from .ui import ui
 from .ui import uifx
+
+from .player import Player, PlayerType

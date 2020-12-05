@@ -23,10 +23,10 @@ def create_light(light_color, radius: int = 50):
     if radius < 1:
         raise ValueError("Radius < 1")
     l_r = radius
-    l_c = max(1, int(.05 * radius))  # core is 10% of the full light circle
+    l_c = max(1, int(0.05 * radius))  # core is 10% of the full light circle
 
     # create a per-pixel alpha surface into which we draw the light source
-    s1 = pygame.Surface((2*l_r, 2*l_r), pygame.SRCALPHA)  # per-pixel alpha
+    s1 = pygame.Surface((2 * l_r, 2 * l_r), pygame.SRCALPHA)  # per-pixel alpha
     # determine the inner white source
     pygame.draw.circle(s1, (255, 255, 255, 255), (l_r, l_r), l_c, l_c)
     # compute the r,g,b,a decrements across the possible range [0, colour]
@@ -44,7 +44,9 @@ def create_light(light_color, radius: int = 50):
     radius_inc = max(1, (radius - l_c) / (a_max - a_min))
 
     for x in range(l_c + 1, l_r, radius_inc):
-        pygame.draw.circle(s1, (max(r, 0), max(g, 0), max(b, 0), max(a, 0)), (l_r, l_r), x, radius_inc)
+        pygame.draw.circle(
+            s1, (max(r, 0), max(g, 0), max(b, 0), max(a, 0)), (l_r, l_r), x, radius_inc
+        )
         a -= a_inc
         r -= r_inc
         g -= g_inc
@@ -57,25 +59,34 @@ def main():
     # init pygame - create the main window, and a background surface
     pygame.init()
 
-    S_WIDTH, S_HEIGHT, S_TITLE = 640, 480, "Elisa 12-3 - Blending of light map onto elisa sprite"
+    S_WIDTH, S_HEIGHT, S_TITLE = (
+        640,
+        480,
+        "Elisa 12-3 - Blending of light map onto elisa sprite",
+    )
     C_BLACK = (0, 0, 0)
 
     screen_buffer = pygame.display.set_mode(size=(S_WIDTH, S_HEIGHT))
     pygame.display.set_caption(S_TITLE)
     pygame.mouse.set_visible(True)
 
-    back_buffer: pygame.Surface = pygame.Surface(screen_buffer.get_size(), pygame.SRCALPHA)
+    back_buffer: pygame.Surface = pygame.Surface(
+        screen_buffer.get_size(), pygame.SRCALPHA
+    )
     back_buffer = back_buffer.convert()
     back_buffer.fill(C_BLACK)
 
     sam = SpriteAssetManager()
-    sam.add_sprite_map(name='Elisa_Idle', metadata_fp='asset/elise_character/tileset_elisa_idle@8x.json')
-    sam.add_sprite_map(name='Light', metadata_fp='asset/tileset_lightmap.json')
+    sam.add_sprite_map(
+        name="Elisa_Idle",
+        metadata_fp="asset/elise_character/tileset_elisa_idle@8x.json",
+    )
+    sam.add_sprite_map(name="Light", metadata_fp="asset/tileset_lightmap.json")
 
-    elisa_sprite = sam['Elisa_Idle']['idle_1']
-    light_sprite = sam['Light']['light_1']
+    elisa_sprite = sam["Elisa_Idle"]["idle_1"]
+    light_sprite = sam["Light"]["light_1"]
 
-    e_img    = elisa_sprite.image.convert()
+    e_img = elisa_sprite.image.convert()
     e_img.set_colorkey((255, 255, 255, 255))
     e_img.set_alpha(255)
 
@@ -91,7 +102,7 @@ def main():
     s1.set_alpha(255)
     s1.blit(l_img, (0, 0))
     l_w, l_h = light_sprite.width, light_sprite.height
-    l_w2, l_h2 = l_w/2, l_h/2
+    l_w2, l_h2 = l_w / 2, l_h / 2
     is_done = False
 
     while not is_done:
@@ -112,4 +123,5 @@ def main():
         pygame.display.flip()
 
 
-if __name__ == '__main__': main()
+if __name__ == "__main__":
+    main()

@@ -13,14 +13,14 @@ from enum import Enum, IntFlag
 from sprites import SpriteMap
 
 
-def xy_inside(x:int, y:int, x0:int, y0:int, w:int, h:int) -> bool:
+def xy_inside(x: int, y: int, x0: int, y0: int, w: int, h: int) -> bool:
     return x0 <= x <= x0 + w and y0 <= y <= y0 + h
 
 
 class FillStyle(Enum):
     Empty = 1
     Colour = 2
-    Image  = 3
+    Image = 3
 
 
 class TextVAlign(Enum):
@@ -36,16 +36,18 @@ class TextHAlign(Enum):
 
 
 class FontStyle(IntFlag):
-    Normal = 0,
-    Bold = 1,
-    Italic = 2,
+    Normal = (0,)
+    Bold = (1,)
+    Italic = (2,)
     Underline = 8
 
 
 class UIElement(object):
     """"""
 
-    def __init__(self, name, x:int = None, y:int = None, w: int = None, h: int = None, **kwargs):
+    def __init__(
+        self, name, x: int = None, y: int = None, w: int = None, h: int = None, **kwargs
+    ):
         """Constructor for UIElement"""
         super().__init__()
         self._name = name
@@ -69,7 +71,7 @@ class UIElement(object):
         return self._x0
 
     @x.setter
-    def x(self, x:int):
+    def x(self, x: int):
         if not x:
             raise ValueError("x")
         if x < 0:
@@ -82,7 +84,7 @@ class UIElement(object):
         return self._y0
 
     @y.setter
-    def y(self, y:int):
+    def y(self, y: int):
         if not y:
             raise ValueError("y")
         if y < 0:
@@ -126,22 +128,27 @@ class UIElement(object):
 class Renderable(UIElement):
     """"""
 
-    def __init__(self, name, x: int = None, y: int = None, w: int = None, h: int = None, **kwargs):
+    def __init__(
+        self, name, x: int = None, y: int = None, w: int = None, h: int = None, **kwargs
+    ):
         """Constructor for Renderable"""
         super().__init__(name, x=x, y=y, w=w, h=h, kwargs=kwargs)
 
-        self._fill_style        = kwargs.get('fill_style', FillStyle.Empty)
-        self._background_colour = kwargs.get('background_colour', (128, 128, 128))
-        self._background_image  = kwargs.get('background_image', None)
-        self._colour = kwargs.get('colour', (0, 0, 0))
-        self._show_border = kwargs.get('show_border', True)
+        self._fill_style = kwargs.get("fill_style", FillStyle.Empty)
+        self._background_colour = kwargs.get("background_colour", (128, 128, 128))
+        self._background_image = kwargs.get("background_image", None)
+        self._colour = kwargs.get("colour", (0, 0, 0))
+        self._show_border = kwargs.get("show_border", True)
 
         self._caption = kwargs.get("caption", "")
-        self._font_size = kwargs.get('font_size', 20)  # width and height is determined by font
-        self._font_style = kwargs.get('font_style', FontStyle.Normal)
-        self._font = pygame.font.Font(kwargs.get('font', pygame.font.get_default_font()),
-                                      self._font_size)
-        self._font_colour = kwargs.get('font_colour', (0, 0, 0))
+        self._font_size = kwargs.get(
+            "font_size", 20
+        )  # width and height is determined by font
+        self._font_style = kwargs.get("font_style", FontStyle.Normal)
+        self._font = pygame.font.Font(
+            kwargs.get("font", pygame.font.get_default_font()), self._font_size
+        )
+        self._font_colour = kwargs.get("font_colour", (0, 0, 0))
 
         self._apply_font_style()
 
@@ -186,7 +193,9 @@ class Renderable(UIElement):
             if not self._background_image:
                 raise ValueError("background fill image but image not provided")
 
-            scaled_bgimg = pygame.transform.scale(self._background_image.image, (self._w, self._h))
+            scaled_bgimg = pygame.transform.scale(
+                self._background_image.image, (self._w, self._h)
+            )
             buffer.blit(scaled_bgimg, dest=(self._x0, self._y0, self._w, self._h))
         else:
             pass
@@ -196,13 +205,18 @@ class Renderable(UIElement):
             pygame.draw.rect(buffer, self._colour, r, 1)
 
         if self._caption:
-            buffer.blit(self._text_caption, dest=(self._x0, self._y0, self._text_bounds[2], self._text_bounds[3]))
+            buffer.blit(
+                self._text_caption,
+                dest=(self._x0, self._y0, self._text_bounds[2], self._text_bounds[3]),
+            )
 
 
 class Clickable(Renderable):
     """"""
 
-    def __init__(self, name, x: int = None, y: int = None, w: int = None, h: int = None, **kwargs):
+    def __init__(
+        self, name, x: int = None, y: int = None, w: int = None, h: int = None, **kwargs
+    ):
         """Constructor for Clickable"""
         super().__init__(name, x=x, y=y, w=w, h=h, **kwargs)
         self._is_clicked = False
@@ -238,7 +252,9 @@ class Clickable(Renderable):
 class Button(Clickable):
     """"""
 
-    def __init__(self, name, caption, x: int, y: int, w: int = None, h: int = None, **kwargs):
+    def __init__(
+        self, name, caption, x: int, y: int, w: int = None, h: int = None, **kwargs
+    ):
         """Constructor for Button"""
         super().__init__(name=name, caption=caption, x=x, y=y, w=w, h=h, **kwargs)
 
@@ -257,13 +273,15 @@ class Button(Clickable):
 
 class MenuItem(Button):
     """"""
-    def __init__(self, name:str, caption: str, w:int = None, h: int = None, **kwargs):
+
+    def __init__(self, name: str, caption: str, w: int = None, h: int = None, **kwargs):
         """Constructor for MenuItem"""
         super().__init__(name=name, caption=caption, x=0, y=0, w=w, h=h, **kwargs)
 
 
 class Menu(Clickable):
     """"""
+
     MENU_ITEM_INNER_MARGIN = 3
 
     def __init__(self, name, caption, x, y, **kwargs):
@@ -367,6 +385,7 @@ class Menu(Clickable):
 
 class GameScreen(Clickable):
     """"""
+
     def __init__(self, name, title, width, height, **kwargs):
         """Constructor for GameScreen"""
         super().__init__(name, x=0, y=0, w=width, h=height, **kwargs)
@@ -397,7 +416,7 @@ class GameScreen(Clickable):
         # check for self and all child elements if they are clicked the one with the smallest hitbox wins
         # if no child is clicked, see if we are clicked
         is_clicked, sender = Clickable.clicked(self, mx, my, button)
-            
+
         for _, c in self._components.items():
             is_clicked_i, sender_i = c.clicked(mx, my, button)
             if is_clicked_i:
@@ -411,7 +430,7 @@ class MainScreen(GameScreen):
 
     def __init__(self):
         """Constructor for MainScreen"""
-        super().__init__(name='screenMain', title='Main', width=640, height=480)
+        super().__init__(name="screenMain", title="Main", width=640, height=480)
         text = "Elisa 10 - Main Screen"
         self._font = pygame.font.Font(pygame.font.get_default_font(), 32)
         self._header = self._font.render(text, 1, (64, 0, 255))
@@ -422,21 +441,41 @@ class MainScreen(GameScreen):
     def _initialize_components(self):
         grass_sprite_map = SpriteMap("asset/tileset_grass.json")
         grass_sprite_map.initialize()
-        img = grass_sprite_map['grass_2']
+        img = grass_sprite_map["grass_2"]
 
-        main_menu = Menu('menuMain', caption='Main', show_caption=False, x=50, y=100)
-        menu_next = MenuItem(name='menuItemNext', caption='Next',
-                             font_size=28, font_colour=(255, 255, 255),
-                             font_style=FontStyle.Bold | FontStyle.Italic | FontStyle.Underline)
+        main_menu = Menu("menuMain", caption="Main", show_caption=False, x=50, y=100)
+        menu_next = MenuItem(
+            name="menuItemNext",
+            caption="Next",
+            font_size=28,
+            font_colour=(255, 255, 255),
+            font_style=FontStyle.Bold | FontStyle.Italic | FontStyle.Underline,
+        )
         menu_next.on_click = self._menuitem_next_click
         main_menu.add_item(menu_next)
 
-        main_menu.add_item(MenuItem(name='menuItemCredits', caption='Credits', font_size=28, font_colour=(255, 128, 64)))
+        main_menu.add_item(
+            MenuItem(
+                name="menuItemCredits",
+                caption="Credits",
+                font_size=28,
+                font_colour=(255, 128, 64),
+            )
+        )
 
-        main_menu.add_item(MenuItem(name='menuItemGFX', caption='GFX', font_size=28, font_colour=(0, 0, 0),
-                                    background_image = img, show_border=True, fill_style=FillStyle.Image,
-                                    w=main_menu["menuItemCredits"].width, h=main_menu["menuItemCredits"].height
-                                    ))
+        main_menu.add_item(
+            MenuItem(
+                name="menuItemGFX",
+                caption="GFX",
+                font_size=28,
+                font_colour=(0, 0, 0),
+                background_image=img,
+                show_border=True,
+                fill_style=FillStyle.Image,
+                w=main_menu["menuItemCredits"].width,
+                h=main_menu["menuItemCredits"].height,
+            )
+        )
         self._components[main_menu.name] = main_menu
 
     def render(self, buffer):
@@ -449,17 +488,23 @@ class NextScreen(GameScreen):
 
     def __init__(self):
         """Constructor for NextScreen"""
-        super().__init__(name='screenNext', title='Next', width=640, height=480)
+        super().__init__(name="screenNext", title="Next", width=640, height=480)
         text = "Elisa 10 - Next Screen"
-        self._font = pygame.font.SysFont('comicsansms', 32)
+        self._font = pygame.font.SysFont("comicsansms", 32)
         self._header = self._font.render(text, True, (64, 0, 255))
 
     def _button_back_click(self, sender, x, y, button):
         self.screen_transition(self)
 
     def _initialize_components(self):
-        buttonBack = Button('buttonBack', 'back', x=300, y=200, # w=100, h=32, - the alignment is not fixed
-                            background_colour=(92, 92, 92), fill_style=FillStyle.Colour)
+        buttonBack = Button(
+            "buttonBack",
+            "back",
+            x=300,
+            y=200,  # w=100, h=32, - the alignment is not fixed
+            background_colour=(92, 92, 92),
+            fill_style=FillStyle.Colour,
+        )
         buttonBack.on_click = self._button_back_click
         self._components[buttonBack.name] = buttonBack
 
@@ -470,15 +515,17 @@ class NextScreen(GameScreen):
 
 def main():
 
-    if not pygame.font: raise("Pygame - fonts not loaded")
-    if not pygame.mixer: print("Pygame - audio not loaded")
+    if not pygame.font:
+        raise ("Pygame - fonts not loaded")
+    if not pygame.mixer:
+        print("Pygame - audio not loaded")
 
     # init pygame - create the main window, and a background surface
 
     pygame.init()
 
     S_WIDTH = 640
-    S_HEIGHT= 480
+    S_HEIGHT = 480
     S_TITLE = "Elisa 10 - A Simple Screen/ Scene/ Menu Structure"
 
     screen_buffer = pygame.display.set_mode(size=(S_WIDTH, S_HEIGHT))
@@ -501,10 +548,15 @@ def main():
         def screen_transition_internal(self):
             screens.pop(0)
             screens.insert(0, to_screen)
+
         return screen_transition_internal
 
-    next_screen.screen_transition = screen_transition(next_screen, next_screen, main_screen)
-    main_screen.screen_transition = screen_transition(main_screen, main_screen, next_screen)
+    next_screen.screen_transition = screen_transition(
+        next_screen, next_screen, main_screen
+    )
+    main_screen.screen_transition = screen_transition(
+        main_screen, main_screen, next_screen
+    )
     # FPS watcher
     fps_watcher = pygame.time.Clock()
     is_done = False
@@ -519,8 +571,10 @@ def main():
                 break
             else:
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    x, y =  event.pos[0], event.pos[1]
-                    clicked, sender = active_screen.clicked(mx=x, my=y, button=event.button)
+                    x, y = event.pos[0], event.pos[1]
+                    clicked, sender = active_screen.clicked(
+                        mx=x, my=y, button=event.button
+                    )
                     if clicked:
                         sender.on_click(sender=sender, x=x, y=y, button=event.button)
                 if event.type == pygame.MOUSEBUTTONUP:
@@ -530,4 +584,6 @@ def main():
         screen_buffer.blit(back_buffer, (0, 0))
         pygame.display.flip()
 
-if __name__ == '__main__': main()
+
+if __name__ == "__main__":
+    main()
