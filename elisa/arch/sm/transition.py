@@ -42,6 +42,14 @@ class Transition(object):
     def id(self) -> str:
         return str(self._id)
 
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @property
+    def description(self) -> str:
+        return self._description
+
     def __repr__(self):
         return "{} ({}) : {} => {}".format(self._id, self._name, self._from, self._to)
 

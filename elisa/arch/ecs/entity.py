@@ -2,6 +2,7 @@ from __future__ import annotations
 from .core import ECSBase
 from .component import Component
 from .ecs import Message
+from uuid import uuid4, UUID
 
 
 class Entity(ECSBase):
@@ -43,6 +44,22 @@ class Entity(ECSBase):
 
         return self
 
+    def __setitem__(self, key, value: Component):
+        if not key:
+            raise ValueError("key not provided")
+
+        if not (isinstance(key, UUID) or isinstance(key, str)):
+            raise ValueError("key must be uuid string or uuid")
+
+        temp_uuid = key
+        if isinstance(key, str):
+            temp_uuid = UUID(key)
+
+        if temp_uuid != value.id:
+            raise ValueError("cannot register component under different uuid")
+
+        self.add(value)
+
     def __getitem__(self, key):
         if isinstance(key, int):
             if key > len(self._components):
@@ -51,6 +68,7 @@ class Entity(ECSBase):
                 if i == key:
                     return self._components[k]
         else:
+            key = str(key)
             return self._components[key]
 
     def get_of_type(self, component_type: str) -> Component:
@@ -93,7 +111,7 @@ class Entity(ECSBase):
         if isinstance(component_type, str):
             return component_type in self._ctypes
         elif isinstance(component_type, list):
-            if len(component_type):
+            if len(component_type) < 1:
                 raise ValueError("component_type cannot be an empty list")
 
             _types = [(t in self._ctypes) for t in component_type]

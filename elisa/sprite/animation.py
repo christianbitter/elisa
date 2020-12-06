@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from uuid import uuid4
+from uuid import uuid4, UUID
 from .spritesheet import SpriteSheet
+from .sprite import Sprite
 
 
 class SpriteAnimation(object):
@@ -43,26 +44,57 @@ class SpriteAnimation(object):
                 self.add_frame(n)
 
     @property
-    def current_frame(self):
+    def current_frame(self) -> int:
+        """Gets the current frame's index
+
+        Returns:
+            int: the index of the current frame
+        """
         return self._current_frame
 
     @property
     def repeats(self) -> bool:
+        """Is this a repeating animation.
+
+        Returns:
+            bool: if the animation repeats itself, return True else False
+        """
         return self._repeats
 
     @property
     def no_frames(self) -> int:
+        """Returns the number of frames in the animation sequence.
+
+        Returns:
+            int: number of frames in this animation
+        """
         return len(self._frames)
 
     @property
-    def id(self) -> uuid4:
+    def id(self) -> UUID:
         return self._id
 
     @property
     def name(self) -> str:
+        """Returns the name of the animation.
+
+        Returns:
+            str: string representing the animation's logical name
+        """
         return self._name
 
-    def add_frame(self, name: str):
+    def add_frame(self, name: str) -> SpriteAnimation:
+        """Based on the underlying SpriteSheet instance, we compose an animation by adding individual frames. The frame is referenced by name.
+
+        Args:
+            name (str): name of the animation to add.
+
+        Raises:
+            ValueError: if no SpriteSheet instance is defined or if the name is not defined in the underlying sprite sheet.
+
+        Returns:
+            SpriteAnimation: the Animation with the added animation frame.
+        """
         if self._source is None:
             raise ValueError("No Sprite Sheet Provided")
 
@@ -77,11 +109,17 @@ class SpriteAnimation(object):
     def __iter__(self):
         return self._frames.__iter__()
 
-    def reset(self):
+    def reset(self) -> SpriteAnimation:
+        """Resets the current animation, setting the frame's index pointer to the start index (often 0) and setting elapsed time back to 0
+
+        Returns:
+            SpriteAnimation: returns self for chaining
+        """
         self._frame_elapsed = 0.0
         self._current_frame = self._start_index
+        return self
 
-    def update(self, delta_time: float):
+    def update(self, delta_time: float) -> Sprite:
         if len(self._frames) == 0:
             raise ValueError("No frames registered")
 

@@ -50,7 +50,7 @@ class Vec2(Vec):
     def is_zero(self):
         return self._v[0] == 0.0 and self._v[1] == 0.0
 
-    def __add__(self, other):
+    def __add__(self, other) -> Vec2:
         if not other:
             raise ValueError("other not provided")
 

@@ -143,11 +143,6 @@ class SpriteSheet(object):
                     print("Loading subsurface:{}".format((x, y, w, h)))
                 sprite_img = self._image.subsurface(x, y, w, h)
 
-                # if self._color_key:
-                # 	if verbose:
-                # 		print("Setting Color Key on surface")
-                # 	sprite_img.set_colorkey(self._color_key)
-
                 _sprite = Sprite(
                     _n,
                     w,

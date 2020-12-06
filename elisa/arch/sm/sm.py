@@ -83,7 +83,18 @@ class StateMachine(object):
 
     def validate(self) -> tuple:
         validation_result = (True,)
-        message = "All ok"
+        message = "Validation Failures:"
+
+        # validate unique names in transitions
+        t_names = []
+        for _tid in self._transitions:
+            _t = self._transitions[_tid]
+            _tn = _t.name
+            if _tn in t_names:
+                message = f"{message}\r\nDuplicate Transition Name: {_tn}"
+                break
+            else:
+                t_names.append(_tn)
 
         # Except for the final node, if there is any other isolated node,
         # raise a validation flag.
@@ -99,14 +110,16 @@ class StateMachine(object):
 
         if len(all_state_ids) > 0:
             validation_result = False
-            message = "The following states are isolated states (no incoming connection): {}".format(
-                all_state_ids
+            message = "{}\r\nThe following states are isolated states (no incoming connection): {}".format(
+                message, all_state_ids
             )
 
         t_final = self._adjacency[self._final_state.id]
         if len(t_final) > 0:
             if self._final_state.id not in t_final:
                 validation_result = False
-                message = "The terminal state can only be connected to itself"
+                message = (
+                    f"{message}\r\nThe terminal state can only be connected to itself"
+                )
 
         return validation_result, message

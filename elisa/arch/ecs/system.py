@@ -36,16 +36,25 @@ class KeyboardInputSystem(System):
 
     def __init__(self):
         super(KeyboardInputSystem, self).__init__()
-
         self._on_key_pressed = None
+        self._on_key_released = None
+        self._pressed_any_key = False
 
     @property
     def on_key_pressed(self):
         return self._on_key_pressed
 
+    @property
+    def on_key_released(self):
+        return self._on_key_released
+
     @on_key_pressed.setter
     def on_key_pressed(self, fn):
         self._on_key_pressed = fn
+
+    @on_key_released.setter
+    def on_key_released(self, fn):
+        self._on_key_released = fn
 
     def update(self, time_delta: float, entities: list) -> None:
         """The systems update mechanism.
@@ -63,7 +72,13 @@ class KeyboardInputSystem(System):
         key_map = pygame.key.get_pressed()
 
         if any(key_map):
+            self._pressed_any_key = True
             self._on_key_pressed(key_map, time_delta, entities)
+        else:
+            if self._pressed_any_key:
+                self._on_key_released(key_map, time_delta, entities)
+
+            self._pressed_any_key = False
 
     def send_msg(self, msg):
         return super().send_msg(msg)
