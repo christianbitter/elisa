@@ -34,14 +34,41 @@ class SpriteAnimation(object):
         self._repeats = repeats
         self._frames = []
         self._start_index = 0
-        self._end_index = 0
+        self._end_index = -1
         self._frames_per_second = fps
         self._frame_hold = 1000.0 / fps
         self._frame_elapsed = 0.0
+        self._on_animation_ends = None
 
         if frames:
             for n in frames:
                 self.add_frame(n)
+
+    @property
+    def on_animation_ends(self):
+        """Once the current frame is our final animation frame, this event fires. Note that cycling/ repetetive animations will not end.
+        Consequently, for these animations on_animation_ends trigger should never fire
+
+        Returns:
+            [type]: function/ handler type accepting one argument sender: SpriteAnimation - the animation invoking the event, and the **kwargs argument
+        """
+        return self._on_animation_ends
+
+    @on_animation_ends.setter
+    def on_animation_ends(self, v):
+        self._on_animation_ends = v
+        return self
+
+    @property
+    def has_ended(self) -> bool:
+        # a cycling animation will not end
+        if self.repeats:
+            return False
+
+        if self._end_index == -1:
+            return self._current_frame == len(self._frames) - 1
+        else:
+            return self._current_frame == self._end_index
 
     @property
     def current_frame(self) -> int:
@@ -137,6 +164,9 @@ class SpriteAnimation(object):
 
             # update our clock
             self._frame_elapsed -= self._frame_hold
+
+        if self.has_ended and self._on_animation_ends is not None:
+            self._on_animation_ends(sender=self)
 
         return self._frames[i_current_frame]
 

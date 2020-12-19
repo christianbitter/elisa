@@ -82,8 +82,24 @@ class StateMachine(object):
         return _adj_struct
 
     def validate(self) -> tuple:
-        validation_result = (True,)
+        """Validate the state machine by checking that there are no isolate states, no duplicated states, transitions, etc.
+
+        Returns:
+            tuple: validation result composed of state (boolean) indicating success (True), and a message (str) concerning the validation
+        """
+        validation_result = (True, "")
         message = "Validation Failures:"
+
+        # validate unique state names
+        s_names = []
+        for _sid in self._states:
+            _s = self._states[_sid]
+            _sn = _s.name
+            if _sn in s_names:
+                message = f"{message}\r\nDuplicate State Name: {_sn}"
+                break
+            else:
+                s_names.append(_sn)
 
         # validate unique names in transitions
         t_names = []
@@ -96,7 +112,9 @@ class StateMachine(object):
             else:
                 t_names.append(_tn)
 
-        # Except for the final node, if there is any other isolated node,
+        # Except for the for the following.
+        # final nodes do not have outgoing transitions
+        # the initial node is not connected, does not have an incoming transition
         # raise a validation flag.
         # the final state cannot have any connection other to itself
 
@@ -106,7 +124,18 @@ class StateMachine(object):
         for s_id in self._adjacency:
             to_states = [st for st in self._adjacency[s_id] if st in all_state_ids]
             for st in to_states:
+                if st not in all_state_ids:
+                    raise ValueError(
+                        "When validating the adjancency struct, we failed to find the state: {}".format(
+                            self._states[st]
+                        )
+                    )
                 all_state_ids.remove(st)
+
+        # the initial state will occur only, if there is a transition into it, which is not explicitly required
+        initial_state_id = self._init.id
+        if initial_state_id in all_state_ids:
+            all_state_ids.remove(initial_state_id)
 
         if len(all_state_ids) > 0:
             validation_result = False

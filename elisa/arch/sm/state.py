@@ -14,8 +14,11 @@ class State(object):
         self._name = name
         self._description = description
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "{} ({})".format(self._name, self._id)
+
+    def __str__(self) -> str:
+        return self.__repr__()
 
     def act(self, **kwargs):
         """When entering the state, this function is executed"""

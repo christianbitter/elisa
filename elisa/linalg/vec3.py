@@ -137,6 +137,8 @@ class Vec3(object):
 
     @staticmethod
     def magnitude(u: Vec3) -> float:
+        if u.is_zero():
+            return 0.0
         _x = u.x
         _y = u.y
         _z = u.z
@@ -144,6 +146,19 @@ class Vec3(object):
 
     @staticmethod
     def unit_vector(u: Vec3) -> Vec3:
+        """Returns the unit vector of u. If u is the unit vector it is directly returned.
+
+        Args:
+            u (Vec3): input vector
+
+        Returns:
+            Vec3: vector resulting from normalizing u, i.e. scaling u by its magnitude.
+        """
+        if not u:
+            raise ValueError("u not provided")
+        if u.is_zero():
+            return u
+
         _mag = Vec3.magnitude(u)
         linv = 1.0 / _mag
         return u * linv

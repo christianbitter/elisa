@@ -299,10 +299,11 @@ def spritesheet_from_tiled(tsx_fp: str, **kwargs):
     spacing = int(root.attrib.get("spacing", 0))
     margin = int(root.attrib.get("margin", 0))
 
-    _no_elems = len(root)
+    atlas_def = root.findall("image")
+    _no_elems = len(atlas_def)
     if _no_elems > 1:
         raise ValueError("Only single sprite sheet tilesets currently supported")
-    atlas_def = root.find("image")
+    atlas_def = atlas_def[0]
 
     # output multiple tile atlasses per def
     image_source = os.path.join(tsx_dir_fp, atlas_def.attrib["source"])

@@ -15,8 +15,9 @@ class System(ECSBase):
                     ECSBase ([type]): [description]
     """
 
-    def __init__(self):
-        super(System, self).__init__()
+    def __init__(self, **kwargs):
+        """Creates a new system instance."""
+        super(System, self).__init__(**kwargs)
 
     def update(self, time_delta, entities):
         pass
@@ -34,11 +35,11 @@ class KeyboardInputSystem(System):
     on_key_pressed handler function is invoked like so on_key_pressed(key_map, time_delta, entities)
     """
 
-    def __init__(self):
-        super(KeyboardInputSystem, self).__init__()
+    def __init__(self, **kwargs):
+        super(KeyboardInputSystem, self).__init__(**kwargs)
         self._on_key_pressed = None
         self._on_key_released = None
-        self._pressed_any_key = False
+        self._keymap = [0] * len(pygame.key.get_pressed())
 
     @property
     def on_key_pressed(self):
@@ -69,16 +70,20 @@ class KeyboardInputSystem(System):
         if not entities or len(entities) < 1:
             return None
 
-        key_map = pygame.key.get_pressed()
+        km = pygame.key.get_pressed()
 
-        if any(key_map):
-            self._pressed_any_key = True
-            self._on_key_pressed(key_map, time_delta, entities)
-        else:
-            if self._pressed_any_key:
-                self._on_key_released(key_map, time_delta, entities)
+        pressed = km
+        released = [
+            self._keymap[_ki] * (not km[_ki]) for _ki, _ in enumerate(self._keymap)
+        ]
 
-            self._pressed_any_key = False
+        self._keymap = km
+
+        if any(pressed):
+            self._on_key_pressed(pressed, time_delta, entities)
+
+        if any(released):
+            self._on_key_released(released, time_delta, entities)
 
     def send_msg(self, msg):
         return super().send_msg(msg)

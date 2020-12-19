@@ -7,22 +7,21 @@ from uuid import uuid4
 
 
 class ECSBase(object):
-    """This is the ECS base entity
+    """This is the ECS base entity. It consists of a uuid4 instance to track object identities."""
 
-    Args:
-                    object ([type]): [description]
-    """
-
-    def __init__(self):
-        """Initializes the instance, setting internal id to new uuid4 value"""
+    def __init__(self, **kwargs):
+        """Create a new instance."""
         self._id = uuid4()
 
     @property
-    def id(self):
+    def id(self) -> uuid4:
         return self._id
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"ECSBase[{self.id}]"
+
+    def __str__(self) -> str:
+        return self.__repr__()
 
     def serialize(self) -> str:
         raise ValueError("serialize not implemented")

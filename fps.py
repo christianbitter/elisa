@@ -2,11 +2,9 @@ import time
 
 
 class FPS:
-    """"""
+    """A frame per second counter"""
 
-    def __init__(
-        self,
-    ):
+    def __init__(self):
         """Constructor for FPS"""
         super(FPS, self).__init__()
         self._time = time.perf_counter_ns()
@@ -15,7 +13,7 @@ class FPS:
         self._no_frames = 0
         self._fps = 0
 
-    def collect(self):
+    def tick(self):
         _t = time.perf_counter_ns()
         dt = _t - self._oldtime
         self._no_frames += 1
@@ -26,6 +24,9 @@ class FPS:
 
         d_s = self._delta_acc / 1000000
         self._fps = self._no_frames / d_s
+
+    def tock(self):
+        pass
 
     @property
     def delta_ms(self):

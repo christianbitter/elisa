@@ -210,9 +210,9 @@ class TileMap(object):
     def get_grid(self, grid_name: str):
         if not grid_name or grid_name.strip() == "":
             raise ValueError("grid name not provided")
-        if grid_name not in self._logical_grid:
+        if grid_name not in self._grid:
             raise ValueError("logical grid does not exist")
-        return self._logical_grid[grid_name]["Grid"]
+        return self._grid[grid_name]["Grid"]
 
     def get_grid_indices(self, grid_name: str) -> {}:
         if not grid_name or grid_name.strip() == "":
@@ -256,6 +256,51 @@ class TileMap(object):
         )
 
 
+def tileprops_from_tsx(tsx_fp: str, reserve_index_zero: bool = True, **kwargs) -> dict:
+    """Creates the tile set properties from the underlying tsx file.
+
+    Args:
+        tsx_fp (str): path to the tile set descriptor xml file.
+        reserve_index_zero (bool, optional): defines if the 0 index in the properties map is reserved for the internal NO-TILE tile. If set to true,
+        the tile with id 0 will have type = __RESERVED__ and all tile types defined in the tsx file will start at index 1. If set to False,
+        all tile types defined in the tsx file will start at ID = 0 and no NO-TILE is inserted. Defaults to True.
+
+    Raises:
+        ValueError: if no tsx file path is provided, the file does not exist at the respective path, or this does not point to a tsx file.
+
+    Returns:
+        dict: a map of tile id to their respective properties
+    """
+    if not tsx_fp or tsx_fp.strip() == "":
+        raise ValueError("tile set path not provided")
+    if not os.path.exists(tsx_fp):
+        raise ValueError("tile set path does not exist")
+    if not tsx_fp.endswith(".tsx"):
+        raise ValueError("tile set descriptor tsx file not provided")
+
+    verbose = kwargs.get("verbose", False)
+    tsx_dir_fp = os.path.dirname(tsx_fp)
+
+    if verbose:
+        print(f"tsx file located under {tsx_dir_fp}")
+
+    root = xml.etree.ElementTree.parse(tsx_fp).getroot()
+    tile_props = root.findall("tile")
+
+    props = {}
+    start_at = 0
+
+    if reserve_index_zero:
+        props[0] = {"type": "__RESERVED__"}
+        start_at = 1
+
+    for tp in tile_props:
+        _id = start_at + int(tp.attrib["id"])
+        props[_id] = {"type": tp.attrib["type"]}
+
+    return props
+
+
 def tilemap_from_tiled(tsm_fp: str, **kwargs) -> tuple:
     """Returns a tile map and path to referenced tileset descriptors built in TileEd.
     Any custom property referenced in the tsm file is added as a TileMap property.
@@ -274,7 +319,7 @@ def tilemap_from_tiled(tsm_fp: str, **kwargs) -> tuple:
                     ValueError: if a referenced layer is not of the dimensionality indicated on the tile map.
 
     Returns:
-                    tuple: a tuple consisting of a TileMap instance and any number of tileset file references.
+                    tuple: a tuple consisting of a TileMap instance, any number of tileset file references and tile object type references (list of dict)
                     These can be used to build the relevant SpriteSheet or TextureAtlas objects.
     """
     if not tsm_fp or tsm_fp.strip() == "":
@@ -359,4 +404,6 @@ def tilemap_from_tiled(tsm_fp: str, **kwargs) -> tuple:
 
     tileset_descs = [os.path.join(tsm_dir_fp, _ts.attrib["source"]) for _ts in tilesets]
 
-    return tm, tileset_descs
+    tileprops = [tileprops_from_tsx(desc_fp, **kwargs) for desc_fp in tileset_descs]
+
+    return tm, tileset_descs, tileprops

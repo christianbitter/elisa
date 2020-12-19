@@ -114,11 +114,14 @@ class Vec2(Vec):
         return Vec2.div(self, other)
 
     def to_unit(self):
-        """Returns the two-dimensional unit vector of the underlying vec2 instance.
+        """Returns the two-dimensional unit vector of the underlying vec2 instance. If the input vector is the zero vector, it is directly returned.
 
         Returns:
                         [Vec2]: the vector transformed to the two-dimensional unit vector.
         """
+        if self.is_zero():
+            return self
+
         d = Vec2.magnitude(self)
         d_inv = 1.0 / d
         return Vec2(self.x * d_inv, self.y * d_inv)
@@ -150,6 +153,12 @@ class Vec2(Vec):
 
     @staticmethod
     def magnitude(u):
+        if not u:
+            raise ValueError("u not provided")
+
+        if u.is_zero():
+            return 0.0
+
         _x = u.x
         _y = u.y
         return math.sqrt(_x ** 2 + _y ** 2)
@@ -164,6 +173,11 @@ class Vec2(Vec):
         Returns:
                         [Vec2]: The unit vector of
         """
+        if not u:
+            raise ValueError("u not provided")
+        if u.is_zero():
+            return u
+
         _mag = Vec2.magnitude(u)
         linv = 1.0 / _mag
         return u * linv

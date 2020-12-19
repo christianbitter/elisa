@@ -5,11 +5,13 @@ from .system import System
 
 
 # We start with a simple manager like entity, i.e. it does not encapsulate creation/ factory
+# TODO: finalize
+# TODO: adapt to asset management like graphics, and audio
 # TODO: make this a singleton
 # https://python-3-patterns-idioms-test.readthedocs.io/en/latest/Singleton.html?highlight=singleton
 class ECSManager(ECSBase):
-    def __init__(self):
-        super(ECSManager, self).__init__()
+    def __init__(self, **kwargs):
+        super(ECSManager, self).__init__(**kwargs)
         self._o_map = {}
 
     def add(self, o) -> None:
@@ -31,14 +33,3 @@ class ECSManager(ECSBase):
         if id not in self._o_map:
             raise ValueError(f"{id} not present")
         return self._o_map[id]
-
-
-class EntityManager(ECSManager):
-    def __init__(self):
-        super(EntityManager, self).__init__()
-
-
-class ComponentManager(ECSManager):
-    def __init__(self):
-        super(ComponentManager, self).__init__()
-        self._etype_map = {}

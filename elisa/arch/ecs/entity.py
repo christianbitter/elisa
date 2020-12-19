@@ -1,8 +1,13 @@
 from __future__ import annotations
+
 from .core import ECSBase
 from .component import Component
 from .ecs import Message
 from uuid import uuid4, UUID
+
+
+# TODO: we need to allow for multiple components of the same type
+# TODO: components need to indicate if they can be registered multiple times on the same entity
 
 
 class Entity(ECSBase):
@@ -13,11 +18,11 @@ class Entity(ECSBase):
         - send_msg(self, msg)
     """
 
-    def __init__(self):
+    def __init__(self, **kwargs):
+        """Creates a new entity instance."""
+        super(Entity, self).__init__(**kwargs)
         self._components = dict()
         self._ctypes = dict()
-
-        super(Entity, self).__init__()
 
     def add(self, c: Component):
         """Add a component to an entity. Only one component per type is allowed on an entity.
@@ -40,7 +45,10 @@ class Entity(ECSBase):
 
         ctype = c._component_type
         self._components[str(c._id)] = c
-        self._ctypes[ctype] = c
+        if ctype not in self._ctypes:
+            self._ctypes[ctype] = []
+
+        self._ctypes[ctype].append(cid)
 
         return self
 
@@ -71,7 +79,7 @@ class Entity(ECSBase):
             key = str(key)
             return self._components[key]
 
-    def get_of_type(self, component_type: str) -> Component:
+    def get_of_type(self, component_type: str):
         """Get the first component of a specific type associated with the entity.
 
         Args:
@@ -81,7 +89,8 @@ class Entity(ECSBase):
                         ValueError: if the component type is not provided, or is not found among the entities components.
 
         Returns:
-                        Component: The component of the specified type.
+                        Component or list of component: if only a single instance is registered of the supplied type, then the individual instance is returned. Else
+                        a list of component instances is returned.
         """
         if not component_type:
             raise ValueError("component_type not provided")
@@ -89,7 +98,10 @@ class Entity(ECSBase):
             raise ValueError("entity does not have any associated component")
 
         ci = self._ctypes[component_type]
-        return ci
+        if len(ci) == 1:
+            return self._components[ci[0]]
+        else:
+            return [self._components[cid] for cid in ci]
 
     def has_component_type(self, component_type) -> bool:
         """Interrogates the underlying entity about the presence of a component of a specific type. In the case of a single type query,
@@ -127,8 +139,10 @@ class Entity(ECSBase):
 
         if component_id in self._components:
             ctype = self._components[component_id]._component_type
-            delattr(self._components, component_id)
-            delattr(self._ctypes[ctype], component_id)
+
+            self._ctypes[ctype].remove(component_id)
+            if len(self._ctypes[ctype]) < 1:
+                delattr(self._ctypes, ctype)
 
         # support chaining
         return self
@@ -136,8 +150,8 @@ class Entity(ECSBase):
     def send_msg(self, msg: Message):
         pass
 
-    def __repr__(self):
-        c_str = f"Entity: {self._id}\r\n"
+    def __repr__(self) -> str:
+        c_str = f"Entity: {self._id}/ {type(self).__name__}\r\n"
         if len(self._components) == 0:
             c_str += "No registered components"
         else:
@@ -145,5 +159,5 @@ class Entity(ECSBase):
                 c_str += "[+{}] = {}\r\n".format(i, self._components[k])
         return c_str
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.__repr__()
