@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from .linalg import is_numeric
-from .vec2 import Point2, Vec2
 from .ray2 import Ray2
+from .vec2 import Point2, Vec2
 
 
 class Poly2(object):
@@ -73,6 +73,16 @@ class Poly2(object):
             _p[i] = _p[i] - _displace
 
         return Poly2(_p)
+
+    @property
+    def AABB(self) -> tuple:
+        # TODO: this can be optimized, but for now sufficient
+        x = [p.x for p in self._points]
+        y = [p.y for p in self._points]
+        minx, miny = min(x), min(y)
+        maxx, maxy = max(x), max(y)
+
+        return (minx, miny, maxx, maxy)
 
 
 # Circle is not a Poly per se, but nonetheless
@@ -190,6 +200,10 @@ class Tri2(Poly2):
 
         return (minx, miny, maxx, maxy)
 
+    @property
+    def AABB(self) -> tuple:
+        return self.bounding_rect()
+
     def __repr__(self) -> str:
         return "Tri2: {}, {}, {}".format(self._p0, self._p1, self._p2)
 
@@ -265,9 +279,48 @@ class Rect2(Poly2):
         # TODO:
         raise ValueError("Not Implemented")
 
-    def inside(self, p: Point2) -> bool:
-        # TODO:
-        raise ValueError("Not Implemented")
+    @property
+    def bounding_rect(self) -> tuple:
+        """Return the axis-aligned bounding rect as a four tuple (xmin, ymin, xmax, ymax)
+
+        Returns:
+            tuple: four tuple of the minimum and maximum coordinates respectively.
+        """
+        # TODO: this can be optimized, such that it is computed initially and cashed until the points are transformed
+        minx, miny = min([self.x0.x, self.x1.x, self.x2.x, self.x3.x]), min(
+            [self.x0.y, self.x1.y, self.x2.y, self.x3.y]
+        )
+        maxx, maxy = max([self.x0.x, self.x1.x, self.x2.x, self.x3.x]), max(
+            [self.x0.y, self.x1.y, self.x2.y, self.x3.y]
+        )
+
+        return minx, miny, maxx, maxy
+
+    def inside(self, p) -> bool:
+        """Determines wether a single point (Point2 or x,y tuple) or a list of points is fully located inside this Rect2 instance.
+
+        Args:
+            p ([Point2, tuple (x,y) or list of the former]): point representation
+
+        Raises:
+            ValueError: if the point data is not provided
+
+        Returns:
+            bool: Returns True if the point or all points in case of collection is fully contained inside the Rect2 instance.
+        """
+        if not p:
+            raise ValueError("p not provided")
+
+        if isinstance(p, Poly2):
+            return self.inside(p.points)
+        if isinstance(p, list):
+            point_list = p
+            tests = [self.inside(_p) for _p in point_list]
+            return all(tests)
+        else:
+            _p: Point2 = Point2(p)
+            xmin, ymin, xmax, ymax = self.bounding_rect
+            return _p.x >= xmin and _p.x <= xmax and _p.y >= ymin and _p.y <= ymax
 
     def __repr__(self) -> str:
         return "Rect2: {}, {}, {}, {}".format(self._p0, self._p1, self._p2, self._p3)
@@ -290,16 +343,6 @@ class Rect2(Poly2):
     @property
     def x3(self) -> Point2:
         return self._points[3]
-
-    def bounding_rect(self) -> tuple:
-        minx, miny = min([self.x0.x, self.x1.x, self.x2.x, self.x3.x]), min(
-            [self.x0.y, self.x1.y, self.x2.y, self.x3.y]
-        )
-        maxx, maxy = max([self.x0.x, self.x1.x, self.x2.x, self.x3.x]), max(
-            [self.x0.y, self.x1.y, self.x2.y, self.x3.y]
-        )
-
-        return (minx, miny, maxx, maxy)
 
     def as_p_wh(self) -> tuple:
         """Returns the Rect2 in the format (x, y, w, h). This is suitable for pygame

@@ -12,20 +12,15 @@
 # in order to create tile sets, you may find the following helpful:
 # sprite packing: https://www.leshylabs.com/apps/sstool/
 
+import json
 import os
+
 import pygame
 from pygame.locals import QUIT
-from elisa.sprite import (
-    Tile,
-    TileMap,
-    SpriteSheet,
-    Sprite,
-    SpriteAnimation,
-    tilemap_from_tiled,
-    spritesheet_from_tiled,
-)
+
 from elisa.arch.sm import State, StateMachine, Transition
-import json
+from elisa.sprite import (Sprite, SpriteAnimation, SpriteSheet, Tile, TileMap,
+                          spritesheet_from_tiled, tilemap_from_tiled)
 
 
 class TileMapRenderer(object):
@@ -114,7 +109,7 @@ class TileMapRenderer(object):
 def build_world():
     # TODO: load the tile map from the tmx file
     tm_fp = "C:/Development/repos/python_projects/games/tileed/test_tiled_tileset.tmx"
-    tm, assets = tilemap_from_tiled(tm_fp)
+    tm, assets, props = tilemap_from_tiled(tm_fp)
     tileset = spritesheet_from_tiled(assets[0], verbose=True)
     return tm, tileset
 

@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import os
-from uuid import uuid4
 import xml.etree.ElementTree
+from uuid import uuid4
+
 from .sprite import Sprite
 from .spritesheet import SpriteSheet
 
@@ -302,7 +303,9 @@ def tileprops_from_tsx(tsx_fp: str, reserve_index_zero: bool = True, **kwargs) -
 
 
 def tilemap_from_tiled(tsm_fp: str, **kwargs) -> tuple:
-    """Returns a tile map and path to referenced tileset descriptors built in TileEd.
+    """Returns a three tuple composed of tile map, path to referenced tileset descriptors built in TileEd and all of the defined properties,
+    i.e. tm, tileset_descs, tileprops.
+
     Any custom property referenced in the tsm file is added as a TileMap property.
     Any layer referenced under the tsm layers is added as a layer to the TileMap.
     It is assumed that the layer names are uniques, and that the layer dimensionality is

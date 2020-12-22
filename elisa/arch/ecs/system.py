@@ -1,5 +1,6 @@
 import pygame
-from .core import ECSBase
+
+from . import ECSBase
 
 
 class System(ECSBase):
@@ -79,10 +80,10 @@ class KeyboardInputSystem(System):
 
         self._keymap = km
 
-        if any(pressed):
+        if self._on_key_pressed is not None and any(pressed):
             self._on_key_pressed(pressed, time_delta, entities)
 
-        if any(released):
+        if self._on_key_released is not None and any(released):
             self._on_key_released(released, time_delta, entities)
 
     def send_msg(self, msg):

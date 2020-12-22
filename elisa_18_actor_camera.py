@@ -13,14 +13,17 @@
 # https://www.cs.usfca.edu/~galles/cs420S13/lecture/Transform/Transformation.html
 # https://gamedev.stackexchange.com/questions/44256/how-to-add-a-scrolling-camera-to-a-2d-java-game
 
-from pygame.locals import QUIT
 import os
-from elisa.sprite import SpriteSheet, SpriteAnimation
-from elisa.arch.camera import Camera2D
-from elisa.linalg import Point3, Vec3, Point2, Vec2
-from elisa.linalg.mat3 import translate2D
-from elisa.arch.ecs import System, KeyboardInputSystem, Entity, Component, Message
+
 import pygame
+from pygame.locals import QUIT
+
+from elisa.arch.camera import Camera2D
+from elisa.arch.ecs import Component, Entity, KeyboardInputSystem, System
+from elisa.arch.ecs.message import Message
+from elisa.linalg import Point2, Point3, Vec2, Vec3
+from elisa.linalg.mat3 import translate2D
+from elisa.sprite import SpriteAnimation, SpriteSheet
 
 
 def draw_box(s, p1, p2, p3, p4):

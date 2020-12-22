@@ -1,12 +1,16 @@
-from .core import ECSBase
+from __future__ import annotations
+
+from elisa.arch.ecs.core import ECSBase
 
 
 class Message(ECSBase):
     """Messages enable entities to interact."""
 
-    def __init__(self, msg_type, **kwargs):
+    def __init__(self, msg_type: str, sender=None, receiver=None, **kwargs):
         super(Message, self).__init__(**kwargs)
         self._message_type = msg_type
+        self._sender = sender
+        self._receiver = receiver
 
     @property
     def message_type(self) -> str:
@@ -22,6 +26,23 @@ class Message(ECSBase):
 
     def __str__(self) -> str:
         return self.__repr__()
+
+    @classmethod
+    def direct(cls, msg_type: str, sender, receiver, **kwargs) -> Message:
+        if not msg_type or msg_type.strip() == "":
+            raise ValueError("No message type provided")
+        return cls(msg_type=msg_type, sender=sender, receiver=receiver, **kwargs)
+
+    @classmethod
+    def broadcast(cls, msg_type: str, sender, receiver: list, **kwargs) -> list:
+        if not msg_type or msg_type.strip() == "":
+            raise ValueError("No message type provided")
+        if not receiver or len(receiver) < 1:
+            raise ValueError("No recepient defined for broadcast")
+        return [
+            cls(msg_type=msg_type, sender=sender, receiver=r, **kwargs)
+            for r in receiver
+        ]
 
 
 class ClockMessage(Message):

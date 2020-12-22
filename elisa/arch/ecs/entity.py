@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from .core import ECSBase
-from .component import Component
-from .ecs import Message
-from uuid import uuid4, UUID
+from uuid import UUID, uuid4
 
+from elisa.arch.ecs.message import Message
+
+from .component import Component
+from .core import ECSBase
 
 # TODO: we need to allow for multiple components of the same type
 # TODO: components need to indicate if they can be registered multiple times on the same entity
@@ -74,10 +75,14 @@ class Entity(ECSBase):
                 raise ValueError("index outside of registered components")
             for i, k in enumerate(self._components):
                 if i == key:
-                    return self._components[k]
-        else:
+                    key = k
+                    break
+        elif isinstance(key, str) or isinstance(key, UUID):
             key = str(key)
-            return self._components[key]
+        else:
+            raise ValueError("Unsupported key type: {}".format(key))
+
+        return self._components[key]
 
     def get_of_type(self, component_type: str):
         """Get the first component of a specific type associated with the entity.

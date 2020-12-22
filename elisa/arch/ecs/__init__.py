@@ -1,6 +1,5 @@
-from .ecs import Message, ClockMessage
 from .component import Component
+from .core import ECSBase
 from .entity import Entity
 from .manager import ECSManager
-from .system import System, KeyboardInputSystem
-from .core import ECSBase
+from .system import KeyboardInputSystem, System

@@ -18,11 +18,14 @@
 # NOTE: For a future version/ expanded tutorial, we should use the camera introduced earlier.
 
 import enum
-from math import pi, sin, cos
+from math import pi
+
 import pygame
-from elisa.arch.ecs import Entity, Component, Message, System
-from elisa.linalg import Point2, Vec2, Ray2, Plane2
+
 import elisa.linalg
+from elisa.arch.ecs import Component, Entity, System
+from elisa.arch.ecs.message import Message
+from elisa.linalg import Plane2, Point2, Ray2, Vec2
 
 # Let us define a couple of types
 # the player entity
@@ -32,16 +35,67 @@ import elisa.linalg
 # and a couple of messages
 
 
+class CTransform2(Component):
+    def __init__(self, pos: Point2, v_dir: Vec2):
+        super(CTransform2, self).__init__(component_type="Transform2")
+        self.position = pos
+        self._viewing_direction = v_dir
+
+    @property
+    def position(self):
+        return self._position
+
+    @position.setter
+    def position(self, v):
+        if not v:
+            v = Point2(0, 0)
+
+        if isinstance(v, tuple):
+            self._position = Point2(v[0], v[1])
+        elif isinstance(v, Point2):
+            self._position = v
+        else:
+            raise ValueError("v is not of the correct type")
+
+    @property
+    def x(self, v):
+        return self._position.x
+
+    @property
+    def y(self):
+        return self._position.y
+
+    @property
+    def viewing_direction(self):
+        return self._viewing_direction
+
+    @viewing_direction.setter
+    def viewing_direction(self, dir: Vec2):
+        self._viewing_direction = dir
+
+    def __repr__(self) -> str:
+        return "CTransform2[{}]:\r\n[+]Position:{}\r\n[+]Viewing Direction: {}".format(
+            self.id, self.position, self.viewing_direction
+        )
+
+    def __str__(self) -> str:
+        return self.__repr__()
+
+
 class EPlayer(Entity):
     def __init__(self):
         super(EPlayer, self).__init__()
 
     def handle_position_update(self, delta_pos: Vec2):
-        pos = self._ctypes["Transform2"].position
-        self._ctypes["Transform2"].position = pos + delta_pos
+        pos = self.transform.position
+        self.transform.position = pos + delta_pos
+
+    @property
+    def transform(self) -> CTransform2:
+        return self.get_of_type("Transform2")
 
     def handle_orientation_update(self, delta_angle: float):
-        orientation = self._ctypes["Transform2"].viewing_direction
+        orientation = self.transform.viewing_direction
         rorientation = orientation.to_angle() % (pi * 2.0)
         aorientation = elisa.linalg.rad_to_angle(rorientation)
         s_angle = 1.0 if delta_angle >= 0 else -1.0
@@ -50,7 +104,7 @@ class EPlayer(Entity):
         )
         aorientation = aorientation % 360.0
         orientation = elisa.linalg.angle_to_rad(aorientation)
-        self._ctypes["Transform2"].viewing_direction = Vec2.from_angle(orientation)
+        self.transform.viewing_direction = Vec2.from_angle(orientation)
 
     def send_msg(self, msg: Message):
         if msg.message_type == "UpdatePosition":
@@ -100,45 +154,6 @@ class CCollidable(Component):
     @property
     def planes(self):
         return self._planes
-
-
-class CTransform2(Component):
-    def __init__(self, pos: Point2, v_dir: Vec2):
-        super(CTransform2, self).__init__(component_type="Transform2")
-        self.position = pos
-        self._viewing_direction = v_dir
-
-    @property
-    def position(self):
-        return self._position
-
-    @position.setter
-    def position(self, v):
-        if not v:
-            v = Point2(0, 0)
-
-        if isinstance(v, tuple):
-            self._position = Point2(v[0], v[1])
-        elif isinstance(v, Point2):
-            self._position = v
-        else:
-            raise ValueError("v is not of the correct type")
-
-    @property
-    def x(self, v):
-        return self._position.x
-
-    @property
-    def y(self):
-        return self._position.y
-
-    @property
-    def viewing_direction(self):
-        return self._viewing_direction
-
-    @viewing_direction.setter
-    def viewing_direction(self, dir: Vec2):
-        self._viewing_direction = dir
 
 
 class UpdatePositionMessage(Message):

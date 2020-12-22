@@ -1,8 +1,11 @@
 # auth: christian bitter
 # name: sm.py
 # desc: simple deterministic Finite State Automaton/ Machine definition
-from .state import State
+from __future__ import annotations
+
 from uuid import uuid4
+
+from .state import State
 
 
 class StateMachine(object):
@@ -18,6 +21,27 @@ class StateMachine(object):
         self._states = dict([(s.id, s) for s in states.copy()])
         self._transitions = dict([(s.id, s) for s in transitions.copy()])
         self._adjacency = self.__build_adjacency_struct()
+        self._on_started_handler = None
+        self._on_finished_handler = None
+        self._in_progress = False
+
+    @property
+    def on_started(self):
+        return self._on_started_handler
+
+    @on_started.setter
+    def on_started(self, v) -> StateMachine:
+        self._on_started_handler = v
+        return self
+
+    @property
+    def on_finished(self):
+        return self._on_finished_handler
+
+    @on_finished.setter
+    def on_finished(self, v) -> StateMachine:
+        self._on_finished_handler = v
+        return self
 
     @property
     def current(self):
@@ -38,9 +62,16 @@ class StateMachine(object):
         return self._current_state == self._final_state
 
     def update(self, **kwargs):
+
+        if self._in_progress is False and self._current_state == self._init:
+            self._in_progress = True
+            if self._on_started_handler:
+                self._on_started_handler()
+
         # get the transitions for the current state, call fires and see ...
-        # in order to be deterministic we allow only a single firing transition, although we allow multiple transitions
-        # per state - but this is the job of the validate function
+        # in order to be deterministic we allow only a single firing transition,
+        # although we allow multiple transitions per state -
+        # but this is the job of the validate function
         firing_transition = None
         for tkey in self._transitions:
             t = self._transitions[tkey]
@@ -53,6 +84,11 @@ class StateMachine(object):
             firing_transition.fire(**kwargs)
             self._current_state = firing_transition.to_state
             self._current_state.act(**kwargs)
+
+        if self._in_progress is True and self._current_state == self._final_state:
+            self._in_progress = False
+            if self._on_finished_handler is not None:
+                self._on_finished_handler()
 
     @property
     def transitions(self):
