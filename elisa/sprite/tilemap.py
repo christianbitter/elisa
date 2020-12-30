@@ -55,7 +55,7 @@ class TileMap(object):
         self._properties = {}
 
     @property
-    def properties(self) -> map:
+    def properties(self) -> dict:
         return self._properties
 
     def add_property(self, k, v) -> TileMap:
@@ -65,7 +65,7 @@ class TileMap(object):
         return self
 
     @staticmethod
-    def _tilemap_data_from(data, map_dim) -> []:
+    def _tilemap_data_from(data, map_dim) -> tuple:
         # 1d or 2d data is turned into a 2D nested list representation
         map_width, map_height = map_dim
         _data = []
@@ -200,10 +200,10 @@ class TileMap(object):
         return self._grid.__iter__()
 
     def __getitem__(self, k):
-        return self.__getitem__(k)
+        return self._grid.__getitem__(k)
 
     def __setitem__(self, k, v):
-        return self.__setitem__(k, v)
+        return self._grid.__setitem__(k, v)
 
     def __contains__(self, key):
         return self._grid.__contains__(key)
@@ -215,29 +215,50 @@ class TileMap(object):
             raise ValueError("logical grid does not exist")
         return self._grid[grid_name]["Grid"]
 
-    def get_grid_indices(self, grid_name: str) -> {}:
+    def get_grid_indices(self, grid_name: str) -> dict:
         if not grid_name or grid_name.strip() == "":
             raise ValueError("grid name not provided")
-        if grid_name not in self._logical_grid:
+        if grid_name not in self._grid:
             raise ValueError("logical grid does not exist")
-        return self._logical_grid[grid_name]["Indices"]
+        return self._grid[grid_name]["Indices"]
 
     def remove_grid(self, grid_name):
         if not grid_name or grid_name.strip() == "":
             raise ValueError("grid name not provided")
-        if grid_name not in self._logical_grid:
+        if grid_name not in self._grid:
             raise ValueError("logical grid does not exist")
-        del self._logical_grid[grid_name]
+        del self._grid[grid_name]
         return self
 
-    def get_tile_index(self, grid_name: str, x: int, y: int):
-        if not grid_name or grid_name.strip() == "":
-            raise ValueError("Grid name not provided")
-        if not (0 <= x <= self.map_width):
+    def get_tile_index(self, x: int, y: int, grid_name: str = None, **kwargs):
+        """Return the tile index at a defined x, y location either for a particular layer or for all grid layers if multiple are registered.
+
+        Args:
+            x (int): x cell-location within the grid
+            y (int): y cell-location within the grid
+            grid_name (str, optional): grid name or None. Defaults to None.
+
+        Raises:
+            ValueError: raised if the cell coordinates are invalid, i.e. outside of the grid boundaries.
+
+        Returns:
+            [int or list of int]: if one grid is queried a single index is returned else all indices of all grids are provided back
+        """
+        if not (0 <= x < self.map_width):
             raise ValueError("x coordinate outside of map dimensions")
-        if not (0 <= y <= self.map_height):
+        if not (0 <= y < self.map_height):
             raise ValueError("y coordinate outside of map boundaries")
-        return self._grid[grid_name]["Grid"][y][x]
+
+        verbose = kwargs.get("verbose", False)
+
+        if grid_name and grid_name.strip() != "":
+            if grid_name not in self._grid:
+                raise ValueError("Unknown grid specified")
+            if verbose:
+                print(f"Return {x}, {y} from {grid_name}")
+            return self._grid[grid_name]["Grid"][y][x]
+        else:
+            return [self._grid[gn]["Grid"][y][x] for gn in self.grid_names()]
 
     def grid_names(self) -> list:
         return [g for g in self._grid]

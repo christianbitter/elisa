@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from uuid import uuid4, UUID
-from .spritesheet import SpriteSheet
+from uuid import UUID, uuid4
+
 from .sprite import Sprite
+from .spritesheet import SpriteSheet
 
 
 class SpriteAnimation(object):
@@ -124,9 +125,10 @@ class SpriteAnimation(object):
         """
         if self._source is None:
             raise ValueError("No Sprite Sheet Provided")
-
+        if name is None or name.strip() == "":
+            raise ValueError("Sprite name not provided")
         if name not in self._source.sprite_names:
-            raise ValueError("No Sprite with that name registered in source")
+            raise ValueError(f"No sprite with that name ({name}) registered in source")
 
         self._frames.append(self._source[name])
         self._end_index = len(self._frames) - 1

@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 from .linalg import is_numeric
+from .mat2 import Mat2
 from .ray2 import Ray2
 from .vec2 import Point2, Vec2
+
+# TODO: general transformation matrix handling
 
 
 class Poly2(object):
@@ -45,6 +48,23 @@ class Poly2(object):
     @property
     def points(self) -> list:
         return self._points
+
+    @staticmethod
+    def translate(poly, x: float, y: float) -> Poly2:
+        if not poly:
+            raise ValueError("poly not provided")
+
+        if x == 0.0 and y == 0.0:
+            return poly
+
+        tv = Vec2(x, y)
+
+        new_points = poly.points.copy()
+
+        for i in range(len(new_points)):
+            new_points[i] = new_points[i] + tv
+
+        return Poly2(points=new_points)
 
     @property
     def edges(self) -> list:
@@ -112,6 +132,14 @@ class Circle2(Poly2):
             self._points[0].x, self._points[0].y, self._radius
         )
 
+    def __eq__(self, o: object) -> bool:
+        return (
+            isinstance(o, Circle2)
+            and o.center_x == self.center
+            and o.center_y == o.center
+            and o.radius == self.radius
+        )
+
 
 class Tri2(Poly2):
     """A 2-dimensional triangular shape"""
@@ -148,8 +176,14 @@ class Tri2(Poly2):
         return self._edge2
 
     @staticmethod
-    def intersect_ray(self, r: Ray2):
+    def intersect_ray(r: Ray2):
         raise ValueError("Not Implemented")
+
+    def __iter__(self):
+        return self._points.__iter__()
+
+    def __getitem__(self, i: int) -> Point2:
+        return self._points.__getitem__(i)
 
     def inside(self, p: Point2) -> bool:
         """Determines if the point p lies inside or on the edge of the triangle by performing a half-space test of the point against the individual triangle edges.
@@ -209,6 +243,13 @@ class Tri2(Poly2):
 
     def __str__(self) -> str:
         return self.__repr__()
+
+    def __eq__(self, o: object) -> bool:
+        return (
+            isinstance(o, Poly2)
+            and len(o.points) == len(self.points)
+            and all([self[i] == o[i] for i in range(len(self._points))])
+        )
 
 
 class Rect2(Poly2):
@@ -286,7 +327,8 @@ class Rect2(Poly2):
         Returns:
             tuple: four tuple of the minimum and maximum coordinates respectively.
         """
-        # TODO: this can be optimized, such that it is computed initially and cashed until the points are transformed
+        # TODO: this can be optimized, such that it is computed initially and
+        # cashed until the points are transformed
         minx, miny = min([self.x0.x, self.x1.x, self.x2.x, self.x3.x]), min(
             [self.x0.y, self.x1.y, self.x2.y, self.x3.y]
         )
@@ -352,6 +394,18 @@ class Rect2(Poly2):
         """
         return (self.x0.x, self.x0.y, self.x2.x - self.x0.x, self.x2.y - self.x0.y)
 
+    def __getitem__(self, i: int) -> Point2:
+        return self._points.__getitem__(i)
+
+    def __eq__(self, o: object) -> bool:
+        return (
+            isinstance(o, Rect2)
+            and self[0] == o[0]
+            and self[1] == o[1]
+            and self[2] == o[2]
+            and self[3] == o[3]
+        )
+
     @staticmethod
     def create(p_min: Point2, p_max: Point2) -> Rect2:
         """Create a Rect2 from a min (left upper) and max (right lower) Point2 instance.
@@ -404,7 +458,8 @@ class Rect2(Poly2):
 
     @staticmethod
     def from_points(x_min: float, y_min: float, x_max: float, y_max: float) -> Rect2:
-        """Create a rect2 instance from individual coordinates describing the extreme points of the rect.
+        """Create a rect2 instance from individual coordinates describing the
+        extreme points of the rect.
 
         Args:
             x_min (float): minimum x coordinate

@@ -1,4 +1,4 @@
-from .component import Component
+from .component import Component, HandlesKBInputComponent
 from .core import ECSBase
 from .entity import Entity
 from .manager import ECSManager

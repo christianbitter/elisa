@@ -1,9 +1,9 @@
 from __future__ import annotations
+
 from uuid import uuid4
 
 # https://www.gamasutra.com/blogs/TobiasStein/20171122/310172/The_EntityComponentSystem__An_awesome_gamedesign_pattern_in_C_Part_1.php#comments
 # TODO: Logger
-# TODO: Manager -> EntityManager, ComponentManager, EventManager
 
 
 class ECSBase(object):
@@ -26,5 +26,5 @@ class ECSBase(object):
     def serialize(self) -> str:
         raise ValueError("serialize not implemented")
 
-    def deserialize(self, str) -> ECSBase:
+    def deserialize(self, str_rep: str) -> ECSBase:
         raise ValueError("deserialize not implemented")

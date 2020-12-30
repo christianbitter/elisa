@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import math
-from .linalg import is_numeric, angle_to_rad
+
+from .linalg import angle_to_rad, is_numeric
 from .vec import Vec
 
 
@@ -152,7 +153,18 @@ class Vec2(Vec):
         return Vec2.orthonormal(self)
 
     @staticmethod
-    def magnitude(u):
+    def magnitude(u: Vec2) -> float:
+        """Computes the magnitude/ length of the vector
+
+        Args:
+            u (Vec2): vector instance for which we want to compute the magnitude
+
+        Raises:
+            ValueError: if the vector us is not provided
+
+        Returns:
+            float: the magnitude
+        """
         if not u:
             raise ValueError("u not provided")
 
@@ -206,6 +218,9 @@ class Vec2(Vec):
                         [float]: The angle in radians
         """
         return math.atan2(self.y, self.x)
+
+    def __eq__(self, o: object) -> bool:
+        return isinstance(o, Vec2) and self.x == o.x and self.y == o.y
 
 
 Point2 = Vec2

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from uuid import UUID, uuid4
+from uuid import UUID
 
 from elisa.arch.ecs.message import Message
 
@@ -19,11 +19,52 @@ class Entity(ECSBase):
         - send_msg(self, msg)
     """
 
-    def __init__(self, **kwargs):
-        """Creates a new entity instance."""
+    def __init__(self, parent=None, **kwargs):
+        """Creates a new entity instance.
+
+        Args:
+            parent (Entity, optional): parent of this entity. Defaults to None.
+        """
         super(Entity, self).__init__(**kwargs)
         self._components = dict()
         self._ctypes = dict()
+        self._is_active = True
+        self._parent = parent
+
+    def has_parent(self) -> bool:
+        return self._parent is not None
+
+    @property
+    def parent(self):
+        """Returns the parent of this entity, which can be an entity or None.
+
+        Returns:
+            Entity: the parent
+        """
+        return self._parent
+
+    @parent.setter
+    def parent(self, p) -> Entity:
+        self._parent = p
+        return self
+
+    @property
+    def is_active(self) -> bool:
+        """Is the entity currently active or inactive.
+
+        Returns:
+            bool: the activity status of the entity
+        """
+        return self._is_active
+
+    @is_active.setter
+    def is_active(self, a: bool) -> Entity:
+        self._is_active = a
+        return self
+
+    @property
+    def registered_component_types(self):
+        return self._ctypes.keys()
 
     def add(self, c: Component):
         """Add a component to an entity. Only one component per type is allowed on an entity.
@@ -45,7 +86,7 @@ class Entity(ECSBase):
             raise ValueError("Component already exists")
 
         ctype = c._component_type
-        self._components[str(c._id)] = c
+        self._components[cid] = c
         if ctype not in self._ctypes:
             self._ctypes[ctype] = []
 
@@ -138,25 +179,44 @@ class Entity(ECSBase):
                 "component type has to be a list of strings or an individual string"
             )
 
-    def remove(self, component_id: str):
-        if not component_id or component_id == "":
+    def remove(self, component_id: str) -> Entity:
+        """Remove the component with id from the entities registered components.
+        If this is the last component of the respective type, then the
+        types are also reduced by that component type.
+
+        Args:
+            component_id (str): id of the component
+
+        Raises:
+            ValueError: if the component id is not provided or a component with the provided id does not exist.
+
+        Returns:
+            Entity: on success returns the entity without the deleted component.
+        """
+        if isinstance(component_id, UUID):
+            component_id = str(component_id)
+
+        if not component_id or component_id.strip() == "":
             raise ValueError("No component id provided")
 
-        if component_id in self._components:
-            ctype = self._components[component_id]._component_type
+        if component_id not in self._components:
+            raise ValueError(f"component with {component_id} not registered")
 
-            self._ctypes[ctype].remove(component_id)
-            if len(self._ctypes[ctype]) < 1:
-                delattr(self._ctypes, ctype)
+        ctype = self._components[component_id]._component_type
 
-        # support chaining
+        self._ctypes[ctype].remove(component_id)
+        if len(self._ctypes[ctype]) < 1:
+            delattr(self._ctypes, ctype)
+
+        del self._components[component_id]
+
         return self
 
     def send_msg(self, msg: Message):
         pass
 
     def __repr__(self) -> str:
-        c_str = f"Entity: {self._id}/ {type(self).__name__}\r\n"
+        c_str = f"Entity[{self._id}]: {type(self).__name__}\r\n<-Parent: {self._parent.id}\r\n"
         if len(self._components) == 0:
             c_str += "No registered components"
         else:
@@ -166,3 +226,6 @@ class Entity(ECSBase):
 
     def __str__(self) -> str:
         return self.__repr__()
+
+    def update(self, time_delta):
+        pass

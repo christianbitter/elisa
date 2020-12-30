@@ -1,5 +1,8 @@
 from __future__ import annotations
+
 from uuid import uuid4
+
+# TODO: it would be good to have the any state abstraction to allow patterns for transition like t(Any, some state)
 
 
 class State(object):

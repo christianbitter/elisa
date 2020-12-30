@@ -29,3 +29,10 @@ repos:
   hooks:
     - id: black
       language_version: python3 # Should be a command that runs python3.6+
+# -   repo: local
+#     hooks:
+#     -   id: tests
+#         name: run tests
+#         entry: pytest -v ".\..\elisa_test"
+#         language: system
+#         types: [python]

@@ -1,13 +1,18 @@
 # name: elisa_19_1_-_collision_detection_qtree.py
 # auth: (c) 2020 christian bitter
-# desc: implement a simple collision detection mechanism for axis aligned bounding boxes.
-# in order to improve this, we also go for a spatial data structure the quadtree
+# desc: in the previous example, we implemented axis aligned bounding boxes as
+# a simple mechanism for checking for collisions between objects.
+# However, in scenes with a large number of objects,
+# the pair-wise checking of inter-object collisions, becomes cumbersome and slow really soon.
+# So, in order to improve this, we also go for a spatial data structure the quad tree
 # source for reference:
 # Computer Science 420 (University of San Francisco): Game Engineering
 # https://www.cs.usfca.edu/~galles/cs420S13/lecture/intersection2D.pdf
-# TODO: dynamic scene
-# TODO: QuadTree updating
-# TODO: QuadTree rebalancing
+# https://www.cs.usfca.edu/~galles/cs420S13/lecture/SpatialDataStructures.pdf
+
+# TODO: documentation
+
+# NOTE: QuadTree rebalancing will be done when moved into Elisa
 
 from __future__ import annotations
 
@@ -25,7 +30,7 @@ class QuadTreeNode(object):
     and 4 child references to sibling treses.
     """
 
-    def __init__(self, parent: QuadTreeNode, area: Rect2, level: int):
+    def __init__(self, parent: QuadTreeNode, area: Rect2, level: int, max_level: int):
         super(QuadTreeNode, self).__init__()
         self._parent = parent
         self._area_rect = area
@@ -43,11 +48,16 @@ class QuadTreeNode(object):
         self._trees = [None, None, None, None]
         self._regions = [rne, rse, rsw, rnw]
         self._level = level
+        self._max_level = max_level
         self._elements = []
 
     @property
     def level(self) -> int:
         return self._level
+
+    @property
+    def max_level(self) -> int:
+        return self._max_level
 
     @property
     def elements(self):
@@ -84,12 +94,12 @@ class QuadTreeNode(object):
 
         return False, -1
 
-    def insert(self, o, max_level: int) -> int:
+    def insert(self, o) -> int:
         if o is None:
             raise ValueError("o not provided")
         # if o cannot be fit into any subspace insert it into this node directly
         f, r = self.fits_into_subspace(o)
-        if f is False or self._level == max_level:
+        if f is False or self._level == self._max_level:
             self._elements.append(o)
             return self._level
         else:
@@ -97,10 +107,75 @@ class QuadTreeNode(object):
             _t = self._trees[r]
             if _t is None:
                 _t = QuadTreeNode(
-                    parent=self, area=self._regions[r], level=self._level + 1
+                    parent=self,
+                    area=self._regions[r],
+                    level=self._level + 1,
+                    max_level=self._max_level,
                 )
                 self._trees[r] = _t
-            return _t.insert(o, max_level=max_level)
+            return _t.insert(o)
+
+    def update(self, o) -> bool:
+        """Updates the QuadTree subtree w.r.t. geometry/ spatial changes occurring to o.
+        For example, in the event that o has moved, we might need to allocate it to
+        a different region in our node or it has to be moved to a different subtree,
+        entirely.
+
+        Args:
+            o (any object type that can be stored inside a QuadTree): The object to update
+
+        Raises:
+            ValueError: if the object is not provided
+
+        Returns:
+            bool: True if the object was updated, else False.
+        """
+        if o is None:
+            raise ValueError("o not provided")
+
+        if o in self._elements:
+            # check if o still fits into this node
+            #   else remove from here and insert at the parent, so that
+            #   updating can be handled there
+            if not self._area_rect.inside(o):
+                self._elements.remove(o)
+                _ = self._parent.insert(o)
+                return True
+        else:
+            _updated = [_t.update(o) for _t in self._trees]
+
+        return any(_updated)
+
+    def replace(self, old, new):
+        # this is the same as update, only that we change the
+        # object identity from old to new
+        if old is None:
+            raise ValueError("old not provided")
+        if new is None:
+            raise ValueError("new not provided")
+
+        _updated = []
+
+        if old in self._elements:
+            # check if new still fits into this node - in this case we simply replace the identity
+            #   else remove from here and insert at the parent, so that
+            #   updating can be handled there
+            if not self._area_rect.inside(new):
+                self._elements.remove(old)
+                u = self._parent.insert(
+                    new,
+                )
+                _updated.append(u)
+            else:
+                self._elements.remove(old)
+                self._elements.append(new)
+                _updated.append(True)
+        else:
+            for _t in self._trees:
+                if _t is not None:
+                    _updated.append(_t.replace(old, new))
+
+        return any(_updated)
 
     def __repr__(self) -> str:
         return "4TNode: {}".format(self._area_rect)
@@ -116,7 +191,18 @@ class QuadTreeNode(object):
                 for st in t.__iter__():
                     yield st
 
-    def remove(self, o):
+    def remove(self, o) -> bool:
+        """Remove an object from the Subtree represented by this QuadTree node.
+
+        Args:
+            o (any object type that can be stored in a QuadTree node): The object to remove
+
+        Raises:
+            ValueError: if the object is not provided an error is raised.
+
+        Returns:
+            bool: True if the object was removed, else False
+        """
         if o is None:
             raise ValueError("o not provided")
         if o in self._elements:
@@ -150,6 +236,17 @@ class QuadTreeNode(object):
         return out_nodes
 
     def contains(self, o) -> bool:
+        """Checks whether the object o is contained in the region denote by the QuadTree Nodes area.
+
+        Args:
+            o (any object supported by Rect2 contained): The object to check
+
+        Returns:
+            bool: True if the object is fully contained inside the area, else False.
+        """
+        if o is None:
+            raise ValueError("o not provided")
+
         if o in self._elements:
             return True
 
@@ -164,7 +261,7 @@ class QuadTree(object):
         self._max_depth = max_depth
         self._depth = 0
         self._no_objects = 0
-        self._root = QuadTreeNode(parent=None, area=area, level=0)
+        self._root = QuadTreeNode(parent=None, area=area, level=0, max_level=max_depth)
 
     @property
     def max_depth(self) -> int:
@@ -178,7 +275,7 @@ class QuadTree(object):
         if o is None:
             raise ValueError("o not provided")
 
-        _level = self._root.insert(o, self._max_depth)
+        _level = self._root.insert(o)
         self._no_objects += 1
 
         if _level > self._depth:
@@ -186,7 +283,6 @@ class QuadTree(object):
 
         return self
 
-    # TODO: query for the objects contained in the proposal region
     def query(self, region: Rect2) -> list:
         return self._root.query(region)
 
@@ -198,8 +294,11 @@ class QuadTree(object):
             self._no_objects -= 1
         return _rem
 
-    def update(self):
-        pass
+    def update(self, o):
+        return self._root.update(o)
+
+    def replace(self, old, new):
+        return self._root.replace(old, new)
 
     @property
     def depth(self) -> int:
@@ -272,12 +371,7 @@ def main():
     fps_watcher = pygame.time.Clock()
     is_done = False
 
-    # we compose a scene of ... two static elements and a moving entity
-    # all entities are simple rects
-
-    # r0 = Rect2.from_points(300, 50, 400, 100)
-    # r1 = Rect2.from_points(300, 200, 350, 250)
-    # r2 = Rect2.from_points(50, 300, 400, 350)
+    # we compose a scene of ...
     poly1 = Poly2(points=[(50, 150), (150, 125), (200, 100), (150, 200), (100, 175)])
     poly2 = Poly2(points=[(350, 100), (500, 150), (400, 200), (250, 150)])
     poly3 = Poly2(points=[(400, 300), (500, 300), (450, 325)])
@@ -299,17 +393,24 @@ def main():
     for p in entities:
         q_tree.insert(p)
 
-    # print(q_tree)
-    # print(q_tree.contains(poly3))
-    # print(q_tree.contains(poly7))
-
     entities.append(poly7)
     q_tree.insert(poly7)
+
+    # for introspection
     print(q_tree)
     print("Removing poly: {}".format(q_tree.remove(poly7)))
     print(q_tree)
 
+    # now we define a query region ... something that we might be interested in
+    # when doing our collision detection
     proposal_region = Rect2.from_points(300, 220, 500, 320)
+
+    # we are going to update one poly along the x-axis.
+    # this will be based on copying/ creating new objects, which is somewhat wasteful
+    # for the purposes of the tutorial and the current code base, this is what we do
+    _move_x_min, _move_x_max = 100, 600
+    update_poly = poly5
+    dir_x = 1.0
 
     while not is_done:
         _ = fps_watcher.tick(60)
@@ -320,6 +421,24 @@ def main():
                 break
 
         back_buffer.fill(c_black)
+
+        # update the two polys - this is wasteful ...
+        _pminx, _pminy, _pmaxx, _pmaxy = update_poly.AABB
+
+        if _pminx + (_pmaxx - _pminx) >= _move_x_max or _pminx <= _move_x_min:
+            dir_x *= -1.0
+
+        dx = dir_x * 1.0
+        new_poly: Poly2 = Poly2.translate(update_poly, dx, 0.0)
+        # update entities
+        entities.remove(update_poly)
+        entities.append(new_poly)
+
+        # update the quad tree
+        q_tree.replace(update_poly, new_poly)
+
+        # replace the object identity
+        update_poly = new_poly
 
         for r in q_tree:
             _r: Rect2 = r.points
@@ -343,8 +462,6 @@ def main():
             screen_buffer.blit(back_buffer, (0, 0))
             pygame.display.flip()
 
-    # after exiting the loop we call it Quit - this will invoke our Quit handler and we are free to perform any heavy clean up lifting
-    # such as freeing memory or releasing any other resources
     pygame.quit()
 
 

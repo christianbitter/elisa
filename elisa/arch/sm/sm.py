@@ -62,8 +62,11 @@ class StateMachine(object):
         return self._current_state == self._final_state
 
     def update(self, **kwargs):
+        verbose = kwargs.get("verbose", False)
 
         if self._in_progress is False and self._current_state == self._init:
+            if verbose:
+                print("Starting State Machine: {}".format(self._current_state))
             self._in_progress = True
             if self._on_started_handler:
                 self._on_started_handler()
@@ -72,20 +75,30 @@ class StateMachine(object):
         # in order to be deterministic we allow only a single firing transition,
         # although we allow multiple transitions per state -
         # but this is the job of the validate function
-        firing_transition = None
+        firing_transition = []
         for tkey in self._transitions:
             t = self._transitions[tkey]
             if t.from_state == self._current_state:
                 if t.fires(**kwargs):
-                    firing_transition = t
-                    break
+                    firing_transition.append(t)
 
-        if firing_transition:
-            firing_transition.fire(**kwargs)
-            self._current_state = firing_transition.to_state
+        assert len(firing_transition) <= 1
+
+        if len(firing_transition) != 0:
+            if verbose:
+                print(
+                    "No. transitions from current state: {} -> {} ({})".format(
+                        self._current_state, firing_transition, len(firing_transition)
+                    )
+                )
+            _firing_transition = firing_transition[0]
+            _firing_transition.fire(**kwargs)
+            self._current_state = _firing_transition.to_state
             self._current_state.act(**kwargs)
 
         if self._in_progress is True and self._current_state == self._final_state:
+            if verbose:
+                print("Ending State Machine: {}".format(self._current_state))
             self._in_progress = False
             if self._on_finished_handler is not None:
                 self._on_finished_handler()
@@ -98,7 +111,12 @@ class StateMachine(object):
     def states(self):
         return self._states
 
-    def __build_adjacency_struct(self):
+    def __build_adjacency_struct(self) -> dict:
+        """Build an adjacency list from the states and transitions defined for this state machine.
+
+        Returns:
+            dict: map of state identifiers to list of state identifiers, representing the to states that can be transitioned from a source state.
+        """
         _adj_struct = {}
 
         if len(self._states) > 0:
