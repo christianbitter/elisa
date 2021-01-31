@@ -8,21 +8,21 @@ from .vec import Vec, cov, mean, sd, var
 from .vec2 import Point2, Vec2
 from .vec3 import Point3, Vec3
 
-# from .linalg import (
-#     ALPHA_PI_INV,
-#     H2_PI,
-#     PI_INV,
-#     TWO_PI,
-#     angle_to_rad,
-#     clampf,
-#     rad_to_angle,
-# )
+from .linalg import (
+    ALPHA_PI_INV,
+    H2_PI,
+    PI_INV,
+    TWO_PI,
+    angle_to_rad,
+    clampf,
+    rad_to_angle,
+)
 
-# from .intersection import (
-#     area_of_intersection_AABB2,
-#     inside_circle2,
-#     inside_rect2,
-#     inside_square2,
-#     intersection2,
-#     intersects_AABB2,
-# )
+from .intersection import (
+    area_of_intersection_AABB2,
+    inside_circle2,
+    inside_rect2,
+    inside_square2,
+    intersection2,
+    intersects_AABB2,
+)
