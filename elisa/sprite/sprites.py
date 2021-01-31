@@ -1,9 +1,6 @@
 import os
+
 import pygame
-import json
-import uuid
-from pygame import Surface, PixelArray
-from uuid import uuid4
 
 
 def load_image(fp, colorkey=None, image_only: bool = False, verbose: bool = False):

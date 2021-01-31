@@ -2,7 +2,7 @@
 # name: linalg.py
 # desc: some math routines needed for our elisa things
 
-from math import sqrt, pi
+from math import pi, sqrt
 
 ALPHA_PI_INV = 1.0 / 180.0
 PI_INV = 1.0 / pi
@@ -23,7 +23,7 @@ def is_numeric(v) -> bool:
     Returns:
         bool: true if v is numeric or in case of a tuple, all of v's members are numeric
     """
-    if isinstance(v, tuple):
+    if isinstance(v, tuple) or isinstance(v, list):
         return all([is_numeric(_x) for _x in v])
     else:
         return isinstance(v, float) or isinstance(v, int)

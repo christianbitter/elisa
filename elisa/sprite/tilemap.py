@@ -4,18 +4,6 @@ import os
 import xml.etree.ElementTree
 from uuid import uuid4
 
-from .sprite import Sprite
-from .spritesheet import SpriteSheet
-
-
-# a Tile is the binding element between the index in the grid structure
-# and the system defining meaning for it, such as a sprite sheet or a logical system that defines a logical tile
-class Tile(object):
-    def __init__(self):
-        super(Tile, self).__init__()
-        self._id = uuid4()
-
-
 # for starters we closely follow: https://developer.mozilla.org/en-US/docs/Games/Techniques/Tilemaps
 # Initially we start with a single tile atlas
 # but
@@ -28,7 +16,13 @@ class Tile(object):
 class TileMap(object):
     """A 2D Tile Map Structure"""
 
-    def __init__(self, tile_extent: int, map_width: int, map_height: int):
+    def __init__(
+        self,
+        tile_extent: int,
+        map_width: int,
+        map_height: int,
+        empty_tile_id: int = None,
+    ):
         """Creates a new 2D tile map structure
 
         Args:
@@ -52,11 +46,16 @@ class TileMap(object):
         self._map_dim = (map_width, map_height)
         # this is a map to the different grids
         self._grid = {}
+        self._empty_tile_index = empty_tile_id
         self._properties = {}
 
     @property
     def properties(self) -> dict:
         return self._properties
+
+    @property
+    def empty_tile_index(self) -> int:
+        return self._empty_tile_index
 
     def add_property(self, k, v) -> TileMap:
         if not k:
@@ -263,9 +262,44 @@ class TileMap(object):
     def grid_names(self) -> list:
         return [g for g in self._grid]
 
-    def empty_grid(self):
-        _g = [self.map_width * [None] for _ in range(self.map_height)]
+    def empty_grid(self) -> list:
+        _g = [self.map_width * [self._empty_tile_index] for _ in range(self.map_height)]
         return _g
+
+    def empty_at(self, x: int, y: int, grid_name: str = None) -> TileMap:
+        """Sets the tile at position x, y in the grid of the tile map to the empty tile.
+        If the grid name is provided, a particular grid is considered. Else the tile is set in
+        all grids of the tile map.
+
+        Args:
+            x (int): x-position in tile map space (x in 0 to tilemap_x)
+            y (int): y-position in tile map space (y in 0 to tilemap_y)
+            grid_name (str, optional): name of the grid in which the tile should be set. Defaults to None.
+
+        Raises:
+            ValueError: if x or y are not inside the map space
+            KeyError: if the grid name is provided but not correct
+
+        Returns:
+            TileMap: the updated tile map
+        """
+        if not (0 <= x < self.map_width):
+            raise ValueError("x coordinate outside of map dimensions")
+        if not (0 <= y < self.map_height):
+            raise ValueError("y coordinate outside of map boundaries")
+
+        if grid_name is not None:
+            if grid_name.strip() == "":
+                raise KeyError("grid name not provided")
+            if grid_name not in self._grid:
+                raise KeyError("Unknown grid specified")
+
+            self._grid[grid_name]["Grid"][y][x] = self._empty_tile_index
+        else:
+            for gn in self._grid:
+                self._grid[gn]["Grid"][y][x] = self._empty_tile_index
+
+        return self
 
     def __repr__(self):
         return "TileMap[{}]({}, {}) - Tiles({}, {}); {} Layers".format(
@@ -323,7 +357,7 @@ def tileprops_from_tsx(tsx_fp: str, reserve_index_zero: bool = True, **kwargs) -
     return props
 
 
-def tilemap_from_tiled(tsm_fp: str, **kwargs) -> tuple:
+def tilemap_from_tiled(tsm_fp: str, reserve_index_zero: bool = True, **kwargs) -> tuple:
     """Returns a three tuple composed of tile map, path to referenced tileset descriptors built in TileEd and all of the defined properties,
     i.e. tm, tileset_descs, tileprops.
 
@@ -334,6 +368,7 @@ def tilemap_from_tiled(tsm_fp: str, **kwargs) -> tuple:
 
     Args:
                     tsm_fp (str): Path to the tiled tilemap tsm file
+                    reserve_index_zero (bool, optional): defines if the 0 index in the properties map is reserved for the internal NO-TILE tile. If set to true,
 
     Raises:
                     ValueError: if the tilemap path is not provided, or does not exist.
@@ -385,7 +420,13 @@ def tilemap_from_tiled(tsm_fp: str, **kwargs) -> tuple:
     tilesets = root.findall("tileset")
     layers = root.findall("layer")
 
-    tm = TileMap(tile_extent=tilewidth, map_width=width, map_height=height)
+    empty_tile = 0 if reserve_index_zero else None
+    tm = TileMap(
+        tile_extent=tilewidth,
+        map_width=width,
+        map_height=height,
+        empty_tile_id=empty_tile,
+    )
     for p in custom_props:
         tm.add_property(p.attrib["name"], p.attrib["value"])
 
@@ -428,6 +469,9 @@ def tilemap_from_tiled(tsm_fp: str, **kwargs) -> tuple:
 
     tileset_descs = [os.path.join(tsm_dir_fp, _ts.attrib["source"]) for _ts in tilesets]
 
-    tileprops = [tileprops_from_tsx(desc_fp, **kwargs) for desc_fp in tileset_descs]
+    tileprops = [
+        tileprops_from_tsx(desc_fp, reserve_index_zero=reserve_index_zero, **kwargs)
+        for desc_fp in tileset_descs
+    ]
 
     return tm, tileset_descs, tileprops

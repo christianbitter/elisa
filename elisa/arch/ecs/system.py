@@ -21,13 +21,21 @@ class System(ECSBase):
         """Creates a new system instance."""
         super(System, self).__init__(**kwargs)
 
-    def update(self, time_delta, entities):
+    def update(self, time_delta: float, entities):
+        """Advance the state of the system
+
+        Args:
+            time_delta (float): time passed between last invocation of the method and now.
+            entities ([type]): entities to update.
+        """
         pass
 
-    def intialize(self, **kwargs):
+    def initialize(self, **kwargs):
+        """Initialize the system."""
         pass
 
     def finalize(self, **kwargs):
+        """Shut the system down"""
         pass
 
     def send_msg(self, msg):

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from uuid import UUID, uuid4
 
+from .aseprite import AsepriteAnimation
 from .sprite import Sprite
 from .spritesheet import SpriteSheet
 
@@ -34,6 +35,7 @@ class SpriteAnimation(object):
         self._source = sprite_sheet
         self._repeats = repeats
         self._frames = []
+        self._timeline = []
         self._start_index = 0
         self._end_index = -1
         self._frames_per_second = fps
@@ -111,11 +113,13 @@ class SpriteAnimation(object):
         """
         return self._name
 
-    def add_frame(self, name: str) -> SpriteAnimation:
+    def add_frame(self, name: str, duration_ms: float = None) -> SpriteAnimation:
         """Based on the underlying SpriteSheet instance, we compose an animation by adding individual frames. The frame is referenced by name.
 
         Args:
             name (str): name of the animation to add.
+            duration_ms (float): (optional) duration in milliseconds the frame should play the image. If not provided the value is derived from
+            the frames per second setting, i.e. for an animation with 24fps the added frame will be played 1000/24 milliseconds.
 
         Raises:
             ValueError: if no SpriteSheet instance is defined or if the name is not defined in the underlying sprite sheet.
@@ -130,10 +134,20 @@ class SpriteAnimation(object):
         if name not in self._source.sprite_names:
             raise ValueError(f"No sprite with that name ({name}) registered in source")
 
+        if duration_ms is None:
+            duration_ms = 1000.0 / self._frames_per_second
+
+        if duration_ms <= 0:
+            raise ValueError(f"Duration {duration_ms} has to be > 0")
+
         self._frames.append(self._source[name])
+        self._timeline.append(duration_ms)
+
         self._end_index = len(self._frames) - 1
 
         return self
+
+    # def remove_frame()
 
     def __iter__(self):
         return self._frames.__iter__()
@@ -153,7 +167,7 @@ class SpriteAnimation(object):
             raise ValueError("No frames registered")
 
         i_current_frame = self._current_frame
-
+        # TODO: pay attention to the timeline
         # only if the clock gave a tick that makes our frame update, only then do we move to the next frame
         self._frame_elapsed += delta_time
         if self._frame_elapsed >= self._frame_hold:
@@ -219,3 +233,7 @@ class SpriteAnimation(object):
 
     def __repr__(self):
         return "Animation-{}({})".format(self._name, self._id)
+
+
+def convert_aseprite_to_animation(aanim: AsepriteAnimation) -> SpriteAnimation:
+    raise ValueError("Not Implemented")

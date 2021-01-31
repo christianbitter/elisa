@@ -147,6 +147,33 @@ class Game(Environment):
         del self._players[player_id]
         return self
 
+    def player_alive(self, name: str) -> bool:
+        if name is None or name.strip() == "":
+            raise ValueError("player name not provided")
+
+        alive = [self._players[pid].name == name for pid in self._players]
+
+        return any(alive)
+
+    def __getitem__(self, i):
+        if isinstance(i, int):
+            # by index
+            if i < 0 or i > len(self._players):
+                raise KeyError("Index outside of the bounds of the players collection")
+            for _jdx, pid in enumerate(self._players):
+                if _jdx == i:
+                    return self._players[pid]
+            raise KeyError("Player at index not found")
+        elif isinstance(i, str):
+            return self._players[i]
+        else:
+            raise ValueError(
+                "Unknown key type to retrieve players provide integer for position or str for id"
+            )
+
+    def player_names(self) -> list:
+        return [self._players[pid].name for pid in self._players]
+
     @property
     def max_players(self):
         return self._no_max_players

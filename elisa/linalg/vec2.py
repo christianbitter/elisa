@@ -224,8 +224,8 @@ class Vec2(Vec):
 
 
 Point2 = Vec2
-zero2 = Vec2(0, 0)
-one2 = Vec2(1, 1)
+ZeroVec2 = Vec2(0, 0)
+OneVec2 = Vec2(1, 1)
 
 
 def proj2_u_v(u: Vec2, v: Vec2) -> Vec2:
