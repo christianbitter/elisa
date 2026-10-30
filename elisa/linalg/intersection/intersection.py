@@ -1,7 +1,7 @@
-from .ray2 import Ray2
-from .plane2 import Plane2
-from .vec2 import Vec2, Point2
-from .geom2 import Tri2, Rect2
+from ..geom import Circle2, Rect2, Tri2
+from ..plane2 import Plane2
+from ..ray2 import Ray2
+from ..vec2 import Point2, Vec2
 
 
 def intersection2(ray: Ray2, plane: Plane2):
@@ -25,7 +25,7 @@ def intersection2(ray: Ray2, plane: Plane2):
     # if the ray points into the opposite direction, no intersection with the plane but still a solution
     d_n_rp = Vec2.dot(plane.normal, ray.origin)
     t = (plane.w - d_n_rp) / d_n_rd
-    intersects = True if t >= 0 else False
+    intersects = t >= 0
     pos = None
     if intersects:
         pos = ray.origin + ray.direction * t
@@ -72,11 +72,11 @@ def intersects_AABB2(a: Rect2, b: Rect2) -> bool:
     """Determines if the two axis aligned bounding boxes a, and b intersect.
 
     Args:
-                    a (Rect2): first AAB
-                    b (Rect2): second AABB
+        a (Rect2): first AAB
+        b (Rect2): second AABB
 
     Returns:
-                    bool: if a and b intersect then True else False
+        bool: if a and b intersect then True else False
     """
     if not a:
         raise ValueError("a not provided")
@@ -91,6 +91,22 @@ def intersects_AABB2(a: Rect2, b: Rect2) -> bool:
 
     # check that either of the boxes does not intersect
     return not (a0x > b2x or a2x < b0x or a0y > b2y or a2y < b0y)
+
+
+def intersects_circle(a: Circle2, b: Circle2) -> bool:
+    """tests whether the two circles a and b intersect
+
+    Args:
+        a (Circle2): circle 1
+        b (Circle2): circle 2
+
+    Returns:
+        bool: true if the circles intersect otherwise false
+    """
+    rs = a.radius + b.radius
+    ba = (b.center - a.center).length
+
+    return ba <= rs
 
 
 def area_of_intersection_AABB2(a: Rect2, b: Rect2) -> Rect2:

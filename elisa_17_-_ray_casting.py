@@ -37,7 +37,7 @@ from elisa.linalg import Plane2, Point2, Ray2, Vec2
 
 class CTransform2(Component):
     def __init__(self, pos: Point2, v_dir: Vec2):
-        super(CTransform2, self).__init__(component_type="Transform2")
+        super().__init__(component_type="Transform2")
         self.position = pos
         self._viewing_direction = v_dir
 
@@ -74,9 +74,7 @@ class CTransform2(Component):
         self._viewing_direction = dir
 
     def __repr__(self) -> str:
-        return "CTransform2[{}]:\r\n[+]Position:{}\r\n[+]Viewing Direction: {}".format(
-            self.id, self.position, self.viewing_direction
-        )
+        return f"CTransform2[{self.id}]:\r\n[+]Position:{self.position}\r\n[+]Viewing Direction: {self.viewing_direction}"
 
     def __str__(self) -> str:
         return self.__repr__()
@@ -84,7 +82,7 @@ class CTransform2(Component):
 
 class EPlayer(Entity):
     def __init__(self):
-        super(EPlayer, self).__init__()
+        super().__init__()
 
     def handle_position_update(self, delta_pos: Vec2):
         pos = self.transform.position
@@ -117,7 +115,7 @@ class EPlayer(Entity):
 
 class EBox(Entity):
     def __init__(self):
-        super(EBox, self).__init__()
+        super().__init__()
 
 
 class Shape(enum.Enum):
@@ -127,7 +125,7 @@ class Shape(enum.Enum):
 
 class CRenderable(Component):
     def __init__(self, render_color=(255, 255, 255), shape=Shape.Point, width=None):
-        super(CRenderable, self).__init__("Renderable")
+        super().__init__("Renderable")
         self._render_color = render_color
         self._shape = shape
         self._width = width
@@ -148,7 +146,7 @@ class CRenderable(Component):
 # while not the cleanest way, this is where we put our surface planes for now
 class CCollidable(Component):
     def __init__(self, planes: list):
-        super(CCollidable, self).__init__("Collidable")
+        super().__init__("Collidable")
         self._planes = planes
 
     @property
@@ -158,7 +156,7 @@ class CCollidable(Component):
 
 class UpdatePositionMessage(Message):
     def __init__(self, dpos: Vec2):
-        super(UpdatePositionMessage, self).__init__("UpdatePosition")
+        super().__init__("UpdatePosition")
         self._delta_position = dpos
 
     @property
@@ -168,7 +166,7 @@ class UpdatePositionMessage(Message):
 
 class UpdateOrientationMessage(Message):
     def __init__(self, dangle: float):
-        super(UpdateOrientationMessage, self).__init__("UpdateOrientation")
+        super().__init__("UpdateOrientation")
         self._delta_orientation = dangle
 
     @property
@@ -178,7 +176,7 @@ class UpdateOrientationMessage(Message):
 
 class CFieldOfView(Component):
     def __init__(self, fov_angle_rad: float = pi / 2.0, fov_distance: int = 10):
-        super(CFieldOfView, self).__init__(component_type="FieldOfView")
+        super().__init__(component_type="FieldOfView")
         self._fov_alpha = fov_angle_rad
         self._fov_z = fov_distance
 
@@ -193,13 +191,13 @@ class CFieldOfView(Component):
 
 class CVelocity(Component):
     def __init__(self, velocity: float):
-        super(CVelocity, self).__init__(component_type="Velocity")
+        super().__init__(component_type="Velocity")
         self._velocity = velocity
 
 
 class SInput(System):
     def __init__(self):
-        super(SInput, self).__init__()
+        super().__init__()
 
     @staticmethod
     def arrow_key_pressed(km):
@@ -212,7 +210,7 @@ class SInput(System):
 
     def update(self, time_delta, entities):
         if len(entities) < 1:
-            return None
+            return
 
         key_map = pygame.key.get_pressed()
 
@@ -257,7 +255,7 @@ class SRender(System):
     C_DARK_GRAY = (92, 92, 92)
 
     def __init__(self, screen_width, screen_height):
-        super(SRender, self).__init__()
+        super().__init__()
         self.screen_width = screen_width
         self.screen_height = screen_height
 
@@ -272,7 +270,7 @@ class SRender(System):
 
     def update(self, time_delta, entities):
         if len(entities) < 1:
-            return None
+            return
 
         pvis = [e for e in entities if e.has_component_type("Collidable")]
 
@@ -389,7 +387,7 @@ class SRender(System):
         self.screen_buffer.blit(self.back_buffer, (0, 0))
         pygame.display.flip()
 
-        return None
+        return
 
 
 def init_ecs(screen_width, screen_height, verbose: bool = True):

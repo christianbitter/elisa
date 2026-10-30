@@ -1,15 +1,17 @@
 from __future__ import annotations
-import os
-import json
-from uuid import uuid4
-from pygame import Surface, PixelArray
 
-from .sprites import load_image, load_png
+import json
+import os
+from uuid import uuid4
+
+from pygame import PixelArray, Surface
+
+from .sprites import load_image
 
 
 # TODO: serialize the meta-data to json/dict struct, remove the internal id
 # avoid to serialize the image data
-class Sprite(object):
+class Sprite:
     def __init__(
         self, name: str, w: int, h: int, img, img_fp: str, z: int = 0, color_key=None
     ):
@@ -18,7 +20,7 @@ class Sprite(object):
         bit-mapped representation (image), its width or height. The PSprite object is a simplified version of
         pygame's Sprite that is required to make working with Sprite maps or texture catalogues easier.
         """
-        super(Sprite, self).__init__()
+        super().__init__()
         self._id = uuid4()
         self._name = name if name and name != "" else self._id
         self._width = w

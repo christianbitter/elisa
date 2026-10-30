@@ -12,7 +12,19 @@ if not pygame.mixer:
     print("Pygame - Mixer not loaded")
 
 
-def load_image(fp, colorkey=None):
+def load_image(fp: str, colorkey: pygame.Color = None) -> tuple[pygame.Surface, pygame.Rect]:
+    """load an image from a file
+
+    Args:
+        fp (str): file path to the image
+        colorkey (pygame.Color, optional): A color (name, RGB tuple, etc.). Defaults to None.
+
+    Raises:
+        ValueError: raised if the file path to the image is not provided or loading the image fails.
+
+    Returns:
+        tuple[pygame.Surface, pygame.Rect]: the image data and the bounding rect.
+    """
     if not fp:
         raise ValueError("load_image - fp not provided")
 

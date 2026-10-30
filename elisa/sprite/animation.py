@@ -7,7 +7,7 @@ from .sprite import Sprite
 from .spritesheet import SpriteSheet
 
 
-class SpriteAnimation(object):
+class SpriteAnimation:
     """A sprite sheet animation composes an animation from frames all defined within a single sprite sheet.
     The sprite sheet has to be initialized to provide access to all image content.
     """
@@ -28,7 +28,7 @@ class SpriteAnimation(object):
             frames (list, optional): optional list of sprite names to initialize the animation
             repeats (bool, optional): Whether this is a cyclic animation or not. Defaults to False.
         """
-        super(SpriteAnimation, self).__init__()
+        super().__init__()
         self._id = uuid4()
         self._name = name if name else self._id
         self._current_frame = 0
@@ -232,7 +232,7 @@ class SpriteAnimation(object):
         raise ValueError("Not Implemented")
 
     def __repr__(self):
-        return "Animation-{}({})".format(self._name, self._id)
+        return f"Animation-{self._name}({self._id})"
 
 
 def convert_aseprite_to_animation(aanim: AsepriteAnimation) -> SpriteAnimation:

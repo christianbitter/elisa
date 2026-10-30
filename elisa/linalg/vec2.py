@@ -8,21 +8,18 @@ from .vec import Vec
 
 class Vec2(Vec):
     """A two-dimensional floating point vector
-
-    Args:
-                    Vec ([type]): [description]
     """
 
     def __init__(self, a, b=None):
         """Generates a new Vec2 instance from individual components, a tuple or an existing Vec2
 
         Args:
-                        a (Vec2, tuple of floats, float): If a is a Vec2 or 2-tuple of floats, then the individual numbers are used to initialize the components of the Vec2.
-                        If a is a single number, then it is expected that the other member b is also a number.
-                        b (numeric, optional): If a is a single numeric, then b has to be a numeric as well. Defaults to None.
+            a (Vec2, tuple of floats, float): If a is a Vec2 or 2-tuple of floats, then the individual numbers are used to initialize the components of the Vec2.
+            If a is a single number, then it is expected that the other member b is also a number.
+            b (numeric, optional): If a is a single numeric, then b has to be a numeric as well. Defaults to None.
 
         Raises:
-                        ValueError: if neither of argument types hold.
+            ValueError: if neither of argument types hold.
         """
         super(Vec2, self).__init__()
         _a = 0.0
@@ -131,9 +128,17 @@ class Vec2(Vec):
     def x(self):
         return self._v[0]
 
+    @x.setter
+    def x(self, val):
+        self._v[0] = val
+
     @property
     def y(self):
         return self._v[1]
+
+    @y.setter
+    def y(self, val):
+        self._v[1] = val
 
     @staticmethod
     def orthogonal(v: Vec2):
