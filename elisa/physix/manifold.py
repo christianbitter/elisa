@@ -5,7 +5,7 @@ from ..linalg import Point2, Vec2
 
 @dataclass
 class Manifold:
-    normal: Vec2 = field(default_factory=lambda: Vec2(0.0, 0.0))
+    normal: Vec2 = field(default_factory=lambda: Vec2.ZERO)
     """unit normal
     """
     depth: float = 0.0

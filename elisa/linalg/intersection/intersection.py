@@ -49,22 +49,44 @@ def inside_rect2(rleftx: float, rlefty: float, w: float, h: float, p: Point2) ->
     px = p.x
     py = p.y
 
-    if (rleftx <= px <= rleftx + w) and (rlefty <= py <= rlefty + h):
-        return True
-    else:
-        return False
+    return (rleftx <= px <= rleftx + w) and (rlefty <= py <= rlefty + h)
 
 
 def inside_square2(rleftx: float, rlefty: float, w: float, p: Point2) -> bool:
     return inside_rect2(rleftx, rlefty, w, w, p)
 
 
-def inside_circle2(rleftx: float, rlefty: float, r: float, p: Point2) -> bool:
-    # TODO: inside_circle2
-    raise ValueError("Todo")
+def inside_circle2(cx: float, cy: float, r: float, p: Point2) -> bool:
+    """tests whether a point p is contained in a circle
+
+    Args:
+        cx (float): circle x
+        cy (float): circle y
+        r (float): radius of circle
+        p (Point2): point to test
+
+    Returns:
+        bool: True if the point is contained in the circle, else False.
+    """
+    d = (Point2(cx, cy) - p).length
+    return d <= r
 
 
 def inside_triangle2(p0x, p0y, p1x, p1y, p2x, p2y, p: Point2) -> bool:
+    """tests if some point p is inside the triangle defined by p0, p1, and p2.
+
+    Args:
+        p0x (_type_): x of p0
+        p0y (_type_): y of p0
+        p1x (_type_): x of p1
+        p1y (_type_): y of p1
+        p2x (_type_): x of p2
+        p2y (_type_): y of p2
+        p (Point2): the point to test for containment
+
+    Returns:
+        bool: True if p is in the triangle else False
+    """
     return Tri2(Point2(p0x, p0y), Point2(p1x, p1y), Point2(p2x, p2y)).inside(p)
 
 

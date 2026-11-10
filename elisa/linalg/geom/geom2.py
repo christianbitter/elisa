@@ -8,6 +8,15 @@ from ..vec2 import Point2, Vec2
 
 AABB = namedtuple("AABB", field_names=["xmin", "ymin", "xmax", "ymax"])
 
+
+def translate_aabb(aabb: AABB, dx: float, dy: float):
+    if dx == 0.0 and dy == 0.0:
+        return aabb
+
+    xmin, ymin, xmax, ymax = aabb
+    return AABB(xmin + dx, ymin + dy, xmax + dx, ymax + dy)
+
+
 # TODO: general transformation matrix handling
 # TODO: initial AABB in the constructors
 # TODO: AABB change on change of x or y
@@ -55,7 +64,7 @@ class Poly2:
         return self._points
 
     @staticmethod
-    def translate(poly, x: float, y: float) -> Poly2:
+    def translate(poly: Poly2, x: float = 0.0, y: float = 0.0) -> Poly2:
         if not poly:
             raise ValueError("poly not provided")
 
@@ -64,7 +73,7 @@ class Poly2:
 
         tv = Vec2(x, y)
 
-        new_points = poly.points.copy()
+        new_points = poly._points.copy()
 
         for i in range(len(new_points)):
             new_points[i] = new_points[i] + tv

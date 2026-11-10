@@ -10,6 +10,19 @@ TWO_PI = 2.0 * pi
 H2_PI = pi / 2.0
 
 
+def solve_quadratic_pq(p: float, q: float) -> tuple[float, float | None]:
+    a = p * -0.5
+    a2 = a**2
+
+    if a2 == q:
+        return -a, None
+    elif a2 < q:
+        raise ValueError("Negative Sqrt - complex solution not supported")
+    else:
+        bs = sqrt(a2 - q)
+        return a + bs, a - bs
+
+
 def clampf(value: float, min_val: float = 0.0, max_val: float = 1.0):
     return min(max(value, min_val), max_val)
 
@@ -48,12 +61,23 @@ def angle_to_rad(alpha_angle: float):
     raise ValueError("not implemented")
 
 
-def rad_to_angle(alpha_rad: float):
-    if not 0.0 <= alpha_rad <= TWO_PI:
-        raise ValueError(f"alpha_rad {alpha_rad} not in 0 .. 2PI")
+def rad_to_angle(alpha_rad: float) -> float:
+    """Convert the angle in radians into an angle in degree
+
+    Args:
+        alpha_rad (float): angle in radians
+
+    Returns:
+        float: angle in degree
+    """
     if alpha_rad == 0.0:
         return 0.0
-    elif alpha_rad == TWO_PI:
+    if alpha_rad == TWO_PI:
         return 360.0
-    else:
-        return alpha_rad * 180.0 * PI_INV
+
+    if alpha_rad < 0.0:
+        alpha_rad += TWO_PI
+    if alpha_rad > TWO_PI:
+        alpha_rad -= TWO_PI
+
+    return alpha_rad * 180.0 * PI_INV

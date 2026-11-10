@@ -15,6 +15,7 @@ from .linalg import (
     angle_to_rad,
     clampf,
     rad_to_angle,
+    solve_quadratic_pq
 )
 from .mat2 import Mat2, eye2, one2, zero2
 from .mat3 import Mat3, eye3, one3, translate2D, zero3

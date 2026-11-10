@@ -7,6 +7,7 @@ collision to this package.
 """
 
 from .accumulator import FixedStepAccumulator
+from .body import Body
 from .constants import (
     CORRECTION_FRACTION,
     FIXED_DT,
@@ -17,18 +18,18 @@ from .constants import (
     SOLVER_ITERATIONS,
 )
 from .physics import force, gravitational_force, weight
-from .world import Body, World
+from .world import World
 
 __all__ = [
-    "Body",
     "CORRECTION_FRACTION",
     "FIXED_DT",
-    "FixedStepAccumulator",
     "GRAVITY_Y",
     "MAX_FRAME_TIME",
     "RESTITUTION_THRESHOLD",
     "SLOP",
     "SOLVER_ITERATIONS",
+    "Body",
+    "FixedStepAccumulator",
     "World",
     "force",
     "gravitational_force",

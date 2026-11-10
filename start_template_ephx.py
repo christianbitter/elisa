@@ -8,6 +8,12 @@ import pygame
 from elisa.linalg import Vec2
 from elisa.physix import World
 
+C_BLACK = (0, 0, 0)
+C_WHITE = (255, 255, 255)
+C_BLUE = (0, 0, 255)
+C_RED = (255, 0, 0)
+C_GREEN = (0, 255, 0)
+
 
 def render(surface, renderables):
     # your rendering code goes here

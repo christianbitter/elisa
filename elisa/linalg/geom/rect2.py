@@ -127,9 +127,6 @@ class Rect2(Poly2):
     def __repr__(self) -> str:
         return f"Rect2: {self._p0}, {self._p1}, {self._p2}, {self._p3}"
 
-    def __str__(self) -> str:
-        return self.__repr__()
-
     @property
     def x0(self) -> Point2:
         return self._points[0]
@@ -220,7 +217,7 @@ class Rect2(Poly2):
         return f"R2(({self._p0[0]}, {self._p0[1]}), ({self._p1[0]}, {self._p1[1]}), ({self._p2[0]}, {self._p2[1]}), ({self._p3[0]}, {self._p3[1]}))"
 
     @staticmethod
-    def from_points(x_min: float, y_min: float, x_max: float, y_max: float) -> Rect2:
+    def from_coords(x_min: float, y_min: float, x_max: float, y_max: float) -> Rect2:
         """Create a rect2 instance from individual coordinates describing the
         extreme points of the rect.
 
@@ -239,3 +236,17 @@ class Rect2(Poly2):
             raise ValueError("ymax not >= ymin")
 
         return Rect2.create(Point2(x_min, y_min), Point2(x_max, y_max))
+
+    @staticmethod
+    def from_points(pmin: Point2, pmax: Point2) -> Rect2:
+        """Create a rect2 instance from individual coordinates describing the
+        extreme points of the rect.
+
+        Args:
+            pmin (Point2): minimum coordinate
+            pmax (Point2): maximum coordinate
+
+        Returns:
+            Rect2: created Rect2 instance
+        """
+        return Rect2.from_coords(pmin.x, pmin.y, pmax.x, pmax.y)
