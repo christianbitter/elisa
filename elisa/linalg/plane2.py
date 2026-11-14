@@ -5,13 +5,13 @@ class Plane2:
     """A 2-dimensional plane provided via a surface normal vector and some offset vector"""
 
     def __init__(self, normal: Vec2, p: Vec2, normalize_direction: bool = True):
-        super(Plane2, self).__init__()
+        super().__init__()
         # the plane equation -> normal * x - d = 0
         # or normal (x - p) = 0 should hold for any vector on the plane, i.e.
         # perpendicular to the surface normal
         self._normal = normal.to_unit() if normalize_direction else normal
         self._p = p
-        self._w = Vec2.dot(normal, p)
+        self._w = Vec2.dot(self._normal, p)
 
     @property
     def normal(self):
@@ -30,4 +30,4 @@ class Plane2:
         return m == self._w
 
     def __repr__(self):
-        return "Plane2: {} * x - {} = 0".format(self._normal, self._w)
+        return f"Plane2: {self._normal} * x - {self._w} = 0"

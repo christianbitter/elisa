@@ -13,13 +13,11 @@ def weight(m: float, gravitational_force: float) -> float:
 
 
 class constants:
-    """"""
-
     def __init__(
         self,
     ):
         """Constructor for constants"""
-        super(constants, self).__init__()
+        super().__init__()
 
     """
     Gravitional constant G
@@ -31,4 +29,4 @@ class constants:
 
 
 def gravitational_force(m1: float, m2: float, r: float):
-    return constants.G * m1 * m2 / r ** 2
+    return constants.G * m1 * m2 / r**2

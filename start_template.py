@@ -1,9 +1,19 @@
 # auth: christian bitter
 # name: start_template
 # desc: the starting template
-# vers: 0.5
+# vers: 0.6
 
 import pygame
+
+C_BLACK = (0, 0, 0)
+C_WHITE = (255, 255, 255)
+C_BLUE = (0, 0, 255)
+C_RED = (255, 0, 0)
+C_GREEN = (0, 255, 0)
+
+def render(surface, renderables):
+    # your rendering code goes here
+    pass
 
 
 def main():
@@ -25,6 +35,8 @@ def main():
     back_buffer = back_buffer.convert()
     back_buffer.fill(c_white)
 
+    renderables = []
+
     fps_watcher = pygame.time.Clock()
     is_done = False
 
@@ -35,6 +47,8 @@ def main():
             if event.type == pygame.QUIT:
                 is_done = True
                 break
+
+        render(back_buffer, renderables)
 
         if not is_done:
             screen_buffer.blit(back_buffer, (0, 0))

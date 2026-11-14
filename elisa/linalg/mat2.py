@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import math
-from .linalg import is_numeric
+
+from .linalg import H2_PI, TWO_PI, is_numeric
 
 # TODO: is orthogonal
 # TODO: is orthonormal
@@ -53,7 +54,7 @@ class Mat2:
                 self._v[3] + other[3],
             )
         else:
-            raise ValueError("Cannot add with this type: {}".format(type(other)))
+            raise ValueError(f"Cannot add with this type: {type(other)}")
 
     def __sub__(self, other) -> Mat2:
         """Subtract two matrices. If the other value is a numeric it is broadcasted onto all of the matrix elements.
@@ -79,7 +80,7 @@ class Mat2:
                 self._v[3] - other[3],
             )
         else:
-            raise ValueError("Cannot sub with this type: {}".format(type(other)))
+            raise ValueError(f"Cannot sub with this type: {type(other)}")
 
     def __mul__(self, other):
         if not other:
@@ -103,7 +104,7 @@ class Mat2:
                 self._v[1] * other[3],
             )
         else:
-            raise ValueError("Cannot mul with this type: {}".format(type(other)))
+            raise ValueError(f"Cannot mul with this type: {type(other)}")
 
     def __truediv__(self, other):
         if not other:
@@ -119,7 +120,7 @@ class Mat2:
         elif isinstance(other, Mat2):
             return self * Mat2.inverse(other)
         else:
-            raise ValueError("Cannot divide with this type: {}".format(type(other)))
+            raise ValueError(f"Cannot divide with this type: {type(other)}")
 
     @property
     def a(self):
@@ -138,15 +139,15 @@ class Mat2:
         return self._v[3]
 
     @property
-    def trace(self):
+    def trace(self) -> float:
         return self._v[0] + self._v[3]
 
     @property
-    def diag(self):
+    def diag(self) -> list:
         return [self._v[0], self._v[3]]
 
     @property
-    def det(self):
+    def det(self) -> float:
         return Mat2.determinant(self)
 
     @property
@@ -172,31 +173,56 @@ class Mat2:
         return m.t
 
     @property
-    def c0(self):
+    def c0(self) -> list:
         return [self._v[0], self._v[2]]
 
     @property
-    def c1(self):
+    def c1(self) -> list:
         return [self._v[1], self._v[3]]
 
     @property
-    def r0(self):
+    def r0(self) -> list:
         return [self._v[0], self._v[1]]
 
     @property
-    def r1(self):
+    def r1(self) -> list:
         return [self._v[2], self._v[3]]
 
     @property
-    def t(self):
+    def t(self) -> Mat2:
         return Mat2(self._v[0], self._v[2], self._v[1], self._v[3])
 
+    @staticmethod
+    def create_rotation(alpha: float) -> Mat2:
+        """Create the 2D rotation matrix. Anti clockwise rotation is positive alpha, else negative when in clockwise direction
+
+        Args:
+            alpha (float): the rotation angle in radians.
+
+        Returns:
+            Mat2: the rotation matrix
+        """
+
+        if alpha > TWO_PI:
+            alpha -= TWO_PI
+
+        if math.isclose(alpha, H2_PI):
+            return Mat2(0, -1.0, 1.0, 0.0)
+        if math.isclose(alpha, -H2_PI):
+            return Mat2(0.0, 1.0, -1.0, 0.0)
+
+        cosa = math.cos(alpha)
+        sina = math.sin(alpha)
+
+        if alpha < 0:
+            sina = -sina
+
+        return Mat2(cosa, -sina, sina, cosa)
+
     def __str__(self):
-        return """[Mat2]
-                [{}, {}
-                 {}, {}]""".format(
-            self._v[0], self._v[1], self._v[2], self._v[3]
-        )
+        return f"""[Mat2]
+                [{self._v[0]}, {self._v[1]}
+                 {self._v[2]}, {self._v[3]}]"""
 
 
 zero2 = Mat2(0.0, 0.0, 0.0, 0.0)

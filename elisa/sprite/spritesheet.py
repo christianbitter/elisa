@@ -1,24 +1,30 @@
 from __future__ import annotations
 
-import os
 import json
-from uuid import uuid4
-from .sprites import load_image, load_png
-from .sprite import Sprite
-from pygame import Surface, PixelArray
+import os
 import xml.etree.ElementTree
+from uuid import uuid4
 
+from pygame import PixelArray, Surface
+
+from .sprite import Sprite
+from .sprites import load_image, load_png
+
+# TODO: remove the dependency on json descriptor, it is only needed for initialization/ creation
+# TODO: move to logging
 
 # TODO: modification is only possible if not yet initialized
 # TODO: serialize to json/dict struct, remove the internal id and persist to file
 # TODO: add sprite (that does not exist) from the underlying image source
 # TODO: remove sprite
 # TODO: the color key is not currently used
-class SpriteSheet(object):
+
+
+class SpriteSheet:
     """A collection of Sprite objects defined within the same underlying image data source."""
 
-    def __init__(self, json_descriptor: str):
-        super(SpriteSheet, self).__init__()
+    def __init__(self, json_descriptor: str = None):
+        super().__init__()
         self._descriptor = json_descriptor
         self._sprites = {}
         self._id = uuid4()
@@ -73,13 +79,12 @@ class SpriteSheet(object):
             self._image, r = load_image(self._image_path, self._color_key)
 
         self._width, self._height = r.width, r.height
-        return None
 
     def initialize_from_spritemap(self, sprite_map: dict, **kwargs) -> SpriteSheet:
         """Explicitly initializes the SpriteSheet using a dictionary of relevant fields. This allows to integrate other Sprite map sources.
 
         Args:
-                        sprite_map (dict): The dictionary used to initialize the internal SpriteSheet members
+                        sprite_map (dict): The dictionary used to initialize the internal SpriteSheet members. sprite_map should contain these fields: name, width, height, image_path, no_sprites, sprites. Optional keys are description, color_key. Each sprite is a dict with the following keys: name, x, y, width, height.
 
         Raises:
                         ValueError: Raised when sprite_map is not presented or empty
@@ -110,7 +115,7 @@ class SpriteSheet(object):
             self._image_path = sprite_map["image_path"]
             self._no_sprites = sprite_map["no_sprites"]
 
-            self._color_key = sprite_map["color_key"]
+            self._color_key = sprite_map.get("color_key")
             if (
                 not self._color_key
                 or len(self._color_key) == 0
@@ -118,49 +123,53 @@ class SpriteSheet(object):
             ):
                 self._color_key = None
 
-            self._description = sprite_map["description"]
-            self._source = sprite_map["source"]
+            self._description = sprite_map.get("description")
+            self._source = sprite_map.get("source")
 
             if verbose:
                 print("Color Key Defined?: ", self._color_key)
 
-            self._load_image()
-            # load sprites
-            sprites = sprite_map["sprites"]
-            if verbose:
-                print("Source Image Surface: {}".format(self._image.get_rect()))
+            # if there are no sprites, why should we care to load them?
+            if self._no_sprites > 0:
 
-            for i, sprite_def in enumerate(sprites):
-                _n = sprite_def["name"]
-                x = sprite_def["x"]
-                y = sprite_def["y"]
-                w = sprite_def["width"]
-                h = sprite_def["height"]
-                if _n in self._name2id:
-                    raise ValueError("Sprite already registered with that name")
-
+                self._load_image()
+                # load sprites
+                sprites = sprite_map["sprites"]
                 if verbose:
-                    print("Loading subsurface:{}".format((x, y, w, h)))
-                sprite_img = self._image.subsurface(x, y, w, h)
+                    print(f"Source Image Surface: {self._image.get_rect()}")
 
-                _sprite = Sprite(
-                    _n,
-                    w,
-                    h,
-                    sprite_img,
-                    img_fp=self._image_path,
-                    color_key=self._color_key,
-                )
+                for i, sprite_def in enumerate(sprites):
+                    _n = sprite_def["name"]
+                    x = sprite_def["x"]
+                    y = sprite_def["y"]
+                    w = sprite_def["width"]
+                    h = sprite_def["height"]
+                    if _n in self._name2id:
+                        raise ValueError("Sprite already registered with that name")
 
-                self._sprites[_sprite.id] = _sprite
-                self._name2id[_n] = _sprite.id
+                    if verbose:
+                        print(f"Loading subsurface:{(x, y, w, h)}")
+                    sprite_img = self._image.subsurface(x, y, w, h)
 
-            if self._no_sprites > 0 and self._no_sprites != len(self._sprites):
-                raise ValueError(
-                    "Number of defined sprites does not match declared sprites"
-                )
+                    _sprite = Sprite(
+                        _n,
+                        w,
+                        h,
+                        sprite_img,
+                        img_fp=self._image_path,
+                        color_key=self._color_key,
+                    )
+
+                    self._sprites[_sprite.id] = _sprite
+                    self._name2id[_n] = _sprite.id
+
+                if self._no_sprites > 0 and self._no_sprites != len(self._sprites):
+                    raise ValueError(
+                        "Number of defined sprites does not match declared sprites"
+                    )
 
             self._initialized = True
+
         return self
 
     def initialize(self, **kwargs) -> SpriteSheet:
@@ -223,7 +232,7 @@ class SpriteSheet(object):
 
     def __repr__(self):
         _sn = self.sprite_names
-        return "Sprite Map: {} # sprites {} -> {}".format(self._id, len(_sn), _sn)
+        return f"Sprite Map: {self._id} # sprites {len(_sn)} -> {_sn}"
 
     @property
     def image(self) -> Surface:
@@ -363,4 +372,4 @@ def spritesheet_from_tiled(tsx_fp: str, **kwargs):
 
 class TextureAtlas(SpriteSheet):
     def __init__(self, descriptor_fp):
-        super(TextureAtlas, self).__init__(descriptor_fp)
+        super().__init__(descriptor_fp)

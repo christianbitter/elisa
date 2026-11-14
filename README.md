@@ -1,4 +1,5 @@
 # elisa
+
 A collection of Pygame - python game programming - tutorials focused on 2D games, starting from a simple template and gradually moving up the ladder.
 
 ## Introduction and Motivation
@@ -44,6 +45,65 @@ This is a quite simplistic example that does not involve a lot of visual tricker
 - **elisa_18_actor_camera.py**:  
 This is an integrated example binding together the composition of scenes via the entity-component-system approach (shown in elisa_16_-_ecs) and **allowing** for independent of game world specification and its depiction via a camera (introduced in elisa_14_camera). Now, what this example does is the following. The player represented by a simple circle, moves through a simple environment depicted by multiple somewhat arbitrarily placed boxes. A camera is setup that follows the player, i.e. the camera is offset by -50 in x and y from the player's position. When moving through the scene, you will see that objects are moved and eventually drop out of view, which is the expected behaviour. Furthermore, through the camera's internal transformation pipeline from world space to normalized clip space and then to viewport space, a very simple visibility test is implemented, which does not draw objects that are fully outside of the camera's field of reception.
 
+## Building Elisa
+
+The `elisa` package is located in the `elisa/` directory and is configured via `pyproject.toml`.
+
+### Prerequisites
+
+- Python 3.12 or newer
+- `pip` (usually bundled with Python)
+
+### Editable Install (for development)
+
+If you only want to use the library locally while running the example scripts, install it in editable mode from the project root:
+
+```bash
+python -m pip install -e .
+```
+
+This makes the `elisa` package importable from any of the example files without copying it around. Changes to the source take effect immediately.
+
+### Build a Distribution Package
+
+To build the distributable artifacts (a source distribution and a wheel), install the `build` tool once and run it from the project root:
+
+```bash
+python -m pip install --upgrade build
+python -m build
+```
+
+The generated files are written to the `dist/` directory:
+
+- `elisa-<version>.tar.gz` — source distribution (sdist)
+- `elisa-<version>-py3-none-any.whl` — wheel
+
+You can also build only one of them:
+
+```bash
+python -m build --sdist   # source distribution only
+python -m build --wheel   # wheel only
+```
+
+### Install the Built Package
+
+Install the wheel (or the sdist) into your environment:
+
+```bash
+python -m pip install dist/elisa-<version>-py3-none-any.whl
+```
+
+After installation, verify that the package is importable:
+
+```bash
+python -c "import elisa; print(elisa.__file__)"
+```
+
+### Notes
+
+- The build output in `dist/` (and the temporary `build/` directory) should not be committed to version control.
+- The example scripts expect the `asset/` directory to be present relative to the project root. The built wheel contains the library code only, not the example scripts or assets.
+
 ## Credits and References
 
-(c) Copyright Christian Bitter 2020
+(c) Copyright Christian Bitter 2026

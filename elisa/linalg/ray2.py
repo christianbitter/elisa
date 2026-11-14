@@ -25,7 +25,7 @@ class Ray2(object):
         self._normal = self._v.to_orthogonal()
 
     def at(self, t: float):
-        return self._u * t + self._v
+        return self._u + self._v * t
 
     @property
     def origin(self):

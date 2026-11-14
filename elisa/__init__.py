@@ -3,4 +3,5 @@ from .linalg.mat2 import Mat2
 from .linalg.vec2 import Point2, Vec2
 from .linalg.vec3 import Point3, Vec3
 from .linalg.vec4 import Vec4
+from .physix import Body, FixedStepAccumulator, World
 from .ui import ui, uifx
