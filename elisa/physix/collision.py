@@ -1,20 +1,27 @@
 import logging
 import math
 
-from ..linalg import Vec2, Point2, Mat2
+from ..linalg import Point2, Vec2
 from ..linalg.geom import AABB, Circle2
 from .manifold import Manifold
 
 logger = logging.getLogger(__name__)
 
-# TODO: construct the full manifold
-
-# - coincident circles: normal ``(0, 1)``, depth ``r_a + r_b``, contact
-#   ``a.center + normal * r_a``. The contact set is the whole circumference, so
-#   this is one documented representative on A's boundary, not "all points";
-
 
 def circle_circle(c1: Circle2, c2: Circle2) -> Manifold | None:
+    """computes the intersection between two circles. Two circles and can intersect in 0, 1, or two points.
+    Here, we treat the case of circles that are identical as a special case, with just one intersection.
+
+    Args:
+        c1 (Circle2): first circle
+        c2 (Circle2): second circle
+
+    Raises:
+        ValueError: if the circles are not provided
+
+    Returns:
+        Manifold | None: if the circles intersect, a manifold is returned.
+    """
     r12 = c1.radius + c2.radius
 
     if c1 == c2:
@@ -29,7 +36,7 @@ def circle_circle(c1: Circle2, c2: Circle2) -> Manifold | None:
     if any([d12 > r12, d12 + c2.radius < c1.radius, d12 + c1.radius < c2.radius]):
         return None
 
-    depth = 0.0
+    depth = c1.radius + c2.radius - d
     contacts = []
 
     if math.isclose(d12, r12):
@@ -78,5 +85,18 @@ def circle_circle(c1: Circle2, c2: Circle2) -> Manifold | None:
 
 
 def circle_aabb(c: Circle2, aabb: AABB) -> Manifold | None:
+    """computes the intersection of a circle with an aabb.
+    The circle may intersect with 0, 1, or 2 points on each of the manifolds half-planes/ lines.
+
+    Args:
+        c (Circle2): the circle
+        aabb (AABB): the aabb
+
+    Raises:
+        ValueError: if either object is not provided
+
+    Returns:
+        Manifold | None: in case there is an intersection a manifold is returned.
+    """
     # and circle_aabb for walls by clamping the centre into the box.
     raise ValueError("TODO: circle-aabb")
